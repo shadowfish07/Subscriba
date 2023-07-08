@@ -10,11 +10,11 @@ type Props = {
 
 function getDefaultUnit(value: string) {
   if (!value.length) {
-    return "日";
+    return "天";
   }
 
   if (value[value.length - 1] === "d") {
-    return "日";
+    return "天";
   } else if (value[value.length - 1] === "m") {
     return "月";
   } else {
@@ -23,11 +23,11 @@ function getDefaultUnit(value: string) {
 }
 
 export const TimeExtensionInput = ({ value, onChangeText }: Props) => {
-  const [unit, setUnit] = useState<"日" | "月" | "年">(getDefaultUnit(value));
+  const [unit, setUnit] = useState<"天" | "月" | "年">(getDefaultUnit(value));
   const [showMenu, setShowMenu] = useState(false);
 
   const handleChangeText = (value: string) => {
-    if (unit === "日") {
+    if (unit === "天") {
       onChangeText(value + "d");
     } else if (unit === "月") {
       onChangeText(value + "m");
@@ -57,9 +57,9 @@ export const TimeExtensionInput = ({ value, onChangeText }: Props) => {
                 style={{ width: 50 }}
               >
                 <Menu.Item
-                  title="日"
+                  title="天"
                   onPress={() => {
-                    setUnit("日");
+                    setUnit("天");
                     setShowMenu(false);
                   }}
                 />
@@ -87,8 +87,8 @@ export const TimeExtensionInput = ({ value, onChangeText }: Props) => {
         visible={["月", "年"].includes(unit)}
         style={{ marginTop: -10 }}
       >
-        {unit === "月" && "每月将折算成31日"}
-        {unit === "年" && "每年将折算成365日"}
+        {unit === "月" && "每月将折算成31天"}
+        {unit === "年" && "每年将折算成365天"}
       </HelperText>
     </View>
   );

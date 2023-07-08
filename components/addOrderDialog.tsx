@@ -4,33 +4,35 @@ import { globalStyles } from "../styles";
 import { MoneyInput } from "./moneyInput";
 import { DatePickerInput } from "react-native-paper-dates";
 import dayjs from "dayjs";
-import { DraftOrder } from "../types";
+import { DraftOrder, SubscriptionPlanType } from "../types";
 import { TimeExtensionInput } from "./timeExtensionInput";
 
 type Props = {
   visible: boolean;
   onConfirm: (draftOrder: DraftOrder) => void;
   onCancel: () => void;
-  isTimeExtensionForever?: boolean;
+  subscriptionPlanType: SubscriptionPlanType;
 };
 
 export const AddOrderDialog = ({
   visible,
   onCancel,
   onConfirm,
-  isTimeExtensionForever,
+  subscriptionPlanType,
 }: Props) => {
   const [price, setPrice] = useState("");
   const [orderDate, setOrderDate] = useState(dayjs().valueOf());
   const [timeExtension, setTimeExtension] = useState(
-    isTimeExtensionForever ? "-1d" : "1m"
+    subscriptionPlanType === SubscriptionPlanType.Buyout ? "0d" : "1m"
   );
   const [note, setNote] = useState("");
 
   const init = () => {
     setPrice("");
     setOrderDate(dayjs().valueOf());
-    setTimeExtension(isTimeExtensionForever ? "-1d" : "1m");
+    setTimeExtension(
+      subscriptionPlanType === SubscriptionPlanType.Buyout ? "0d" : "1m"
+    );
     setNote("");
   };
 
@@ -45,6 +47,7 @@ export const AddOrderDialog = ({
       note,
       orderDate,
       timeExtension,
+      subscriptionPlanType,
     });
     onCancel();
   };
@@ -64,7 +67,7 @@ export const AddOrderDialog = ({
             style={globalStyles.textInput}
             inputMode="start"
           />
-          {!isTimeExtensionForever && (
+          {subscriptionPlanType !== SubscriptionPlanType.Buyout && (
             <TimeExtensionInput
               value={timeExtension}
               onChangeText={setTimeExtension}

@@ -1,5 +1,5 @@
 import { Card, Text, useTheme } from "react-native-paper";
-import { DraftOrder } from "../../../types";
+import { DraftOrder, SubscriptionPlanType } from "../../../types";
 import { formatDate } from "../../../util/formatDate";
 import { View } from "react-native";
 import { rawTimeExtension2String } from "../../../util/rawTimeExtension2String";
@@ -23,7 +23,7 @@ export const OrderItem = ({ draftOrder }: Props) => {
           </View>
           <View style={{ justifyContent: "center" }}>
             <Text variant="titleMedium" style={{ color: theme.colors.primary }}>
-              {draftOrder.timeExtension === "-1d"
+              {draftOrder.subscriptionPlanType === SubscriptionPlanType.Buyout
                 ? "永久"
                 : "+" + rawTimeExtension2String(draftOrder.timeExtension)}
             </Text>

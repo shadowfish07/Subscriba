@@ -61,6 +61,7 @@ export const DraftManualSubscriptionPlanCard = ({
         isDraft={true}
         orders={usingForm.orders}
         onChange={(orders) => usingSetFormKey("orders", orders)}
+        subscriptionPlanType={SubscriptionPlanType.Manual}
       />
     </DraftPlanCard>
   );

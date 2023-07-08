@@ -1,7 +1,7 @@
 import { Button, Text } from "react-native-paper";
 import { OrderItem } from "./orderItem";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
-import { DraftOrder } from "../../../types";
+import { DraftOrder, SubscriptionPlanType } from "../../../types";
 import { AddOrderDialog } from "../../../components/addOrderDialog";
 import { useMemo, useState } from "react";
 import { OrdersModal } from "../../../modals";
@@ -12,7 +12,7 @@ type BaseTypes = {
   onChange?: (orders: DraftOrder[]) => void;
   onAdd?: (order: DraftOrder) => void;
   containerStyle?: StyleProp<ViewStyle>;
-  isTimeExtensionForever?: boolean;
+  subscriptionPlanType: SubscriptionPlanType;
 };
 
 type DraftProps = BaseTypes & {
@@ -32,7 +32,7 @@ const defaultContainerStyle = {
 };
 
 export const Orders = ({
-  isTimeExtensionForever,
+  subscriptionPlanType,
   orders,
   onChange,
   onAdd,
@@ -50,9 +50,13 @@ export const Orders = ({
   );
 
   const canDisplayAddOrderButton = () => {
-    const isFirstBuyout = isTimeExtensionForever && orders.length === 0;
+    const isFirstBuyout =
+      subscriptionPlanType === SubscriptionPlanType.Buyout &&
+      orders.length === 0;
 
-    return isFirstBuyout || !isTimeExtensionForever;
+    return (
+      isFirstBuyout || subscriptionPlanType !== SubscriptionPlanType.Buyout
+    );
   };
 
   return (
@@ -90,7 +94,7 @@ export const Orders = ({
           if (onChange) onChange([...orders, order]);
           if (onAdd) onAdd(order);
         }}
-        isTimeExtensionForever={isTimeExtensionForever}
+        subscriptionPlanType={subscriptionPlanType}
       />
     </View>
   );

@@ -61,7 +61,7 @@ export const DraftBuyoutSubscriptionPlanCard = ({
         isDraft={true}
         orders={usingForm.orders}
         onChange={(orders) => usingSetFormKey("orders", orders)}
-        isTimeExtensionForever
+        subscriptionPlanType={SubscriptionPlanType.Buyout}
       />
     </DraftPlanCard>
   );

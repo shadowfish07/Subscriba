@@ -129,6 +129,7 @@ const ManualSubscriptionPlanComp = ({
         containerStyle={{ marginHorizontal: 16 }}
         orders={plan.orders}
         onAdd={onAddOrder}
+        subscriptionPlanType={SubscriptionPlanType.Manual}
       />
     </Card>
   );
@@ -168,7 +169,7 @@ const BuyoutSubscriptionPlanComp = ({
         containerStyle={{ marginHorizontal: 16 }}
         orders={plan.orders}
         onAdd={onAddOrder}
-        isTimeExtensionForever
+        subscriptionPlanType={SubscriptionPlanType.Buyout}
       />
     </Card>
   );

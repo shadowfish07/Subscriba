@@ -20,7 +20,7 @@ export function usePerUnit(): ReturnType {
     (orders: OrdersModal[]) => {
       function calculateNonBuyout() {
         const nonBuyoutOrders = orders.filter(
-          (order) => order.timeExtension != "-1d"
+          (order) => order.subscriptionPlanType !== SubscriptionPlanType.Buyout
         );
         const priceSum = nonBuyoutOrders.reduce((prev, curr) => {
           const currentMoney = new Money(curr.price);
@@ -51,7 +51,7 @@ export function usePerUnit(): ReturnType {
        */
       function calculateBuyout() {
         const buyoutOrders = orders.filter(
-          (order) => order.timeExtension == "-1d"
+          (order) => order.subscriptionPlanType === SubscriptionPlanType.Buyout
         );
         const priceSum = buyoutOrders.reduce((prev, curr) => {
           const currentMoney = new Money(curr.price);
