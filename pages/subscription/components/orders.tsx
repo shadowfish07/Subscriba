@@ -1,7 +1,7 @@
 import { Button, Text } from "react-native-paper";
 import { OrderItem } from "./orderItem";
 import { StyleProp, StyleSheet, View, ViewStyle } from "react-native";
-import { DraftOrder, SubscriptionPlanType } from "../../../types";
+import { DraftOrder, OrderType } from "../../../types";
 import { AddOrderDialog } from "../../../components/addOrderDialog";
 import { useMemo, useState } from "react";
 import { OrdersModal } from "../../../modals";
@@ -12,7 +12,6 @@ type BaseTypes = {
   onChange?: (orders: DraftOrder[]) => void;
   onAdd?: (order: DraftOrder) => void;
   containerStyle?: StyleProp<ViewStyle>;
-  subscriptionPlanType: SubscriptionPlanType;
 };
 
 type DraftProps = BaseTypes & {
@@ -31,13 +30,7 @@ const defaultContainerStyle = {
   marginVertical: 8,
 };
 
-export const Orders = ({
-  subscriptionPlanType,
-  orders,
-  onChange,
-  onAdd,
-  containerStyle,
-}: Props) => {
+export const Orders = ({ orders, onChange, onAdd, containerStyle }: Props) => {
   const [showDialog, setShowDialog] = useState(false);
 
   const totalCost = useMemo(() => {
@@ -48,16 +41,6 @@ export const Orders = ({
     defaultContainerStyle,
     containerStyle
   );
-
-  const canDisplayAddOrderButton = () => {
-    const isFirstBuyout =
-      subscriptionPlanType === SubscriptionPlanType.Buyout &&
-      orders.length === 0;
-
-    return (
-      isFirstBuyout || subscriptionPlanType !== SubscriptionPlanType.Buyout
-    );
-  };
 
   return (
     <View style={mergedStyles}>
@@ -77,15 +60,13 @@ export const Orders = ({
       {orders.map((order, index) => (
         <OrderItem key={index} draftOrder={order} />
       ))}
-      {canDisplayAddOrderButton() && (
-        <Button
-          mode="contained-tonal"
-          style={{ marginTop: 10 }}
-          onPress={() => setShowDialog(true)}
-        >
-          添加订单
-        </Button>
-      )}
+      <Button
+        mode="contained-tonal"
+        style={{ marginTop: 10 }}
+        onPress={() => setShowDialog(true)}
+      >
+        添加订单
+      </Button>
       <AddOrderDialog
         visible={showDialog}
         onCancel={() => setShowDialog(false)}
@@ -94,7 +75,6 @@ export const Orders = ({
           if (onChange) onChange([...orders, order]);
           if (onAdd) onAdd(order);
         }}
-        subscriptionPlanType={subscriptionPlanType}
       />
     </View>
   );

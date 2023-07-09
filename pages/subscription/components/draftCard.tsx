@@ -2,14 +2,12 @@ import { Card, Button } from "react-native-paper";
 import { globalStyles } from "../../../styles";
 
 type Props = {
-  title: string;
   children: React.ReactNode;
   showSaveButton?: boolean;
   onSave?: () => void;
   onCancel?: () => void;
 };
-export const DraftPlanCard = ({
-  title,
+export const DraftCard = ({
   children,
   showSaveButton,
   onSave,
@@ -17,7 +15,6 @@ export const DraftPlanCard = ({
 }: Props) => {
   return (
     <Card style={globalStyles.card}>
-      <Card.Title title={title} />
       <Card.Content>{children}</Card.Content>
       <Card.Actions style={{ marginTop: 20 }}>
         <Button mode="text" onPress={() => onCancel()}>

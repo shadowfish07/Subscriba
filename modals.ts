@@ -1,82 +1,58 @@
-import { SubscriptionPlanType } from "./types";
+import { OrderType, PaymentCycle } from "./types";
 
-/**
- * 由于 created的默认值设为number时间戳需要用触发器，
- * 目前 created/updated的时间格式为字符串，其他业务时间应使用number
- */
-
-export type AutoSubscriptionPlanModal = {
+export type BaseModal = {
   id: number;
-  subscriptionId: number;
-  serviceName: string;
-  startAt: number;
-  protocolPrice: number;
-  paymentCycle: number;
-  createdAt: string;
-  updatedAt: string;
-  /**
-   * select计算值
-   */
-  type: SubscriptionPlanType.Auto;
+  createdAt: number;
+  updatedAt: number;
 };
 
-export type BuyoutSubscriptionPlanModal = {
-  id: number;
-  subscriptionId: number;
-  serviceName: string;
-  createdAt: string;
-  updatedAt: string;
-  /**
-   * select计算值
-   */
-  type: SubscriptionPlanType.Buyout;
-};
-
-export type ManualSubscriptionPlanModal = {
-  id: number;
-  subscriptionId: number;
-  serviceName: string;
-  createdAt: string;
-  updatedAt: string;
-  /**
-   * select计算值
-   */
-  type: SubscriptionPlanType.Manual;
-};
-
-export type SubscriptionModal = {
-  id: number;
+export type SubscriptionModal = BaseModal & {
   appName: string;
   note: string;
-  createdAt: string;
-  updatedAt: string;
 };
 
-export type TagModal = {
-  id: number;
+export type TagModal = BaseModal & {
   name: string;
   color: string;
-  createdAt: string;
-  updatedAt: string;
 };
 
-export type OrdersModal = {
-  id: number;
-  subscriptionPlanId: number;
-  subscriptionPlanType: SubscriptionPlanType;
+type BaseOrdersModal = {
+  serviceId: number;
   price: string;
   discount: string;
   note: string;
   /**
+   * 订单时间（下单时间）
+   */
+  orderDate: number;
+  /**
    * 生效时间
    * 每个订单的生效时间区间不能重叠
    */
-  orderDate: number;
+  activeDate: number;
   /**
    * 订单增加的有效时间
    * 1d 目前都用这种格式存储
    */
   timeExtension: string;
-  createdAt: string;
-  updatedAt: string;
+};
+
+type NonAutoSubscriptionModal = {
+  type: OrderType.Buyout | OrderType.Manual;
+};
+
+type AutoSubscriptionModal = {
+  type: OrderType.Auto;
+  autoProtocolPrice: string;
+  autoPaymentCycle: PaymentCycle;
+};
+
+export type OrdersModal = BaseModal &
+  BaseOrdersModal &
+  (NonAutoSubscriptionModal | AutoSubscriptionModal);
+
+export type ServiceModal = BaseModal & {
+  subscriptionId: number;
+  name: string;
+  note: string;
 };

@@ -8,7 +8,7 @@ import { useData } from "../hooks/useData";
 export const MoneyWithPerCost = () => {
   const theme = useTheme();
   const { unit, setUnit, calculatePerCost } = usePerUnit();
-  const { data: allOrders } = useData("selectOrders", []);
+  const { data: allOrders } = useData("selectAllOrders", []);
 
   if (!allOrders) return null;
   const handleSetUnit = () => {

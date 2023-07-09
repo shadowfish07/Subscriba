@@ -1,38 +1,37 @@
 import { useState } from "react";
-import { Portal, Dialog, Button, Text, TextInput } from "react-native-paper";
+import {
+  Portal,
+  Dialog,
+  Button,
+  Text,
+  TextInput,
+  SegmentedButtons,
+} from "react-native-paper";
 import { globalStyles } from "../styles";
 import { MoneyInput } from "./moneyInput";
 import { DatePickerInput } from "react-native-paper-dates";
 import dayjs from "dayjs";
-import { DraftOrder, SubscriptionPlanType } from "../types";
+import { DraftOrder, OrderType } from "../types";
 import { TimeExtensionInput } from "./timeExtensionInput";
 
 type Props = {
   visible: boolean;
   onConfirm: (draftOrder: DraftOrder) => void;
   onCancel: () => void;
-  subscriptionPlanType: SubscriptionPlanType;
 };
 
-export const AddOrderDialog = ({
-  visible,
-  onCancel,
-  onConfirm,
-  subscriptionPlanType,
-}: Props) => {
+export const AddOrderDialog = ({ visible, onCancel, onConfirm }: Props) => {
   const [price, setPrice] = useState("");
-  const [orderDate, setOrderDate] = useState(dayjs().valueOf());
-  const [timeExtension, setTimeExtension] = useState(
-    subscriptionPlanType === SubscriptionPlanType.Buyout ? "0d" : "1m"
-  );
+  const [activeDate, setActiveDate] = useState(dayjs().valueOf());
+  const [orderType, setOrderType] = useState(OrderType.Manual);
+  const [timeExtension, setTimeExtension] = useState("1m");
   const [note, setNote] = useState("");
 
   const init = () => {
     setPrice("");
-    setOrderDate(dayjs().valueOf());
-    setTimeExtension(
-      subscriptionPlanType === SubscriptionPlanType.Buyout ? "0d" : "1m"
-    );
+    setActiveDate(dayjs().valueOf());
+    setOrderType(OrderType.Manual);
+    setTimeExtension("1m");
     setNote("");
   };
 
@@ -45,9 +44,11 @@ export const AddOrderDialog = ({
     onConfirm({
       price,
       note,
-      orderDate,
+      orderDate: activeDate,
       timeExtension,
-      subscriptionPlanType,
+      type: orderType,
+      discount: "",
+      activeDate,
     });
     onCancel();
   };
@@ -57,17 +58,33 @@ export const AddOrderDialog = ({
       <Dialog visible={visible} onDismiss={onCancel}>
         <Dialog.Title>新建订单</Dialog.Title>
         <Dialog.Content>
+          <SegmentedButtons
+            value={orderType.toString()}
+            onValueChange={(value) => setOrderType(Number(value))}
+            buttons={[
+              {
+                value: OrderType.Manual.toString(),
+                label: "手动订阅",
+              },
+              {
+                value: OrderType.Buyout.toString(),
+                label: "买断",
+              },
+              // { value: OrderType.Auto.toString(), label: "连续包年" },
+            ]}
+            style={{ marginBottom: 5 }}
+          />
           <MoneyInput label="金额" onChangeText={setPrice} value={price} />
           <DatePickerInput
             locale="zh"
             mode="outlined"
             label="生效时间"
-            value={new Date(orderDate)}
-            onChange={(value) => setOrderDate(dayjs(value).valueOf())}
+            value={new Date(activeDate)}
+            onChange={(value) => setActiveDate(dayjs(value).valueOf())}
             style={globalStyles.textInput}
             inputMode="start"
           />
-          {subscriptionPlanType !== SubscriptionPlanType.Buyout && (
+          {orderType !== OrderType.Buyout && (
             <TimeExtensionInput
               value={timeExtension}
               onChangeText={setTimeExtension}

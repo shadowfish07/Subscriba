@@ -1,27 +1,12 @@
+import { SQLTransaction, WebSQLDatabase } from "expo-sqlite";
 import {
-  SQLResultSetRowList,
-  SQLTransaction,
-  WebSQLDatabase,
-} from "expo-sqlite";
-import {
-  DraftOrder,
   DraftSubscription,
-  PriceInfoOfSubscriptionPlan,
   Subscription,
   SubscriptionDetail,
-  SubscriptionPlanType,
-  SupportedDraftSubscriptionPlans,
+  Draft,
+  Service,
 } from "../types";
-import {
-  AutoSubscriptionPlanModal,
-  BuyoutSubscriptionPlanModal,
-  ManualSubscriptionPlanModal,
-  OrdersModal,
-  SubscriptionModal,
-} from "../modals";
-import dayjs from "dayjs";
-import { Money } from "./money";
-import { merge } from "lodash";
+import { OrdersModal, ServiceModal, SubscriptionModal } from "../modals";
 
 export class DatabaseService {
   constructor(private db: WebSQLDatabase) {}
@@ -38,7 +23,7 @@ export class DatabaseService {
           (tx) => {
             tx.executeSql(sql, args, (_, { rows }) => {
               console.info(
-                "exec sql(mode 1)",
+                "exec sql(mode 1) success",
                 sql,
                 JSON.stringify(args),
                 rows._array
@@ -47,10 +32,7 @@ export class DatabaseService {
             });
           },
           (error) => {
-            console.error(
-              "🚀 ~ file: databaseService.ts:55 ~ DatabaseService ~ returnnewPromise ~ error:",
-              error
-            );
+            console.error("SQL error:", sql, JSON.stringify(args), error);
             reject(error);
             return true;
           }
@@ -61,7 +43,7 @@ export class DatabaseService {
           args,
           (_, { rows }) => {
             console.info(
-              "exec sql(mode 2)",
+              "exec sql(mode 2) success",
               sql,
               JSON.stringify(args),
               rows._array
@@ -82,11 +64,7 @@ export class DatabaseService {
     });
   };
 
-  insertOrder = async (
-    subscriptionPlanId: number,
-    subscriptionPlanType: number,
-    order: DraftOrder
-  ): Promise<unknown[]> => {
+  insertOrder = async (order: Draft<OrdersModal>): Promise<unknown[]> => {
     function transformTimeExtensionToDayUnit(value: string) {
       if (value[value.length - 1] === "d") {
         return value;
@@ -98,16 +76,24 @@ export class DatabaseService {
     }
 
     return this.executeSql(
-      "INSERT INTO orders (subscriptionPlanId,subscriptionPlanType,price,discount,note,orderDate,timeExtension) VALUES (?,?,?,?,?,?,?)",
+      "INSERT INTO orders (serviceId,type,price,discount,note,orderDate,activeDate,timeExtension) VALUES (?,?,?,?,?,?,?,?)",
       [
-        subscriptionPlanId,
-        subscriptionPlanType,
+        order.serviceId,
+        order.type,
         order.price,
         null,
         order.note,
         order.orderDate,
+        order.activeDate,
         transformTimeExtensionToDayUnit(order.timeExtension),
       ]
+    );
+  };
+
+  insertService = async (service: Draft<ServiceModal>): Promise<unknown[]> => {
+    return this.executeSql(
+      "INSERT INTO service (subscriptionId,name,note) VALUES (?,?,?)",
+      [service.subscriptionId, service.name, service.note]
     );
   };
 
@@ -139,47 +125,16 @@ export class DatabaseService {
 
           const subscriptionId = await this.getLastInsertRowId();
 
-          for (const plan of draftSubscription.subscriptionPlans) {
-            let subscriptionPlanId: number;
-            switch (plan.type) {
-              case SubscriptionPlanType.Manual:
-                await this.executeSql(
-                  "INSERT INTO manual_subscription_plan (subscriptionId,serviceName) VALUES (?,?)",
-                  [subscriptionId, plan.serviceName]
-                );
-                subscriptionPlanId = await this.getLastInsertRowId();
-                for (const order of plan.orders) {
-                  await this.insertOrder(
-                    subscriptionPlanId,
-                    SubscriptionPlanType.Manual,
-                    order
-                  );
-                }
-                break;
-              case SubscriptionPlanType.Buyout:
-                await this.executeSql(
-                  "INSERT INTO buyout_subscription_plan (subscriptionId,serviceName) VALUES (?,?)",
-                  [subscriptionId, plan.serviceName]
-                );
-                subscriptionPlanId = await this.getLastInsertRowId();
-                for (const order of plan.orders) {
-                  await this.insertOrder(
-                    subscriptionPlanId,
-                    SubscriptionPlanType.Buyout,
-                    order
-                  );
-                }
-                break;
-              case SubscriptionPlanType.Auto:
-                await this.executeSql(
-                  "INSERT INTO auto_subscription_plan (subscriptionId,serviceName,startAt,protocolPrice,paymentCycle) VALUES (LAST_INSERT_ROWID(),?,?,?,?)",
-                  [
-                    plan.serviceName,
-                    plan.startAt,
-                    plan.protocolPrice,
-                    plan.paymentCycle,
-                  ]
-                );
+          for (const service of draftSubscription.services) {
+            await this.insertService({
+              ...service,
+              subscriptionId: subscriptionId,
+            });
+
+            const serviceId = await this.getLastInsertRowId();
+
+            for (const order of service.orders) {
+              await this.insertOrder({ ...order, serviceId: serviceId });
             }
           }
 
@@ -207,97 +162,42 @@ export class DatabaseService {
     )[0];
   };
 
-  selectOrders = async (): Promise<OrdersModal[]> => {
-    return this.executeSql("SELECT * FROM orders");
+  selectAllOrders = async (): Promise<OrdersModal[]> => {
+    return this.executeSql<OrdersModal>("SELECT * FROM orders");
   };
 
-  selectManualSubscriptionPlans = async (
-    subscriptionId: number
-  ): Promise<ManualSubscriptionPlanModal[]> => {
-    return this.executeSql(
-      "SELECT *, 0 AS type FROM manual_subscription_plan WHERE subscriptionId = ?",
+  selectOrders = async (serviceId: number): Promise<OrdersModal[]> => {
+    return this.executeSql("SELECT * FROM orders WHERE serviceId = ?", [
+      serviceId,
+    ]);
+  };
+
+  selectServices = async (subscriptionId: number): Promise<ServiceModal[]> => {
+    return this.executeSql<ServiceModal>(
+      "SELECT * FROM service WHERE subscriptionId = ?",
       [subscriptionId]
     );
   };
 
-  selectAutoSubscriptionPlans = async (
+  selectOrdersOfSubscription = async (
     subscriptionId: number
-  ): Promise<AutoSubscriptionPlanModal[]> => {
-    return this.executeSql(
-      "SELECT *, 1 AS type FROM auto_subscription_plan WHERE subscriptionId = ?",
+  ): Promise<OrdersModal[]> => {
+    return this.executeSql<OrdersModal>(
+      `SELECT * FROM orders WHERE serviceId IN (
+        SELECT id FROM service WHERE subscriptionId = ?
+      )`,
       [subscriptionId]
     );
-  };
-
-  selectBuyoutSubscriptionPlans = async (
-    subscriptionId: number
-  ): Promise<BuyoutSubscriptionPlanModal[]> => {
-    return this.executeSql(
-      "SELECT *, 2 AS type FROM buyout_subscription_plan WHERE subscriptionId = ?",
-      [subscriptionId]
-    );
-  };
-
-  getPriceInfoOfSubscriptionPlan = async (
-    subscriptionPlanId: number,
-    subscriptionPlanType: SubscriptionPlanType
-  ): Promise<PriceInfoOfSubscriptionPlan> => {
-    const orders = await this.executeSql<OrdersModal>(
-      "SELECT * FROM orders WHERE subscriptionPlanId = ? AND subscriptionPlanType = ?",
-      [subscriptionPlanId, subscriptionPlanType]
-    );
-    const totalPrice = Money.sum(
-      ...orders.map((order) => order.price)
-    ).toString();
-    return {
-      totalPrice,
-      orders,
-    };
   };
 
   getSubscriptionList = async (): Promise<Subscription[]> => {
-    const getOrdersOfPlans = async (
-      plans: (
-        | ManualSubscriptionPlanModal
-        | BuyoutSubscriptionPlanModal
-        | AutoSubscriptionPlanModal
-      )[]
-    ) => {
-      let result = [];
-      for (const plan of plans) {
-        const orders = await this.executeSql<OrdersModal>(
-          "SELECT * FROM orders WHERE subscriptionPlanId = ? AND subscriptionPlanType = ? ORDER BY orderDate ASC",
-          [plan.id, plan.type]
-        );
-        result = result.concat(orders);
-      }
-
-      return result;
-    };
-
     const result = [];
     const subscriptions = await this.selectSubscriptions();
 
     for (const subscription of subscriptions) {
-      const manualSubscriptionPlans = await this.selectManualSubscriptionPlans(
-        subscription.id
-      );
-      const autoSubscriptionPlans = await this.selectAutoSubscriptionPlans(
-        subscription.id
-      );
-      const buyoutSubscriptionPlans = await this.selectBuyoutSubscriptionPlans(
-        subscription.id
-      );
-
-      const orders = [
-        ...(await getOrdersOfPlans(manualSubscriptionPlans)),
-        ...(await getOrdersOfPlans(autoSubscriptionPlans)),
-        ...(await getOrdersOfPlans(buyoutSubscriptionPlans)),
-      ];
-
       result.push({
         ...subscription,
-        orders,
+        orders: await this.selectOrdersOfSubscription(subscription.id),
       });
     }
 
@@ -307,79 +207,16 @@ export class DatabaseService {
   getSubscriptionDetail = async (
     subscriptionId: number
   ): Promise<SubscriptionDetail> => {
-    const mergePriceInfo = async (
-      plans: (
-        | ManualSubscriptionPlanModal
-        | BuyoutSubscriptionPlanModal
-        | AutoSubscriptionPlanModal
-      )[]
-    ) => {
-      for (const plan of plans) {
-        merge(
-          plan,
-          await this.getPriceInfoOfSubscriptionPlan(plan.id, plan.type)
-        );
-      }
-    };
-
     const basicInfo = await this.selectSubscription(subscriptionId);
+    const services = (await this.selectServices(subscriptionId)) as Service[];
 
-    const manualSubscriptionPlans = await this.selectManualSubscriptionPlans(
-      subscriptionId
-    );
-
-    const autoSubscriptionPlans = await this.selectAutoSubscriptionPlans(
-      subscriptionId
-    );
-    const buyoutSubscriptionPlans = await this.selectBuyoutSubscriptionPlans(
-      subscriptionId
-    );
-
-    await mergePriceInfo(manualSubscriptionPlans);
-    await mergePriceInfo(autoSubscriptionPlans);
-    await mergePriceInfo(buyoutSubscriptionPlans);
+    for (const service of services) {
+      service.orders = await this.selectOrders(service.id);
+    }
 
     return {
       basicInfo,
-      subscriptionPlans: []
-        .concat(manualSubscriptionPlans)
-        .concat(autoSubscriptionPlans)
-        .concat(buyoutSubscriptionPlans)
-        .sort(
-          (a, b) => dayjs(b.createdAt).valueOf() - dayjs(a.createdAt).valueOf()
-        ),
+      services,
     };
-  };
-
-  insertSubscriptionPlan = async (
-    subscriptionId: number,
-    plan: SupportedDraftSubscriptionPlans
-  ): Promise<void> => {
-    switch (plan.type) {
-      case SubscriptionPlanType.Manual:
-        await this.executeSql(
-          "INSERT INTO manual_subscription_plan (subscriptionId,serviceName) VALUES (?,?)",
-          [subscriptionId, plan.serviceName]
-        );
-        break;
-      case SubscriptionPlanType.Auto:
-        await this.executeSql(
-          "INSERT INTO auto_subscription_plan (subscriptionId,serviceName,startAt,protocolPrice,paymentCycle) VALUES (?,?,?,?,?)",
-          [
-            subscriptionId,
-            plan.serviceName,
-            plan.startAt,
-            plan.protocolPrice,
-            plan.paymentCycle,
-          ]
-        );
-        break;
-      case SubscriptionPlanType.Buyout:
-        await this.executeSql(
-          "INSERT INTO buyout_subscription_plan (subscriptionId,serviceName) VALUES (?,?)",
-          [subscriptionId, plan.serviceName]
-        );
-        break;
-    }
   };
 }

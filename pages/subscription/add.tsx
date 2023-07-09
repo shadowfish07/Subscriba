@@ -1,17 +1,9 @@
 import { ScrollView, StyleSheet, View } from "react-native";
 import { Card, TextInput, Text, Chip, IconButton } from "react-native-paper";
 import { globalStyles } from "../../styles";
-import { AddSubscriptionDialog } from "./components/addSubsriptionDialog";
-import {
-  DraftSubscription,
-  SubscriptionPlanType,
-  SubscriptionPlanTypeLabel,
-} from "../../types";
+import { DraftSubscription } from "../../types";
 import { useDraftSubscriptionStore } from "../../store/useDraftSubscriptionStore";
-import { subscriptionTypeLabel2Int } from "../../util/subscriptionTypeLabel2Int";
-import { DraftAutoSubscriptionPlanCard } from "./components/draftAutoSubsciptionPlanCard";
-import { DraftManualSubscriptionPlanCard } from "./components/draftManualSubsciptionPlanCard";
-import { DraftBuyoutSubscriptionPlanCard } from "./components/draftBuyoutSubsciptionPlanCard";
+import { DraftServiceCard } from "./components/draftServiceCard";
 
 type BasicInfoProps = {
   form: DraftSubscription;
@@ -44,7 +36,7 @@ const BasicInfo = ({
           onChangeText={(text) => setBasicInfo("note", text)}
           style={styles.input}
         />
-        <Text variant="labelMedium" style={{ marginTop: 15, marginBottom: 5 }}>
+        {/* <Text variant="labelMedium" style={{ marginTop: 15, marginBottom: 5 }}>
           标签
         </Text>
         <View
@@ -74,7 +66,7 @@ const BasicInfo = ({
           </Text>
 
           <IconButton icon="plus" size={20} style={{ height: 20 }} />
-        </View>
+        </View> */}
       </Card.Content>
     </Card>
   );
@@ -90,59 +82,38 @@ export const Add = () => {
   ] = useDraftSubscriptionStore((store) => [
     store.draftSubscription,
     store.setBasicInfoKey,
-    store.addSubscriptionPlan,
-    store.setSubscriptionPlanKey,
-    store.deleteSubscriptionPlan,
+    store.addService,
+    store.setServiceKey,
+    store.deleteService,
   ]);
 
-  const renderPlans = () => {
+  const renderServices = () => {
     function getSetFormKeyFn(index: number) {
       return (key: string, value: any) =>
         setSubscriptionPlanKey(index, key, value);
     }
 
-    return draftSubscription.subscriptionPlans.map((plan, index) => {
-      switch (plan.type) {
-        case SubscriptionPlanType.Manual:
-          return (
-            <DraftManualSubscriptionPlanCard
-              key={index}
-              form={plan}
-              setFormKey={getSetFormKeyFn(index)}
-              onCancel={() => deleteSubscriptionPlan(index)}
-            />
-          );
-        case SubscriptionPlanType.Auto:
-          return (
-            <DraftAutoSubscriptionPlanCard
-              key={index}
-              form={plan}
-              setFormKey={getSetFormKeyFn(index)}
-              onCancel={() => deleteSubscriptionPlan(index)}
-            />
-          );
-        case SubscriptionPlanType.Buyout:
-          return (
-            <DraftBuyoutSubscriptionPlanCard
-              key={index}
-              form={plan}
-              setFormKey={getSetFormKeyFn(index)}
-              onCancel={() => deleteSubscriptionPlan(index)}
-            />
-          );
-      }
+    return draftSubscription.services.map((service, index) => {
+      return (
+        <DraftServiceCard
+          key={index}
+          form={service}
+          setFormKey={getSetFormKeyFn(index)}
+          onCancel={() => deleteSubscriptionPlan(index)}
+        />
+      );
     });
   };
 
   return (
     <ScrollView>
       <BasicInfo form={draftSubscription} setBasicInfo={setBasicInfoKey} />
-      {renderPlans()}
-      <AddSubscriptionDialog
-        onConfirm={function (selectedPlan: SubscriptionPlanTypeLabel): void {
+      {renderServices()}
+      {/* <AddSubscriptionDialog
+        onConfirm={function (selectedPlan: OrderTypeLabel): void {
           addSubscriptionPlan(subscriptionTypeLabel2Int(selectedPlan));
         }}
-      />
+      /> */}
     </ScrollView>
   );
 };

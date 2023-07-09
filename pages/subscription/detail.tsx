@@ -2,9 +2,7 @@ import { View, StyleSheet, ScrollView, Dimensions } from "react-native";
 import {
   Button,
   Card,
-  Chip,
   List,
-  Surface,
   Text,
   TouchableRipple,
   useTheme,
@@ -14,32 +12,18 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { LineChart } from "react-native-chart-kit";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import {
-  BuyoutSubscriptionPlan,
   DraftOrder,
-  ManualSubscriptionPlan,
-  PaymentCycle,
   RouteParams,
   SubscriptionDetail,
-  SubscriptionPlanType,
-  SupportedDraftSubscriptionPlans,
+  Service,
+  DraftService,
 } from "../../types";
 import { useDatabase } from "../../hooks/useDatabase";
-import { useEffect, useState } from "react";
-import {
-  AutoSubscriptionPlanModal,
-  BuyoutSubscriptionPlanModal,
-  ManualSubscriptionPlanModal,
-} from "../../modals";
-import { formatDate } from "../../util/formatDate";
-import { paymentCycle2String } from "../../util/paymentCycle2String";
+import { useState } from "react";
 import { useData } from "../../hooks/useData";
-import { AddSubscriptionDialog } from "./components/addSubsriptionDialog";
-import { DraftManualSubscriptionPlanCard } from "./components/draftManualSubsciptionPlanCard";
-import { DraftAutoSubscriptionPlanCard } from "./components/draftAutoSubsciptionPlanCard";
-import { DraftBuyoutSubscriptionPlanCard } from "./components/draftBuyoutSubsciptionPlanCard";
-import { subscriptionTypeLabel2Int } from "../../util/subscriptionTypeLabel2Int";
 import { Orders } from "./components/orders";
 import { PlanDetailCalculator } from "../../util/planDetailCalculator";
+import { DraftServiceCard } from "./components/draftServiceCard";
 
 type BasicInfoProps = {
   basicInfo: SubscriptionDetail["basicInfo"];
@@ -91,24 +75,21 @@ const BasicInfo = ({ basicInfo }: BasicInfoProps) => {
   );
 };
 
-type ManualSubscriptionPlanProps = {
-  plan: ManualSubscriptionPlan;
+type ServiceCardProps = {
+  service: Service;
   onAddOrder: (order: DraftOrder) => void;
 };
 // 订阅不设置协议价格，买断
-const ManualSubscriptionPlanComp = ({
-  plan,
-  onAddOrder,
-}: ManualSubscriptionPlanProps) => {
-  const calculator = new PlanDetailCalculator(plan);
+const ServiceCard = ({ service, onAddOrder }: ServiceCardProps) => {
+  const calculator = new PlanDetailCalculator(service);
 
   return (
     <Card style={mergedStyles.card}>
       <View style={{ flexDirection: "row" }}>
         <View style={{ flex: 1 }}>
           <List.Item
-            title={<Text variant="labelMedium">订阅类型</Text>}
-            description={<Text variant="bodyLarge">手动订阅</Text>}
+            title={<Text variant="labelMedium">订阅服务名称</Text>}
+            description={<Text variant="bodyLarge">{service.name}</Text>}
           />
           <List.Item
             title={<Text variant="labelMedium">开始时间</Text>}
@@ -119,8 +100,8 @@ const ManualSubscriptionPlanComp = ({
         </View>
         <View style={{ flex: 1 }}>
           <List.Item
-            title={<Text variant="labelMedium">订阅服务名称</Text>}
-            description={<Text variant="bodyLarge">{plan.serviceName}</Text>}
+            title={<Text variant="labelMedium">备注</Text>}
+            description={<Text variant="bodyLarge">{service.note || "-"}</Text>}
           />
           <List.Item
             title={<Text variant="labelMedium">到期时间</Text>}
@@ -130,114 +111,9 @@ const ManualSubscriptionPlanComp = ({
       </View>
       <Orders
         containerStyle={{ marginHorizontal: 16 }}
-        orders={plan.orders}
+        orders={service.orders}
         onAdd={onAddOrder}
-        subscriptionPlanType={SubscriptionPlanType.Manual}
       />
-    </Card>
-  );
-};
-
-type BuyoutSubscriptionPlanProps = {
-  plan: BuyoutSubscriptionPlan;
-  onAddOrder: (order: DraftOrder) => void;
-};
-const BuyoutSubscriptionPlanComp = ({
-  plan,
-  onAddOrder,
-}: BuyoutSubscriptionPlanProps) => {
-  const calculator = new PlanDetailCalculator(plan);
-
-  return (
-    <Card style={mergedStyles.card}>
-      <View style={{ flexDirection: "row" }}>
-        <View style={{ flex: 1 }}>
-          <List.Item
-            title={<Text variant="labelMedium">订阅类型</Text>}
-            description={<Text variant="bodyLarge">买断</Text>}
-          />
-          <List.Item
-            title={<Text variant="labelMedium">开始时间</Text>}
-            description={
-              <Text variant="bodyLarge">{calculator.startTime}</Text>
-            }
-          />
-        </View>
-        <View style={{ flex: 1 }}>
-          <List.Item
-            title={<Text variant="labelMedium">订阅服务名称</Text>}
-            description={<Text variant="bodyLarge">{plan.serviceName}</Text>}
-          />
-        </View>
-      </View>
-      <Orders
-        containerStyle={{ marginHorizontal: 16 }}
-        orders={plan.orders}
-        onAdd={onAddOrder}
-        subscriptionPlanType={SubscriptionPlanType.Buyout}
-      />
-    </Card>
-  );
-};
-
-type AutoSubscriptionPlanProps = {
-  plan: AutoSubscriptionPlanModal;
-};
-const AutoSubscriptionPlanComp = ({ plan }: AutoSubscriptionPlanProps) => {
-  const title =
-    plan.paymentCycle === PaymentCycle.Monthly ? "连续包月" : "连续包年";
-
-  return (
-    <Card style={mergedStyles.card}>
-      <View style={{ flexDirection: "row" }}>
-        <View style={{ flex: 1 }}>
-          <List.Item
-            title={<Text variant="labelMedium">订阅类型</Text>}
-            description={<Text variant="bodyLarge">{title}</Text>}
-          />
-          <List.Item
-            title={<Text variant="labelMedium">开始时间</Text>}
-            description={
-              <Text variant="bodyLarge">{formatDate(plan.createdAt)}</Text>
-            }
-          />
-          <List.Item
-            title={<Text variant="labelMedium">协议价格</Text>}
-            description={
-              <Text variant="bodyLarge">{`${
-                plan.protocolPrice
-              }/${paymentCycle2String(plan.paymentCycle)}`}</Text>
-            }
-          />
-        </View>
-        <View style={{ flex: 1 }}>
-          <List.Item
-            title={<Text variant="labelMedium">订阅服务名称</Text>}
-            description={<Text variant="bodyLarge">{plan.serviceName}</Text>}
-          />
-          <List.Item
-            title={<Text variant="labelMedium">到期时间</Text>}
-            description={<Text variant="bodyLarge">0</Text>}
-          />
-        </View>
-      </View>
-      {/* <List.Item
-        title={<Text>账单</Text>}
-        right={() => {
-          return (
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Text style={{ lineHeight: 16, color: theme.colors.primary }}>
-                $158
-              </Text>
-              <Icon
-                name="chevron-right"
-                size={16}
-                color={theme.colors.primary}
-              />
-            </View>
-          );
-        }}
-      /> */}
     </Card>
   );
 };
@@ -360,92 +236,52 @@ const HistoryPriceChart = () => {
 
 export const Detail = () => {
   const route = useRoute<RouteProp<RouteParams, "SubscriptionDetail">>();
-  const [draftPlans, setDraftPlans] = useState<SubscriptionPlanType[]>([]);
+  const [draftServices, setDraftServices] = useState<number[]>([]);
   const id = route.params.id;
   const { databaseService } = useDatabase();
   const { data, load } = useData("getSubscriptionDetail", [id]);
 
   if (!data) return null;
 
-  const renderPlans = () => {
-    return data.subscriptionPlans.map((plan) => {
+  const renderServices = () => {
+    return data.services.map((service) => {
       const handleAddOrder = async (order: DraftOrder) => {
-        await databaseService.insertOrder(plan.id, plan.type, order);
+        await databaseService.insertOrder({ ...order, serviceId: service.id });
         load();
       };
-      switch (plan.type) {
-        case SubscriptionPlanType.Manual:
-          return (
-            <ManualSubscriptionPlanComp
-              key={plan.type.toString() + plan.id}
-              plan={plan}
-              onAddOrder={handleAddOrder}
-            />
-          );
-        case SubscriptionPlanType.Auto:
-          return (
-            <AutoSubscriptionPlanComp
-              key={plan.type.toString() + plan.id}
-              plan={plan}
-            />
-          );
-        case SubscriptionPlanType.Buyout:
-          return (
-            <BuyoutSubscriptionPlanComp
-              key={plan.type.toString() + plan.id}
-              plan={plan}
-              onAddOrder={handleAddOrder}
-            />
-          );
-      }
+      return (
+        <ServiceCard
+          key={service.id}
+          service={service}
+          onAddOrder={handleAddOrder}
+        />
+      );
     });
   };
 
-  const renderDraftPlans = () => {
-    const getHandleSave =
-      (index: number) => (form: SupportedDraftSubscriptionPlans) => {
-        databaseService.insertSubscriptionPlan(id, form);
-        load().then(() => {
-          getHandleClose(index)();
-        });
-      };
+  const renderDraftService = () => {
+    const getHandleSave = (index: number) => (form: DraftService) => {
+      databaseService.insertService({ ...form, subscriptionId: id });
+      load().then(() => {
+        getHandleClose(index)();
+      });
+    };
 
     const getHandleClose = (index: number) => {
       return () => {
-        setDraftPlans(draftPlans.filter((_, i) => i !== index));
+        setDraftServices(draftServices.filter((_, i) => i !== index));
       };
     };
 
-    return draftPlans.map((type, index) => {
-      switch (type) {
-        case SubscriptionPlanType.Manual:
-          return (
-            <DraftManualSubscriptionPlanCard
-              key={index}
-              showSaveButton
-              onSave={getHandleSave(index)}
-              onCancel={getHandleClose(index)}
-            />
-          );
-        case SubscriptionPlanType.Auto:
-          return (
-            <DraftAutoSubscriptionPlanCard
-              key={index}
-              showSaveButton
-              onSave={getHandleSave(index)}
-              onCancel={getHandleClose(index)}
-            />
-          );
-        case SubscriptionPlanType.Buyout:
-          return (
-            <DraftBuyoutSubscriptionPlanCard
-              key={index}
-              showSaveButton
-              onSave={getHandleSave(index)}
-              onCancel={getHandleClose(index)}
-            />
-          );
-      }
+    return draftServices.map((_, index) => {
+      return (
+        <DraftServiceCard
+          key={index}
+          showSaveButton
+          onSave={getHandleSave(index)}
+          onCancel={getHandleClose(index)}
+        />
+      );
     });
   };
 
@@ -453,15 +289,16 @@ export const Detail = () => {
     <ScrollView style={styles.container}>
       <BasicInfo basicInfo={data.basicInfo} />
       {/* <HistoryPrice /> */}
-      {renderDraftPlans()}
-      {renderPlans()}
-      <AddSubscriptionDialog
-        onConfirm={(type) => {
-          setDraftPlans([subscriptionTypeLabel2Int(type), ...draftPlans]);
+      {renderServices()}
+      {renderDraftService()}
+      <Button
+        style={mergedStyles.card}
+        mode="text"
+        onPress={() => {
+          setDraftServices([...draftServices, 0]);
         }}
-      />
-      <Button style={mergedStyles.card} mode="text">
-        修改/删除
+      >
+        新增订阅服务
       </Button>
     </ScrollView>
   );

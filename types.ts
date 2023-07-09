@@ -1,17 +1,16 @@
 import {
-  AutoSubscriptionPlanModal,
-  BuyoutSubscriptionPlanModal,
-  ManualSubscriptionPlanModal,
+  BaseModal,
   OrdersModal,
+  ServiceModal,
   SubscriptionModal,
 } from "./modals";
 
-export enum SubscriptionPlanTypeLabel {
+export enum OrderTypeLabel {
   Manual = "手动订阅",
   Auto = "连续包月",
   Buyout = "买断",
 }
-export enum SubscriptionPlanType {
+export enum OrderType {
   Manual = 0,
   Auto = 1,
   Buyout = 2,
@@ -22,13 +21,8 @@ export enum PaymentCycle {
   Yearly = 1,
 }
 
-export type Subscription = {
-  id: number;
-  appName: string;
-  note: string;
+export type Subscription = SubscriptionModal & {
   orders: OrdersModal[];
-  createdAt: string;
-  updatedAt: string;
 };
 
 export enum SupportedCurrency {
@@ -50,65 +44,20 @@ export type RouteParams = {
   };
 };
 
-export type PriceInfoOfSubscriptionPlan = {
-  orders: OrdersModal[];
-  totalPrice: string;
-};
-
-export type BuyoutSubscriptionPlan = BuyoutSubscriptionPlanModal &
-  PriceInfoOfSubscriptionPlan;
-
-export type ManualSubscriptionPlan = ManualSubscriptionPlanModal &
-  PriceInfoOfSubscriptionPlan;
+export type Service = ServiceModal & { orders: OrdersModal[] };
 
 export type SubscriptionDetail = {
   basicInfo: SubscriptionModal;
-  subscriptionPlans: (
-    | AutoSubscriptionPlanModal
-    | BuyoutSubscriptionPlan
-    | ManualSubscriptionPlan
-  )[];
+  services: Service[];
 };
 
-// ====Draft=====
-
-export type DraftOrder = {
-  price: string;
-  note?: string;
-  orderDate: number;
-  timeExtension: string;
-  subscriptionPlanType: SubscriptionPlanType;
-};
-
-export type DraftManualSubscriptionPlan = {
-  type: SubscriptionPlanType.Manual;
-  serviceName: string;
+export type Draft<T extends BaseModal> = Omit<T, keyof BaseModal>;
+export type DraftService = Omit<Draft<ServiceModal>, "subscriptionId"> & {
   orders: DraftOrder[];
 };
-
-export type DraftAutoSubscriptionPlan = {
-  type: SubscriptionPlanType.Auto;
-  serviceName: string;
-  startAt: number;
-  protocolPrice: string;
-  paymentCycle: PaymentCycle;
-};
-
-export type DraftBuyoutSubscriptionPlan = {
-  type: SubscriptionPlanType.Buyout;
-  serviceName: string;
-  orders: DraftOrder[];
-};
-
-export type SupportedDraftSubscriptionPlans =
-  | DraftAutoSubscriptionPlan
-  | DraftBuyoutSubscriptionPlan
-  | DraftManualSubscriptionPlan;
+export type DraftOrder = Omit<Draft<OrdersModal>, "serviceId">;
 
 export type DraftSubscription = {
-  basicInfo: {
-    appName: string;
-    note: string;
-  };
-  subscriptionPlans: SupportedDraftSubscriptionPlans[];
+  basicInfo: Draft<SubscriptionModal>;
+  services: DraftService[];
 };

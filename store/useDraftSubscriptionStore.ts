@@ -1,21 +1,15 @@
 import { create } from "zustand";
-import {
-  DraftSubscription,
-  SubscriptionPlanType,
-  SupportedDraftSubscriptionPlans,
-} from "../types";
-import dayjs from "dayjs";
-import { getDefaultDraftSubscriptionPlan } from "../constants/draftSubscriptionPlan";
+import { DraftSubscription } from "../types";
+import { getDefaultDraftService } from "../constants/draftSubscriptionPlan";
 export interface IDraftSubscription {
   draftSubscription: DraftSubscription;
   setBasicInfoKey: <T extends keyof DraftSubscription["basicInfo"]>(
     key: T,
     value: DraftSubscription["basicInfo"][T]
   ) => void;
-  setSubscriptionPlanKey: (index: number, key: string, value: any) => void;
-  setDraftSubscription: (draftSubscription: DraftSubscription) => void;
-  addSubscriptionPlan: (type: SubscriptionPlanType) => void;
-  deleteSubscriptionPlan: (index: number) => void;
+  setServiceKey: (index: number, key: string, value: any) => void;
+  addService: () => void;
+  deleteService: (index: number) => void;
 }
 
 export const useDraftSubscriptionStore = create<IDraftSubscription>(
@@ -25,9 +19,8 @@ export const useDraftSubscriptionStore = create<IDraftSubscription>(
         appName: "",
         note: "",
       },
-      subscriptionPlans: [],
+      services: [getDefaultDraftService()],
     },
-    setDraftSubscription: (draftSubscription) => set({ draftSubscription }),
     setBasicInfoKey: <T extends keyof DraftSubscription["basicInfo"]>(
       key: T,
       value: DraftSubscription["basicInfo"][T]
@@ -44,49 +37,44 @@ export const useDraftSubscriptionStore = create<IDraftSubscription>(
         };
       });
     },
-    addSubscriptionPlan: (type: SubscriptionPlanType) => {
+    addService: () => {
       set((draft) => {
-        function getNewSubscriptionPlan(
-          type: SubscriptionPlanType
-        ): SupportedDraftSubscriptionPlans {
-          return getDefaultDraftSubscriptionPlan(type);
-        }
         return {
           draftSubscription: {
             ...draft.draftSubscription,
-            subscriptionPlans: [
-              ...draft.draftSubscription.subscriptionPlans,
-              getNewSubscriptionPlan(type),
+            services: [
+              ...draft.draftSubscription.services,
+              getDefaultDraftService(),
             ],
           },
         };
       });
     },
-    setSubscriptionPlanKey: (index: number, key: string, value: any) => {
+    setServiceKey: (index: number, key: string, value: any) => {
       set((draft) => {
         return {
           draftSubscription: {
             ...draft.draftSubscription,
-            subscriptionPlans: [
-              ...draft.draftSubscription.subscriptionPlans.slice(0, index),
+            services: [
+              ...draft.draftSubscription.services.slice(0, index),
               {
-                ...draft.draftSubscription.subscriptionPlans[index],
+                ...draft.draftSubscription.services[index],
                 [key]: value,
               },
-              ...draft.draftSubscription.subscriptionPlans.slice(index + 1),
+              ...draft.draftSubscription.services.slice(index + 1),
             ],
           },
         };
       });
     },
-    deleteSubscriptionPlan: (index: number) => {
+    deleteService: (index: number) => {
       set((draft) => {
         return {
           draftSubscription: {
             ...draft.draftSubscription,
-            subscriptionPlans: [
-              ...draft.draftSubscription.subscriptionPlans.slice(0, index),
-              ...draft.draftSubscription.subscriptionPlans.slice(index + 1),
+            services: [
+              ...draft.draftSubscription.services.slice(0, index),
+              ...draft.draftSubscription.services.slice(index + 1),
             ],
           },
         };

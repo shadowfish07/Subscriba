@@ -1,15 +1,15 @@
 import { Button, Dialog, Portal, RadioButton, Text } from "react-native-paper";
 import { globalStyles } from "../../../styles";
 import { useState } from "react";
-import { SubscriptionPlanTypeLabel } from "../../../types";
+import { OrderTypeLabel } from "../../../types";
 import { View } from "react-native";
 
 type Props = {
-  onConfirm: (selectedPlan: SubscriptionPlanTypeLabel) => void;
+  onConfirm: (selectedPlan: OrderTypeLabel) => void;
 };
 export const AddSubscriptionDialog = ({ onConfirm }: Props) => {
   const [visible, setVisible] = useState(false);
-  const [checked, setChecked] = useState<SubscriptionPlanTypeLabel | "">("");
+  const [checked, setChecked] = useState<OrderTypeLabel | "">("");
 
   const showDialog = () => setVisible(true);
   const hideDialog = () => {
@@ -17,7 +17,7 @@ export const AddSubscriptionDialog = ({ onConfirm }: Props) => {
     setVisible(false);
   };
   const confirmDialog = () => {
-    onConfirm(checked as SubscriptionPlanTypeLabel);
+    onConfirm(checked as OrderTypeLabel);
     hideDialog();
   };
 
@@ -32,21 +32,21 @@ export const AddSubscriptionDialog = ({ onConfirm }: Props) => {
           <Dialog.Content>
             <RadioButton.Group
               onValueChange={(newValue) =>
-                setChecked(newValue as SubscriptionPlanTypeLabel)
+                setChecked(newValue as OrderTypeLabel)
               }
               value={checked}
             >
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <RadioButton value={SubscriptionPlanTypeLabel.Manual} />
-                <Text>{SubscriptionPlanTypeLabel.Manual}</Text>
+                <RadioButton value={OrderTypeLabel.Manual} />
+                <Text>{OrderTypeLabel.Manual}</Text>
               </View>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <RadioButton value={SubscriptionPlanTypeLabel.Auto} />
-                <Text>{SubscriptionPlanTypeLabel.Auto}</Text>
+                <RadioButton value={OrderTypeLabel.Auto} />
+                <Text>{OrderTypeLabel.Auto}</Text>
               </View>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <RadioButton value={SubscriptionPlanTypeLabel.Buyout} />
-                <Text>{SubscriptionPlanTypeLabel.Buyout}</Text>
+                <RadioButton value={OrderTypeLabel.Buyout} />
+                <Text>{OrderTypeLabel.Buyout}</Text>
               </View>
             </RadioButton.Group>
           </Dialog.Content>

@@ -1,38 +1,33 @@
 import { TextInput, Button, Text } from "react-native-paper";
-import {
-  DraftBuyoutSubscriptionPlan,
-  SubscriptionPlanType,
-} from "../../../types";
+import { DraftService, OrderType } from "../../../types";
 import { globalStyles } from "../../../styles";
-import { DraftPlanCard } from "./draftPlanCard";
+import { DraftCard } from "./draftCard";
 import { useState } from "react";
-import { getDefaultDraftSubscriptionPlan } from "../../../constants/draftSubscriptionPlan";
 import { Orders } from "./orders";
+import { getDefaultDraftService } from "../../../constants/draftSubscriptionPlan";
 
 type Props = {
-  form?: DraftBuyoutSubscriptionPlan;
+  form?: DraftService;
   showSaveButton?: boolean;
-  setFormKey?: <T extends keyof DraftBuyoutSubscriptionPlan>(
+  setFormKey?: <T extends keyof DraftService>(
     key: T,
-    value: DraftBuyoutSubscriptionPlan[T]
+    value: DraftService[T]
   ) => void;
   onCancel?: () => void;
-  onSave?: (form: DraftBuyoutSubscriptionPlan) => void;
+  onSave?: (form: DraftService) => void;
 };
-export const DraftBuyoutSubscriptionPlanCard = ({
+export const DraftServiceCard = ({
   form,
   showSaveButton,
   setFormKey,
   onCancel,
   onSave,
 }: Props) => {
-  const [formState, setFormState] = useState(
-    getDefaultDraftSubscriptionPlan(SubscriptionPlanType.Buyout)
-  );
+  const [formState, setFormState] = useState(getDefaultDraftService());
 
-  const setFormKeyState = <T extends keyof DraftBuyoutSubscriptionPlan>(
+  const setFormKeyState = <T extends keyof DraftService>(
     key: T,
-    value: DraftBuyoutSubscriptionPlan[T]
+    value: DraftService[T]
   ) => {
     setFormState({
       ...formState,
@@ -44,8 +39,7 @@ export const DraftBuyoutSubscriptionPlanCard = ({
   const usingSetFormKey = setFormKey || setFormKeyState;
 
   return (
-    <DraftPlanCard
-      title="买断"
+    <DraftCard
       onCancel={onCancel}
       onSave={() => onSave(usingForm)}
       showSaveButton={showSaveButton}
@@ -53,16 +47,22 @@ export const DraftBuyoutSubscriptionPlanCard = ({
       <TextInput
         label="订阅服务名称"
         mode="outlined"
-        value={usingForm.serviceName}
-        onChangeText={(value) => usingSetFormKey("serviceName", value)}
+        value={usingForm.name}
+        onChangeText={(value) => usingSetFormKey("name", value)}
+        style={globalStyles.textInput}
+      />
+      <TextInput
+        label="备注"
+        mode="outlined"
+        value={usingForm.note}
+        onChangeText={(value) => usingSetFormKey("note", value)}
         style={globalStyles.textInput}
       />
       <Orders
         isDraft={true}
         orders={usingForm.orders}
         onChange={(orders) => usingSetFormKey("orders", orders)}
-        subscriptionPlanType={SubscriptionPlanType.Buyout}
       />
-    </DraftPlanCard>
+    </DraftCard>
   );
 };

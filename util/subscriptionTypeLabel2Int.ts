@@ -1,14 +1,12 @@
-import { SubscriptionPlanType, SubscriptionPlanTypeLabel } from "../types";
+import { OrderType, OrderTypeLabel } from "../types";
 
-export const subscriptionTypeLabel2Int = (
-  label: SubscriptionPlanTypeLabel
-): SubscriptionPlanType => {
+export const subscriptionTypeLabel2Int = (label: OrderTypeLabel): OrderType => {
   switch (label) {
-    case SubscriptionPlanTypeLabel.Manual:
+    case OrderTypeLabel.Manual:
       return 0;
-    case SubscriptionPlanTypeLabel.Auto:
+    case OrderTypeLabel.Auto:
       return 1;
-    case SubscriptionPlanTypeLabel.Buyout:
+    case OrderTypeLabel.Buyout:
       return 2;
   }
 };

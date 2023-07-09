@@ -4,7 +4,7 @@ import { Money } from "../util/money";
 import { OrdersModal } from "../modals";
 import dayjs from "dayjs";
 import { min } from "lodash";
-import { SubscriptionPlanType } from "../types";
+import { OrderType } from "../types";
 
 type ReturnType = {
   unit: "日均" | "月均" | "年均";
@@ -20,7 +20,7 @@ export function usePerUnit(): ReturnType {
     (orders: OrdersModal[]) => {
       function calculateNonBuyout() {
         const nonBuyoutOrders = orders.filter(
-          (order) => order.subscriptionPlanType !== SubscriptionPlanType.Buyout
+          (order) => order.subscriptionPlanType !== OrderType.Buyout
         );
         const priceSum = nonBuyoutOrders.reduce((prev, curr) => {
           const currentMoney = new Money(curr.price);
@@ -51,7 +51,7 @@ export function usePerUnit(): ReturnType {
        */
       function calculateBuyout() {
         const buyoutOrders = orders.filter(
-          (order) => order.subscriptionPlanType === SubscriptionPlanType.Buyout
+          (order) => order.subscriptionPlanType === OrderType.Buyout
         );
         const priceSum = buyoutOrders.reduce((prev, curr) => {
           const currentMoney = new Money(curr.price);
@@ -80,9 +80,7 @@ export function usePerUnit(): ReturnType {
   const calculateBuyoutCost = useCallback(
     (orders: OrdersModal[]) => {
       return orders
-        .filter(
-          (order) => order.subscriptionPlanType === SubscriptionPlanType.Buyout
-        )
+        .filter((order) => order.subscriptionPlanType === OrderType.Buyout)
         .reduce((prev, curr) => {
           const currentMoney = new Money(curr.price);
           return currentMoney.add(prev);
