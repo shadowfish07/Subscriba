@@ -61,7 +61,7 @@ export const AddOrderDialog = ({
           <DatePickerInput
             locale="zh"
             mode="outlined"
-            label="订单时间"
+            label="生效时间"
             value={new Date(orderDate)}
             onChange={(value) => setOrderDate(dayjs(value).valueOf())}
             style={globalStyles.textInput}

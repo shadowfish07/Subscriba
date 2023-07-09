@@ -266,7 +266,7 @@ export class DatabaseService {
       let result = [];
       for (const plan of plans) {
         const orders = await this.executeSql<OrdersModal>(
-          "SELECT * FROM orders WHERE subscriptionPlanId = ? AND subscriptionPlanType = ?",
+          "SELECT * FROM orders WHERE subscriptionPlanId = ? AND subscriptionPlanType = ? ORDER BY orderDate ASC",
           [plan.id, plan.type]
         );
         result = result.concat(orders);

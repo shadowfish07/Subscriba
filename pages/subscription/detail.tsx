@@ -39,6 +39,7 @@ import { DraftAutoSubscriptionPlanCard } from "./components/draftAutoSubsciption
 import { DraftBuyoutSubscriptionPlanCard } from "./components/draftBuyoutSubsciptionPlanCard";
 import { subscriptionTypeLabel2Int } from "../../util/subscriptionTypeLabel2Int";
 import { Orders } from "./components/orders";
+import { PlanDetailCalculator } from "../../util/planDetailCalculator";
 
 type BasicInfoProps = {
   basicInfo: SubscriptionDetail["basicInfo"];
@@ -99,6 +100,8 @@ const ManualSubscriptionPlanComp = ({
   plan,
   onAddOrder,
 }: ManualSubscriptionPlanProps) => {
+  const calculator = new PlanDetailCalculator(plan);
+
   return (
     <Card style={mergedStyles.card}>
       <View style={{ flexDirection: "row" }}>
@@ -110,7 +113,7 @@ const ManualSubscriptionPlanComp = ({
           <List.Item
             title={<Text variant="labelMedium">开始时间</Text>}
             description={
-              <Text variant="bodyLarge">{formatDate(plan.createdAt)}</Text>
+              <Text variant="bodyLarge">{calculator.startTime}</Text>
             }
           />
         </View>
@@ -121,7 +124,7 @@ const ManualSubscriptionPlanComp = ({
           />
           <List.Item
             title={<Text variant="labelMedium">到期时间</Text>}
-            description={<Text variant="bodyLarge">0</Text>}
+            description={<Text variant="bodyLarge">{calculator.endTime}</Text>}
           />
         </View>
       </View>
@@ -143,6 +146,8 @@ const BuyoutSubscriptionPlanComp = ({
   plan,
   onAddOrder,
 }: BuyoutSubscriptionPlanProps) => {
+  const calculator = new PlanDetailCalculator(plan);
+
   return (
     <Card style={mergedStyles.card}>
       <View style={{ flexDirection: "row" }}>
@@ -154,7 +159,7 @@ const BuyoutSubscriptionPlanComp = ({
           <List.Item
             title={<Text variant="labelMedium">开始时间</Text>}
             description={
-              <Text variant="bodyLarge">{formatDate(plan.createdAt)}</Text>
+              <Text variant="bodyLarge">{calculator.startTime}</Text>
             }
           />
         </View>
