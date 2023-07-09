@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { DraftSubscription } from "../types";
-import { getDefaultDraftService } from "../constants/draftSubscriptionPlan";
+import { getDefaultDraftService } from "../constants/getDefaultDraftService";
 export interface IDraftSubscription {
   draftSubscription: DraftSubscription;
   setBasicInfoKey: <T extends keyof DraftSubscription["basicInfo"]>(
@@ -10,6 +10,7 @@ export interface IDraftSubscription {
   setServiceKey: (index: number, key: string, value: any) => void;
   addService: () => void;
   deleteService: (index: number) => void;
+  init: () => void;
 }
 
 export const useDraftSubscriptionStore = create<IDraftSubscription>(
@@ -20,6 +21,19 @@ export const useDraftSubscriptionStore = create<IDraftSubscription>(
         note: "",
       },
       services: [getDefaultDraftService()],
+    },
+    init: () => {
+      set((draft) => {
+        return {
+          draftSubscription: {
+            basicInfo: {
+              appName: "",
+              note: "",
+            },
+            services: [getDefaultDraftService()],
+          },
+        };
+      });
     },
     setBasicInfoKey: <T extends keyof DraftSubscription["basicInfo"]>(
       key: T,

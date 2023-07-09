@@ -16,13 +16,14 @@ export class DatabaseService {
     args: any[] = [],
     tx?: SQLTransaction
   ): Promise<T[]> => {
-    console.info("exec sql", sql, args);
+    console.info(Date.now(), "exec sql", sql, args);
     return new Promise((resolve, reject) => {
       if (!tx) {
         this.db.transaction(
           (tx) => {
             tx.executeSql(sql, args, (_, { rows }) => {
               console.info(
+                Date.now(),
                 "exec sql(mode 1) success",
                 sql,
                 JSON.stringify(args),
@@ -32,7 +33,13 @@ export class DatabaseService {
             });
           },
           (error) => {
-            console.error("SQL error:", sql, JSON.stringify(args), error);
+            console.error(
+              Date.now(),
+              "SQL error:",
+              sql,
+              JSON.stringify(args),
+              error
+            );
             reject(error);
             return true;
           }
@@ -65,18 +72,8 @@ export class DatabaseService {
   };
 
   insertOrder = async (order: Draft<OrdersModal>): Promise<unknown[]> => {
-    function transformTimeExtensionToDayUnit(value: string) {
-      if (value[value.length - 1] === "d") {
-        return value;
-      } else if (value[value.length - 1] === "m") {
-        return Number(value.slice(0, value.length - 1)) * 31 + "d";
-      } else {
-        return Number(value.slice(0, value.length - 1)) * 365 + "d";
-      }
-    }
-
     return this.executeSql(
-      "INSERT INTO orders (serviceId,type,price,discount,note,orderDate,activeDate,timeExtension) VALUES (?,?,?,?,?,?,?,?)",
+      "INSERT INTO orders (serviceId,type,price,discount,note,orderDate,activeDate,timeExtension,includeInTheAverage) VALUES (?,?,?,?,?,?,?,?,?)",
       [
         order.serviceId,
         order.type,
@@ -85,7 +82,8 @@ export class DatabaseService {
         order.note,
         order.orderDate,
         order.activeDate,
-        transformTimeExtensionToDayUnit(order.timeExtension),
+        order.timeExtension,
+        order.includeInTheAverage,
       ]
     );
   };
@@ -162,10 +160,6 @@ export class DatabaseService {
     )[0];
   };
 
-  selectAllOrders = async (): Promise<OrdersModal[]> => {
-    return this.executeSql<OrdersModal>("SELECT * FROM orders");
-  };
-
   selectOrders = async (serviceId: number): Promise<OrdersModal[]> => {
     return this.executeSql("SELECT * FROM orders WHERE serviceId = ?", [
       serviceId,
@@ -190,6 +184,38 @@ export class DatabaseService {
     );
   };
 
+  getAllServices = async (): Promise<Service[]> => {
+    const subscriptions = await this.selectSubscriptions();
+
+    const services = (
+      await Promise.all(subscriptions.map(({ id }) => this.selectServices(id)))
+    ).flat();
+
+    return Promise.all(
+      services.map(async (service) => {
+        return {
+          ...service,
+          orders: await this.selectOrders(service.id),
+        };
+      })
+    );
+  };
+
+  getServicesOfSubscription = async (
+    subscriptionId: number
+  ): Promise<Service[]> => {
+    const services = await this.selectServices(subscriptionId);
+
+    return Promise.all(
+      services.map(async (service) => {
+        return {
+          ...service,
+          orders: await this.selectOrders(service.id),
+        };
+      })
+    );
+  };
+
   getSubscriptionList = async (): Promise<Subscription[]> => {
     const result = [];
     const subscriptions = await this.selectSubscriptions();
@@ -198,6 +224,7 @@ export class DatabaseService {
       result.push({
         ...subscription,
         orders: await this.selectOrdersOfSubscription(subscription.id),
+        services: await this.getServicesOfSubscription(subscription.id),
       });
     }
 

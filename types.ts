@@ -23,6 +23,7 @@ export enum PaymentCycle {
 
 export type Subscription = SubscriptionModal & {
   orders: OrdersModal[];
+  services: Service[];
 };
 
 export enum SupportedCurrency {

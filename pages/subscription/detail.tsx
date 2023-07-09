@@ -22,7 +22,7 @@ import { useDatabase } from "../../hooks/useDatabase";
 import { useState } from "react";
 import { useData } from "../../hooks/useData";
 import { Orders } from "./components/orders";
-import { PlanDetailCalculator } from "../../util/planDetailCalculator";
+import { OrderCalculator } from "../../util/orderCalculator";
 import { DraftServiceCard } from "./components/draftServiceCard";
 
 type BasicInfoProps = {
@@ -81,7 +81,7 @@ type ServiceCardProps = {
 };
 // 订阅不设置协议价格，买断
 const ServiceCard = ({ service, onAddOrder }: ServiceCardProps) => {
-  const calculator = new PlanDetailCalculator(service);
+  const calculator = new OrderCalculator(service.orders);
 
   return (
     <Card style={mergedStyles.card}>

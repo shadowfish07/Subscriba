@@ -4,13 +4,14 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { usePerUnitStore } from "../store/usePerUnitStore";
 import { usePerUnit } from "../hooks/usePerUnit";
 import { useData } from "../hooks/useData";
+import { Money } from "../util/money";
 
 export const MoneyWithPerCost = () => {
   const theme = useTheme();
-  const { unit, setUnit, calculatePerCost } = usePerUnit();
-  const { data: allOrders } = useData("selectAllOrders", []);
+  const { unit, setUnit, calculateServicesPerCost } = usePerUnit();
+  const { data: services } = useData("getAllServices", []);
 
-  if (!allOrders) return null;
+  if (!services) return null;
   const handleSetUnit = () => {
     if (unit === "年均") {
       setUnit("月均");
@@ -33,7 +34,7 @@ export const MoneyWithPerCost = () => {
             {unit}
           </Text>
           <Text variant="titleLarge" style={styles.per}>
-            {calculatePerCost(allOrders)}
+            {new Money(calculateServicesPerCost(services)).toString(2)}
           </Text>
         </View>
         <Icon name="menu-swap" size={16} color={theme.colors.onSurface} />

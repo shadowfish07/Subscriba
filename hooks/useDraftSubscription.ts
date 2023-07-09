@@ -18,6 +18,7 @@ export function useDraftSubscription(): Return {
     await databaseService.createSubscription(
       draftSubscriptionStore.draftSubscription
     );
+    draftSubscriptionStore.init();
   };
 
   return {

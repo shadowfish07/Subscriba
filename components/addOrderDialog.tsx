@@ -6,6 +6,7 @@ import {
   Text,
   TextInput,
   SegmentedButtons,
+  Checkbox,
 } from "react-native-paper";
 import { globalStyles } from "../styles";
 import { MoneyInput } from "./moneyInput";
@@ -13,6 +14,7 @@ import { DatePickerInput } from "react-native-paper-dates";
 import dayjs from "dayjs";
 import { DraftOrder, OrderType } from "../types";
 import { TimeExtensionInput } from "./timeExtensionInput";
+import { View } from "react-native";
 
 type Props = {
   visible: boolean;
@@ -25,6 +27,8 @@ export const AddOrderDialog = ({ visible, onCancel, onConfirm }: Props) => {
   const [activeDate, setActiveDate] = useState(dayjs().valueOf());
   const [orderType, setOrderType] = useState(OrderType.Manual);
   const [timeExtension, setTimeExtension] = useState("1m");
+
+  const [includeInTheAverage, setIncludeInTheAverage] = useState(true);
   const [note, setNote] = useState("");
 
   const init = () => {
@@ -49,8 +53,9 @@ export const AddOrderDialog = ({ visible, onCancel, onConfirm }: Props) => {
       type: orderType,
       discount: "",
       activeDate,
+      includeInTheAverage,
     });
-    onCancel();
+    handleCancel();
   };
 
   return (
@@ -98,6 +103,23 @@ export const AddOrderDialog = ({ visible, onCancel, onConfirm }: Props) => {
             mode="outlined"
             style={globalStyles.textInput}
           />
+          {orderType !== OrderType.Buyout && (
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Text>计入均值</Text>
+              <Checkbox
+                status={includeInTheAverage ? "checked" : "unchecked"}
+                onPress={() => {
+                  setIncludeInTheAverage(!includeInTheAverage);
+                }}
+              />
+            </View>
+          )}
         </Dialog.Content>
         <Dialog.Actions>
           <Button onPress={handleCancel}>取消</Button>

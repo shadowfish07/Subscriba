@@ -54,7 +54,6 @@ const SubscriptionDetailHeader = ({
         />
       )}
       <Appbar.Content title={(route.params as any).appName} />
-      <MoneyWithPerCost />
     </Appbar.Header>
   );
 };
@@ -81,8 +80,9 @@ const SubscriptionAddHeader = ({
         icon="content-save"
         onPress={() => {
           // TODO 校验
-          saveSubscription();
-          navigation.goBack();
+          saveSubscription().then(() => {
+            navigation.goBack();
+          });
         }}
       />
     </Appbar.Header>

@@ -4,7 +4,7 @@ import { globalStyles } from "../../../styles";
 import { DraftCard } from "./draftCard";
 import { useState } from "react";
 import { Orders } from "./orders";
-import { getDefaultDraftService } from "../../../constants/draftSubscriptionPlan";
+import { getDefaultDraftService } from "../../../constants/getDefaultDraftService";
 
 type Props = {
   form?: DraftService;

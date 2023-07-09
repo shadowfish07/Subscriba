@@ -1,7 +1,8 @@
 import { View } from "react-native";
 import { TextInput, Text, Menu, HelperText } from "react-native-paper";
 import { globalStyles } from "../styles";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { TimeExtension } from "../util/timeExtension";
 
 type Props = {
   value: string;
@@ -25,11 +26,12 @@ function getDefaultUnit(value: string) {
 export const TimeExtensionInput = ({ value, onChangeText }: Props) => {
   const [unit, setUnit] = useState<"天" | "月" | "年">(getDefaultUnit(value));
   const [showMenu, setShowMenu] = useState(false);
+  const valueRef = useRef(value);
 
-  const handleChangeText = (value: string) => {
-    if (unit === "天") {
+  const handleChangeText = (value: string, usingUnit = unit) => {
+    if (usingUnit === "天") {
       onChangeText(value + "d");
-    } else if (unit === "月") {
+    } else if (usingUnit === "月") {
       onChangeText(value + "m");
     } else {
       onChangeText(value + "y");
@@ -61,6 +63,10 @@ export const TimeExtensionInput = ({ value, onChangeText }: Props) => {
                   onPress={() => {
                     setUnit("天");
                     setShowMenu(false);
+                    handleChangeText(
+                      new TimeExtension(valueRef.current).unitValue.toString(),
+                      "天"
+                    );
                   }}
                 />
                 <Menu.Item
@@ -68,6 +74,10 @@ export const TimeExtensionInput = ({ value, onChangeText }: Props) => {
                   onPress={() => {
                     setUnit("月");
                     setShowMenu(false);
+                    handleChangeText(
+                      new TimeExtension(valueRef.current).unitValue.toString(),
+                      "月"
+                    );
                   }}
                 />
                 <Menu.Item
@@ -75,6 +85,10 @@ export const TimeExtensionInput = ({ value, onChangeText }: Props) => {
                   onPress={() => {
                     setUnit("年");
                     setShowMenu(false);
+                    handleChangeText(
+                      new TimeExtension(valueRef.current).unitValue.toString(),
+                      "年"
+                    );
                   }}
                 />
               </Menu>

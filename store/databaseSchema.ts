@@ -79,6 +79,7 @@ note               TEXT,
 orderDate          INTEGER,
 activeDate         INTEGER,
 timeExtension       TEXT,
+includeInTheAverage INTEGER,
 autoProtocolPrice   TEXT,
 autoPaymentCycle    INTEGER,
 `

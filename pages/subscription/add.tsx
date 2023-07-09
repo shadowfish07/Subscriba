@@ -73,24 +73,17 @@ const BasicInfo = ({
 };
 
 export const Add = () => {
-  const [
-    draftSubscription,
-    setBasicInfoKey,
-    addSubscriptionPlan,
-    setSubscriptionPlanKey,
-    deleteSubscriptionPlan,
-  ] = useDraftSubscriptionStore((store) => [
-    store.draftSubscription,
-    store.setBasicInfoKey,
-    store.addService,
-    store.setServiceKey,
-    store.deleteService,
-  ]);
+  const [draftSubscription, setBasicInfoKey, addService, deleteService] =
+    useDraftSubscriptionStore((store) => [
+      store.draftSubscription,
+      store.setBasicInfoKey,
+      store.setServiceKey,
+      store.deleteService,
+    ]);
 
   const renderServices = () => {
     function getSetFormKeyFn(index: number) {
-      return (key: string, value: any) =>
-        setSubscriptionPlanKey(index, key, value);
+      return (key: string, value: any) => addService(index, key, value);
     }
 
     return draftSubscription.services.map((service, index) => {
@@ -99,7 +92,7 @@ export const Add = () => {
           key={index}
           form={service}
           setFormKey={getSetFormKeyFn(index)}
-          onCancel={() => deleteSubscriptionPlan(index)}
+          onCancel={() => deleteService(index)}
         />
       );
     });

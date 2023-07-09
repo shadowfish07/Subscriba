@@ -23,7 +23,7 @@ export const OrderItem = ({ draftOrder }: Props) => {
           </View>
           <View style={{ justifyContent: "center" }}>
             <Text variant="titleMedium" style={{ color: theme.colors.primary }}>
-              {draftOrder.subscriptionPlanType === OrderType.Buyout
+              {draftOrder.type === OrderType.Buyout
                 ? "永久"
                 : "+" + rawTimeExtension2String(draftOrder.timeExtension)}
             </Text>

@@ -35,6 +35,10 @@ type BaseOrdersModal = {
    * 1d 目前都用这种格式存储
    */
   timeExtension: string;
+  /**
+   * 订单是否会被加入均值计算
+   */
+  includeInTheAverage: boolean;
 };
 
 type NonAutoSubscriptionModal = {

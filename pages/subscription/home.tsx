@@ -14,7 +14,7 @@ import { Money } from "../../util/money";
 
 export const Home = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-  const { calculatePerCost, calculateBuyoutCost } = usePerUnit();
+  const { calculateServicesPerCost, calculateBuyoutCost } = usePerUnit();
   const { data: subscriptions } = useData("getSubscriptionList", []);
 
   const calculateExtraCost = (orders: OrdersModal[]) => {
@@ -31,7 +31,7 @@ export const Home = () => {
       <ScrollView>
         {(subscriptions || []).map((subscription) => (
           <SubscriptionItem
-            cost={calculatePerCost(subscription.orders)}
+            cost={calculateServicesPerCost(subscription.services)}
             key={subscription.id}
             subscription={subscription}
             extraCost={calculateExtraCost(subscription.orders)}
