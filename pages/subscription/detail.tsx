@@ -24,12 +24,20 @@ import { useData } from "../../hooks/useData";
 import { Orders } from "./components/orders";
 import { OrderCalculator } from "../../util/orderCalculator";
 import { DraftServiceCard } from "./components/draftServiceCard";
+import { OrdersModal } from "../../modals";
+import { usePerUnit } from "../../hooks/usePerUnit";
+import { PerUnit } from "../../store/usePerUnitStore";
 
 type BasicInfoProps = {
   basicInfo: SubscriptionDetail["basicInfo"];
+  orders: OrdersModal[];
 };
-const BasicInfo = ({ basicInfo }: BasicInfoProps) => {
+const BasicInfo = ({ basicInfo, orders }: BasicInfoProps) => {
   const theme = useTheme();
+  const calculator = new OrderCalculator(orders);
+  const { unit, setNextUnit } = usePerUnit();
+
+  const ordersPerCost = calculator.getPerCost(unit);
 
   return (
     <Card style={mergedStyles.card}>
@@ -37,14 +45,20 @@ const BasicInfo = ({ basicInfo }: BasicInfoProps) => {
         <View style={{ flex: 1 }}>
           <List.Item
             title={<Text variant="labelMedium">首次订阅</Text>}
-            description={<Text variant="bodyLarge">-</Text>}
+            description={
+              <Text variant="bodyLarge">{calculator.startTime || "-"}</Text>
+            }
           />
           <List.Item
-            title={<Text variant="labelMedium">每月花费</Text>}
+            title={<Text variant="labelMedium">{unit}</Text>}
             description={() => (
-              <TouchableRipple onPress={() => {}}>
+              <TouchableRipple
+                onPress={() => {
+                  setNextUnit();
+                }}
+              >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                  <Text variant="bodyLarge">-</Text>
+                  <Text variant="bodyLarge">{ordersPerCost || "-"}</Text>
                   <Icon
                     name="menu-swap"
                     size={16}
@@ -63,7 +77,9 @@ const BasicInfo = ({ basicInfo }: BasicInfoProps) => {
         <View style={{ flex: 1 }}>
           <List.Item
             title={<Text variant="labelMedium">总计花费</Text>}
-            description={<Text variant="bodyLarge">-</Text>}
+            description={
+              <Text variant="bodyLarge">{calculator.totalCost || "-"}</Text>
+            }
           />
         </View>
       </View>
@@ -287,7 +303,12 @@ export const Detail = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <BasicInfo basicInfo={data.basicInfo} />
+      <BasicInfo
+        basicInfo={data.basicInfo}
+        orders={data.services.reduce((prev, curr) => {
+          return prev.concat(curr.orders);
+        }, [])}
+      />
       {/* <HistoryPrice /> */}
       {renderServices()}
       {renderDraftService()}

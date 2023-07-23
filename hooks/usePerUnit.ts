@@ -1,5 +1,5 @@
-import { useCallback } from "react";
-import { usePerUnitStore } from "../store/usePerUnitStore";
+import { useCallback, useState } from "react";
+import { PerUnit, usePerUnitStore } from "../store/usePerUnitStore";
 import { Money } from "../util/money";
 import { OrdersModal } from "../modals";
 import dayjs from "dayjs";
@@ -10,23 +10,34 @@ import { OrderCalculator } from "../util/orderCalculator";
 type ReturnType = {
   unit: "日均" | "月均" | "年均";
   setUnit: (unit: "日均" | "月均" | "年均") => void;
+  setNextUnit: () => void;
   calculateOrdersPerCost: (orders: OrdersModal[]) => string;
   calculateServicesPerCost: (services: Service[]) => string;
   calculateBuyoutCost: (orders: OrdersModal[]) => string;
 };
 
-export function usePerUnit(): ReturnType {
-  const { unit, setUnit } = usePerUnitStore();
+export function usePerUnit(usingGlobalData: boolean = false): ReturnType {
+  const storageSource: () => [PerUnit["unit"], PerUnit["setUnit"]] =
+    usingGlobalData
+      ? () => usePerUnitStore((store) => [store.unit, store.setUnit])
+      : () => useState<PerUnit["unit"]>("月均");
+  const [unit, setUnit] = storageSource();
+
+  const setNextUnit = () => {
+    if (unit === "年均") {
+      setUnit("月均");
+    } else if (unit === "月均") {
+      setUnit("日均");
+    } else {
+      setUnit("年均");
+    }
+  };
 
   const calculateOrdersPerCost = (orders: OrdersModal[]) => {
     return new OrderCalculator(orders).getPerCost(unit);
   };
 
   const calculateServicesPerCost = (services: Service[]) => {
-    console.log(
-      "🚀 ~ file: usePerUnit.ts:26 ~ calculateServicesPerCost ~ services:",
-      JSON.stringify(services)
-    );
     return services
       .reduce((prev, curr) => {
         return prev.add(new Money(calculateOrdersPerCost(curr.orders)));
@@ -35,18 +46,13 @@ export function usePerUnit(): ReturnType {
   };
 
   const calculateBuyoutCost = (orders: OrdersModal[]) => {
-    return orders
-      .filter((order) => order.type === OrderType.Buyout)
-      .reduce((prev, curr) => {
-        const currentMoney = new Money(curr.price);
-        return currentMoney.add(prev);
-      }, new Money())
-      .toString(0);
+    return new OrderCalculator(orders).totalBuyoutCost;
   };
 
   return {
     unit,
     setUnit,
+    setNextUnit,
     calculateOrdersPerCost,
     calculateBuyoutCost,
     calculateServicesPerCost,

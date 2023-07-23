@@ -14,7 +14,7 @@ import { Money } from "../../util/money";
 
 export const Home = () => {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
-  const { calculateServicesPerCost, calculateBuyoutCost } = usePerUnit();
+  const { calculateServicesPerCost, calculateBuyoutCost } = usePerUnit(true);
   const { data: subscriptions } = useData("getSubscriptionList", []);
 
   const calculateExtraCost = (orders: OrdersModal[]) => {

@@ -8,22 +8,13 @@ import { Money } from "../util/money";
 
 export const MoneyWithPerCost = () => {
   const theme = useTheme();
-  const { unit, setUnit, calculateServicesPerCost } = usePerUnit();
+  const { unit, setNextUnit, calculateServicesPerCost } = usePerUnit(true);
   const { data: services } = useData("getAllServices", []);
 
   if (!services) return null;
-  const handleSetUnit = () => {
-    if (unit === "年均") {
-      setUnit("月均");
-    } else if (unit === "月均") {
-      setUnit("日均");
-    } else {
-      setUnit("年均");
-    }
-  };
 
   return (
-    <TouchableRipple style={styles.container} onPress={handleSetUnit}>
+    <TouchableRipple style={styles.container} onPress={setNextUnit}>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <View style={{ alignItems: "flex-end" }}>
           <Text

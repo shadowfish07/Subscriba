@@ -33,6 +33,9 @@ export class OrderCalculator {
     );
   }
 
+  /**
+   * 不会计算买断
+   */
   getPerCost(unit: "日均" | "月均" | "年均"): string {
     if (this.orders.length === 0) {
       return new Money().toString(2);
@@ -66,5 +69,22 @@ export class OrderCalculator {
     };
 
     return calculateNonBuyout().toString(2);
+  }
+
+  get totalCost(): string {
+    return this.orders
+      .reduce((prev, curr) => {
+        return prev.add(new Money(curr.price));
+      }, new Money())
+      .toString(2);
+  }
+
+  get totalBuyoutCost(): string {
+    return this.orders
+      .filter((order) => order.type === OrderType.Buyout)
+      .reduce((prev, curr) => {
+        return prev.add(new Money(curr.price));
+      }, new Money())
+      .toString(2);
   }
 }
