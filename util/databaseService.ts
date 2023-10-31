@@ -173,6 +173,12 @@ export class DatabaseService {
     );
   };
 
+  deleteSubscription = async (subscriptionId: number): Promise<void> => {
+    await this.executeSql("DELETE FROM subscription WHERE id = ?", [
+      subscriptionId,
+    ]);
+  };
+
   selectOrdersOfSubscription = async (
     subscriptionId: number
   ): Promise<OrdersModal[]> => {
