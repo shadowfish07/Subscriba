@@ -59,6 +59,7 @@ export const DraftServiceCard = ({
         style={globalStyles.textInput}
       />
       <Orders
+        serviceId={null}
         isDraft={true}
         orders={usingForm.orders}
         onChange={(orders) => usingSetFormKey("orders", orders)}

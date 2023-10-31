@@ -94,9 +94,14 @@ const BasicInfo = ({ basicInfo, orders }: BasicInfoProps) => {
 type ServiceCardProps = {
   service: Service;
   onAddOrder: (order: DraftOrder) => void;
+  onDeleteService: () => void;
 };
 // 订阅不设置协议价格，买断
-const ServiceCard = ({ service, onAddOrder }: ServiceCardProps) => {
+const ServiceCard = ({
+  service,
+  onAddOrder,
+  onDeleteService,
+}: ServiceCardProps) => {
   const calculator = new OrderCalculator(service.orders);
 
   return (
@@ -126,6 +131,8 @@ const ServiceCard = ({ service, onAddOrder }: ServiceCardProps) => {
         </View>
       </View>
       <Orders
+        onDelete={onDeleteService}
+        serviceId={service.id}
         containerStyle={{ marginHorizontal: 16 }}
         orders={service.orders}
         onAdd={onAddOrder}
@@ -265,11 +272,16 @@ export const Detail = () => {
         await databaseService.insertOrder({ ...order, serviceId: service.id });
         load();
       };
+      const handleDeleteService = async () => {
+        await databaseService.deleteService(service.id);
+        load();
+      };
       return (
         <ServiceCard
           key={service.id}
           service={service}
           onAddOrder={handleAddOrder}
+          onDeleteService={handleDeleteService}
         />
       );
     });
