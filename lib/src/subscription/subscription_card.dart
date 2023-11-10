@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:subscriba/src/database/subscription.dart';
+import 'package:subscriba/src/util/order_calculator.dart';
 
 class SubscriptionCard extends StatelessWidget {
   const SubscriptionCard({super.key, required this.subscription});
@@ -8,6 +9,9 @@ class SubscriptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("subscription $subscription");
+    final totalPrize = OrderCalculator(orders: subscription.orders).totalPrize;
+
     return Card(
       child: SizedBox(
         height: 80,
@@ -24,7 +28,7 @@ class SubscriptionCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    "\$800",
+                    "\$$totalPrize",
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   Text(

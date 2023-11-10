@@ -3,16 +3,16 @@ import 'package:flutter/widgets.dart';
 import 'package:subscriba/src/styles/styles.dart';
 
 class HomeSection extends StatelessWidget {
-  const HomeSection({super.key, required this.title, required this.children});
+  const HomeSection({super.key, required this.title, required this.child});
 
   final String title;
 
-  final List<Widget> children;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: defaultCenterPadding,
+      padding: defaultCenterPadding.add(EdgeInsets.only(bottom: 16)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Padding(
           padding: EdgeInsets.only(bottom: 8),
@@ -24,7 +24,7 @@ class HomeSection extends StatelessWidget {
                 .copyWith(color: Theme.of(context).colorScheme.primary),
           ),
         ),
-        ...children
+        child
       ]),
     );
   }

@@ -13,7 +13,7 @@ enum PaymentCycleType { daily, monthly, yearly }
 class Order extends BaseModel {
   const Order(
       {required super.id,
-      required this.description,
+      this.description,
       required super.createdAt,
       required super.updatedAt,
       super.deletedAt,
@@ -103,7 +103,7 @@ class Order extends BaseModel {
         updatedAt: map[BaseModel.columnUpdatedAt] as int,
         deletedAt: map[BaseModel.columnDeletedAt] as int?,
         subscriptionId: map[columnSubscriptionId] as int,
-        description: map[columnDescription] as String,
+        description: map[columnDescription] as String?,
         orderDate: map[columnOrderDate] as int,
         paymentType: PaymentType.values[map[columnPaymentType] as int],
         startDate: map[columnStartDate] as int,
@@ -135,5 +135,14 @@ class OrderProvider extends BaseModalProvider {
     }
 
     return Order.fromMap(map);
+  }
+
+  Future<List<Order>> getOrdersOfSubscription(int subscriptionId) async {
+    final db = await BaseModalProvider.db;
+
+    final List<Map<String, Object?>> maps = await db.query(tableName,
+        where: "subscription_id = ?", whereArgs: [subscriptionId]);
+
+    return maps.map((e) => Order.fromMap(e)).toList();
   }
 }

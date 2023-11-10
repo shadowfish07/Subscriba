@@ -1,26 +1,37 @@
+import 'package:intl/intl.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/util/payment_cycle.dart';
 
 class Duration {
   const Duration({required this.duration, required this.unit});
 
+  factory Duration.fromDate(int startDate, int endDate, PaymentCycleType unit) {
+    final diff = DateTime.fromMicrosecondsSinceEpoch(endDate)
+        .difference(DateTime.fromMicrosecondsSinceEpoch(startDate));
+
+    return Duration(
+      duration: diff.inDays,
+      unit: unit,
+    );
+  }
+
   final int duration;
-  final PaymentCycleHelper unit;
+  final PaymentCycleType unit;
 
   // 每个月都视为31天，每年都视为365天（对于付款周期来说）
   static const double dayPerMonth = 31; //dayPerYear / 12;
   static const double dayPerYear = 365;
 
   double toDays() {
-    if (unit.paymentCycle == PaymentCycleType.daily) {
+    if (unit == PaymentCycleType.daily) {
       return duration.toDouble();
     }
 
-    if (unit.paymentCycle == PaymentCycleType.monthly) {
+    if (unit == PaymentCycleType.monthly) {
       return duration * dayPerMonth;
     }
 
-    if (unit.paymentCycle == PaymentCycleType.yearly) {
+    if (unit == PaymentCycleType.yearly) {
       return duration * dayPerYear;
     }
 
@@ -28,15 +39,15 @@ class Duration {
   }
 
   double toMonths() {
-    if (unit.paymentCycle == PaymentCycleType.daily) {
+    if (unit == PaymentCycleType.daily) {
       return duration / dayPerMonth;
     }
 
-    if (unit.paymentCycle == PaymentCycleType.monthly) {
+    if (unit == PaymentCycleType.monthly) {
       return duration * dayPerMonth;
     }
 
-    if (unit.paymentCycle == PaymentCycleType.yearly) {
+    if (unit == PaymentCycleType.yearly) {
       return duration * 12;
     }
 
@@ -44,15 +55,15 @@ class Duration {
   }
 
   double toYears() {
-    if (unit.paymentCycle == PaymentCycleType.daily) {
+    if (unit == PaymentCycleType.daily) {
       return duration / dayPerYear;
     }
 
-    if (unit.paymentCycle == PaymentCycleType.monthly) {
+    if (unit == PaymentCycleType.monthly) {
       return duration / 12;
     }
 
-    if (unit.paymentCycle == PaymentCycleType.yearly) {
+    if (unit == PaymentCycleType.yearly) {
       return duration.toDouble();
     }
 

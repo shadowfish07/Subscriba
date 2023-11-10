@@ -198,9 +198,10 @@ class _RecurringTab extends State<RecurringTab> {
       final totalPaymentAmount = PaymentCalculator(
               duration: util.Duration(
                   duration: int.parse(durationController.text),
-                  unit: PaymentCycleHelper(timeUnit: "Day")),
-              paymentCycle: PaymentCycleHelper(timeUnit: paymentCycle))
-          .getTotalPaymentAmount(double.parse(paymentPerPeriodController.text))
+                  unit: PaymentCycleHelper(timeUnit: "Day").paymentCycle),
+              paymentCycle:
+                  PaymentCycleHelper(timeUnit: paymentCycle).paymentCycle)
+          .getTotalPaymentAmount(int.parse(paymentPerPeriodController.text))
           .toStringAsFixed(2);
 
       if (totalPaymentAmount != totalPaymentAmountController.text &&
@@ -256,8 +257,9 @@ class _RecurringTab extends State<RecurringTab> {
         final paymentPerPeriod = PaymentCalculator(
                 duration: util.Duration(
                     duration: int.parse(durationController.text),
-                    unit: PaymentCycleHelper(timeUnit: "Day")),
-                paymentCycle: PaymentCycleHelper(timeUnit: paymentCycle))
+                    unit: PaymentCycleHelper(timeUnit: "Day").paymentCycle),
+                paymentCycle:
+                    PaymentCycleHelper(timeUnit: paymentCycle).paymentCycle)
             .getPaymentPerPeriod(
                 double.parse(totalPaymentAmountController.text))
             .toStringAsFixed(2);

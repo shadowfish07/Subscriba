@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:subscriba/src/add_subscription/add_subscription_form.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/database/subscription.dart';
+import 'package:subscriba/src/util/payment_cycle.dart';
 
 class AddSubscriptionView extends StatefulWidget {
   static const routeName = '/subscription/add';
@@ -55,7 +56,8 @@ class _AddSubscriptionView extends State<AddSubscriptionView>
               title: subscriptionNameController.text,
               description: subscriptionDescriptionController.text));
 
-      await OrderProvider().insert(Order.create(
+      await OrderProvider().insert(
+        Order.create(
           orderDate: DateFormat.yMd()
               .parseLoose(startTimeDateController.text)
               .microsecondsSinceEpoch,
@@ -65,7 +67,14 @@ class _AddSubscriptionView extends State<AddSubscriptionView>
           startDate: DateFormat.yMd()
               .parseLoose(startTimeDateController.text)
               .microsecondsSinceEpoch,
-          subscriptionId: subscriptionId));
+          endDate: DateFormat.yMd()
+              .parseLoose(endTimeDateController.text)
+              .microsecondsSinceEpoch,
+          subscriptionId: subscriptionId,
+          paymentPerPeriodUnit: "\$",
+          // paymentCycleType: PaymentCycleHelper(timeUnit: paymentc)
+        ),
+      );
     }
   }
 

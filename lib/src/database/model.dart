@@ -119,6 +119,12 @@ create table "${OrderProvider.tableName}" (
     return null;
   }
 
+  Future<List<Map<String, Object?>>> getAll() async {
+    final db = await BaseModalProvider.db;
+
+    return await db.query(table, columns: null);
+  }
+
   Future<bool> delete(int id) async {
     final db = await BaseModalProvider.db;
     final count = await db.update(table,

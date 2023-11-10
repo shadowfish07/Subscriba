@@ -19,7 +19,7 @@ class HomeView extends StatelessWidget {
 
     return Scaffold(
       appBar: HomeAppBar(),
-      body: HomeBody(),
+      body: const HomeBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: onPressCreateSubscriptionFAB,
         child: const Icon(Icons.add),
