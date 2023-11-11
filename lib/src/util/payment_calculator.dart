@@ -25,7 +25,7 @@ class PaymentCalculator {
     throw ArgumentError('paymentCycle must be one of d, m, or y');
   }
 
-  double getTotalPaymentAmount(int paymentPerPeriod) {
+  double getTotalPaymentAmount(double paymentPerPeriod) {
     if (paymentCycle == PaymentCycleType.daily) {
       return paymentPerPeriod * duration.toDays();
     }

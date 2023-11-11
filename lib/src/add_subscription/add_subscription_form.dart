@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:provider/provider.dart';
+import 'package:subscriba/src/add_subscription/add_subscription_view.dart';
+import 'package:subscriba/src/add_subscription/form_model.dart';
+import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/styles/styles.dart';
 import 'package:subscriba/src/util/payment_calculator.dart';
 import 'package:subscriba/src/util/duration.dart' as util;
@@ -13,7 +18,6 @@ class AddSubscriptionForm extends StatefulWidget {
       {super.key,
       required this.subscriptionFormKey,
       required this.recurringFormKey,
-      required this.paymentTypeTabController,
       required this.subscriptionNameController,
       required this.subscriptionDescriptionController,
       required this.startTimeDateController,
@@ -24,7 +28,6 @@ class AddSubscriptionForm extends StatefulWidget {
 
   final GlobalKey<FormState> subscriptionFormKey;
   final GlobalKey<FormState> recurringFormKey;
-  final TabController paymentTypeTabController;
   final TextEditingController subscriptionNameController;
   final TextEditingController subscriptionDescriptionController;
   final TextEditingController startTimeDateController;
@@ -38,7 +41,6 @@ class AddSubscriptionForm extends StatefulWidget {
   State<StatefulWidget> createState() => _AddSubscriptionFormState(
       subscriptionFormKey: subscriptionFormKey,
       recurringFormKey: recurringFormKey,
-      paymentTypeTabController: paymentTypeTabController,
       subscriptionNameController: subscriptionNameController,
       subscriptionDescriptionController: subscriptionDescriptionController,
       startTimeDateController: startTimeDateController,
@@ -48,11 +50,11 @@ class AddSubscriptionForm extends StatefulWidget {
       paymentPerPeriodController: paymentPerPeriodController);
 }
 
-class _AddSubscriptionFormState extends State<AddSubscriptionForm> {
+class _AddSubscriptionFormState extends State<AddSubscriptionForm>
+    with TickerProviderStateMixin {
   _AddSubscriptionFormState(
       {required this.subscriptionFormKey,
       required this.recurringFormKey,
-      required this.paymentTypeTabController,
       required this.subscriptionNameController,
       required this.subscriptionDescriptionController,
       required this.startTimeDateController,
@@ -63,7 +65,7 @@ class _AddSubscriptionFormState extends State<AddSubscriptionForm> {
 
   final GlobalKey<FormState> subscriptionFormKey;
   final GlobalKey<FormState> recurringFormKey;
-  final TabController paymentTypeTabController;
+  late final TabController paymentTypeTabController;
   final TextEditingController subscriptionNameController;
   final TextEditingController subscriptionDescriptionController;
   final TextEditingController startTimeDateController;
@@ -73,7 +75,15 @@ class _AddSubscriptionFormState extends State<AddSubscriptionForm> {
   final TextEditingController paymentPerPeriodController;
 
   @override
+  void initState() {
+    super.initState();
+    paymentTypeTabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final formModel = Provider.of<FormModel>(context);
+
     return Form(
         key: subscriptionFormKey,
         child: Column(
@@ -81,34 +91,40 @@ class _AddSubscriptionFormState extends State<AddSubscriptionForm> {
             Padding(
               padding: defaultCenterPadding
                   .add(const EdgeInsets.symmetric(vertical: 16)),
-              child: TextFormField(
-                  controller: subscriptionNameController,
-                  validator: notEmptyValidator,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Subscription Name',
-                  )),
+              child: Observer(
+                  builder: (_) => TextFormField(
+                      onChanged: (value) => formModel.subscriptionName = value,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Subscription Name',
+                      ))),
             ),
             Padding(
               padding: defaultCenterPadding,
-              child: TextFormField(
-                  controller: subscriptionDescriptionController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Subscription Description',
-                  )),
+              child: Observer(
+                  builder: (_) => TextFormField(
+                      onChanged: (value) =>
+                          formModel.subscriptionDescription = value,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Subscription Description',
+                      ))),
             ),
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.only(
                 bottom: 16,
               ),
-              child: TabBar(controller: paymentTypeTabController, tabs: const [
-                Tab(text: "recurring"),
-                Tab(
-                  text: "one-time",
-                )
-              ]),
+              child: Observer(
+                  builder: (_) => TabBar(
+                          controller: paymentTypeTabController,
+                          onTap: (value) => formModel.paymentTypeInt = value,
+                          tabs: const [
+                            Tab(text: "recurring"),
+                            Tab(
+                              text: "one-time",
+                            )
+                          ])),
             ),
             Expanded(
               child: Padding(
@@ -123,14 +139,8 @@ class _AddSubscriptionFormState extends State<AddSubscriptionForm> {
                           height: 10,
                         ),
                         RecurringTab(
-                            recurringFormKey: recurringFormKey,
-                            startTimeDateController: startTimeDateController,
-                            endTimeDateController: endTimeDateController,
-                            durationController: durationController,
-                            totalPaymentAmountController:
-                                totalPaymentAmountController,
-                            paymentPerPeriodController:
-                                paymentPerPeriodController),
+                          recurringFormKey: recurringFormKey,
+                        ),
                       ],
                     ),
                     Text("1"),
@@ -144,69 +154,67 @@ class _AddSubscriptionFormState extends State<AddSubscriptionForm> {
 }
 
 class RecurringTab extends StatefulWidget {
-  const RecurringTab(
-      {super.key,
-      required this.recurringFormKey,
-      required this.startTimeDateController,
-      required this.endTimeDateController,
-      required this.durationController,
-      required this.totalPaymentAmountController,
-      required this.paymentPerPeriodController});
+  const RecurringTab({
+    super.key,
+    required this.recurringFormKey,
+  });
 
   final GlobalKey<FormState> recurringFormKey;
-  final TextEditingController startTimeDateController;
-  final TextEditingController endTimeDateController;
-  final TextEditingController durationController;
-  final TextEditingController totalPaymentAmountController;
-  final TextEditingController paymentPerPeriodController;
 
   @override
   State<StatefulWidget> createState() =>
       // ignore: no_logic_in_create_state
       _RecurringTab(
-          recurringFormKey: recurringFormKey,
-          startTimeDateController: startTimeDateController,
-          endTimeDateController: endTimeDateController,
-          durationController: durationController,
-          totalPaymentAmountController: totalPaymentAmountController,
-          paymentPerPeriodController: paymentPerPeriodController);
+        recurringFormKey: recurringFormKey,
+      );
 }
 
 class _RecurringTab extends State<RecurringTab> {
-  _RecurringTab(
-      {required this.recurringFormKey,
-      required this.startTimeDateController,
-      required this.endTimeDateController,
-      required this.durationController,
-      required this.totalPaymentAmountController,
-      required this.paymentPerPeriodController});
+  _RecurringTab({
+    required this.recurringFormKey,
+  });
 
   final GlobalKey<FormState> recurringFormKey;
-  final TextEditingController startTimeDateController;
-  final TextEditingController endTimeDateController;
-  final TextEditingController durationController;
-  final TextEditingController totalPaymentAmountController;
-  final TextEditingController paymentPerPeriodController;
+  final TextEditingController startTimeDateController = TextEditingController();
+  final TextEditingController endTimeDateController = TextEditingController();
+  final TextEditingController durationController = TextEditingController();
+  final TextEditingController totalPaymentAmountController =
+      TextEditingController();
+  final TextEditingController paymentPerPeriodController =
+      TextEditingController();
   final totalPaymentFocusNode = FocusNode();
   final paymentPerPeriodFocusNode = FocusNode();
 
-  String paymentCycle = "Monthly";
-
-  void updateTotalPaymentAmount() {
+  void updateTotalPaymentAmount(FormModel formModel) {
     if (paymentPerPeriodController.text != '' &&
         durationController.text != '') {
       final totalPaymentAmount = PaymentCalculator(
               duration: util.Duration(
                   duration: int.parse(durationController.text),
                   unit: PaymentCycleHelper(timeUnit: "Day").paymentCycle),
-              paymentCycle:
-                  PaymentCycleHelper(timeUnit: paymentCycle).paymentCycle)
-          .getTotalPaymentAmount(int.parse(paymentPerPeriodController.text))
+              paymentCycle: formModel.paymentCycleType)
+          .getTotalPaymentAmount(double.parse(paymentPerPeriodController.text))
           .toStringAsFixed(2);
 
       if (totalPaymentAmount != totalPaymentAmountController.text &&
           !totalPaymentFocusNode.hasFocus) {
         totalPaymentAmountController.text = totalPaymentAmount;
+        formModel.totalPaymentAmountText = totalPaymentAmount;
+      }
+    }
+  }
+
+  void updateDuration() {
+    if (startTimeDateController.text != "" &&
+        endTimeDateController.text != "") {
+      final difference = DateFormat.yMd()
+          .parseLoose(endTimeDateController.text)
+          .difference(
+              DateFormat.yMd().parseLoose(startTimeDateController.text));
+      if (durationController.text != difference.inDays.toString() &&
+          int.parse(difference.inDays.toString()) > 0) {
+        durationController.text = difference.inDays.toString();
+        formModel.durationText = durationController.text;
       }
     }
   }
@@ -214,52 +222,42 @@ class _RecurringTab extends State<RecurringTab> {
   @override
   void initState() {
     super.initState();
-    void updateDuration() {
-      if (startTimeDateController.text != "" &&
-          endTimeDateController.text != "") {
-        final difference = DateFormat.yMd()
-            .parseLoose(endTimeDateController.text)
-            .difference(
-                DateFormat.yMd().parseLoose(startTimeDateController.text));
-        if (durationController.text != difference.inDays.toString() &&
-            int.parse(difference.inDays.toString()) > 0) {
-          durationController.text = difference.inDays.toString();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final formModel = Provider.of<FormModel>(context, listen: false);
+      startTimeDateController.addListener(() {
+        updateDuration();
+        updateTotalPaymentAmount(formModel);
+      });
+      endTimeDateController.addListener(() {
+        updateDuration();
+        updateTotalPaymentAmount(formModel);
+      });
+      durationController.addListener(() {
+        if (startTimeDateController.text != "" &&
+            durationController.text != "") {
+          final newEndTime = DateFormat.yMd()
+              .parseLoose(startTimeDateController.text)
+              .add(Duration(days: int.parse(durationController.text)));
+          final newEndTimeStr = DateFormat.yMd().format(newEndTime);
+
+          if (newEndTimeStr != endTimeDateController.text) {
+            endTimeDateController.text = newEndTimeStr;
+
+            updateTotalPaymentAmount(formModel);
+          }
         }
-      }
-    }
-
-    startTimeDateController.addListener(() {
-      updateDuration();
-      updateTotalPaymentAmount();
-    });
-    endTimeDateController.addListener(() {
-      updateDuration();
-      updateTotalPaymentAmount();
-    });
-    durationController.addListener(() {
-      if (startTimeDateController.text != "" && durationController.text != "") {
-        final newEndTime = DateFormat.yMd()
-            .parseLoose(startTimeDateController.text)
-            .add(Duration(days: int.parse(durationController.text)));
-        final newEndTimeStr = DateFormat.yMd().format(newEndTime);
-
-        if (newEndTimeStr != endTimeDateController.text) {
-          endTimeDateController.text = newEndTimeStr;
-
-          updateTotalPaymentAmount();
-        }
-      }
-    });
-    paymentPerPeriodController.addListener(updateTotalPaymentAmount);
-    totalPaymentAmountController.addListener(() {
+      });
+      paymentPerPeriodController
+          .addListener(() => updateTotalPaymentAmount(formModel));
+      totalPaymentAmountController.addListener(() {});
       if (totalPaymentAmountController.text != '' &&
           durationController.text != '') {
         final paymentPerPeriod = PaymentCalculator(
                 duration: util.Duration(
                     duration: int.parse(durationController.text),
                     unit: PaymentCycleHelper(timeUnit: "Day").paymentCycle),
-                paymentCycle:
-                    PaymentCycleHelper(timeUnit: paymentCycle).paymentCycle)
+                paymentCycle: formModel.paymentCycleType)
             .getPaymentPerPeriod(
                 double.parse(totalPaymentAmountController.text))
             .toStringAsFixed(2);
@@ -290,143 +288,166 @@ class _RecurringTab extends State<RecurringTab> {
 
   @override
   Widget build(BuildContext context) {
+    final formModel = Provider.of<FormModel>(context);
+
     return Form(
         key: recurringFormKey,
         child: Column(
           children: [
-            TextFormField(
-              validator: notEmptyValidator,
-              controller: startTimeDateController,
-              keyboardType: TextInputType.none,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Start Date',
-              ),
-              readOnly: true,
-              showCursor: false,
-              onTap: () {
-                showDatePicker(
-                        context: context,
-                        initialDate: startTimeDateController.text == ""
-                            ? DateTime.now()
-                            : DateFormat.yMd()
-                                .parseLoose(startTimeDateController.text),
-                        firstDate: DateTime.utc(2000, 1, 1),
-                        lastDate: DateTime.utc(2100, 1, 1))
-                    .then((value) => {
-                          if (value != null)
+            Observer(
+                builder: (_) => TextFormField(
+                      controller: startTimeDateController,
+                      keyboardType: TextInputType.none,
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: 'Start Date',
+                          errorText: formModel.error.startTimeDate),
+                      readOnly: true,
+                      showCursor: false,
+                      onTap: () {
+                        showDatePicker(
+                                context: context,
+                                initialDate: startTimeDateController.text == ""
+                                    ? DateTime.now()
+                                    : DateFormat.yMd().parseLoose(
+                                        startTimeDateController.text),
+                                firstDate: DateTime.utc(2000, 1, 1),
+                                lastDate: DateTime.utc(2100, 1, 1))
+                            .then((value) {
+                          if (value != null) {
                             startTimeDateController.text =
-                                DateFormat.yMd().format(value)
+                                DateFormat.yMd().format(value);
+                            formModel.startTimeDate =
+                                startTimeDateController.text;
+                          }
                         });
-              },
-            ),
+                      },
+                    )),
             const SizedBox(
               height: 16,
             ),
             Row(
               children: <Widget>[
                 Expanded(
-                  child: TextFormField(
-                      validator: notEmptyValidator,
-                      keyboardType: TextInputType.none,
-                      controller: endTimeDateController,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'End Date',
-                      ),
-                      showCursor: false,
-                      readOnly: true,
-                      onTap: () {
-                        showDatePicker(
-                                context: context,
-                                initialDate: endTimeDateController.text == ""
-                                    ? DateTime.now()
-                                    : DateFormat.yMd()
-                                        .parseLoose(endTimeDateController.text),
-                                firstDate: DateTime.utc(2000, 1, 1),
-                                lastDate: DateTime.utc(2100, 1, 1))
-                            .then((value) => {
-                                  if (value != null)
-                                    endTimeDateController.text =
-                                        DateFormat.yMd().format(value)
-                                });
-                      }),
+                  child: Observer(
+                    builder: (_) => TextFormField(
+                        keyboardType: TextInputType.none,
+                        controller: endTimeDateController,
+                        decoration: InputDecoration(
+                            border: const OutlineInputBorder(),
+                            labelText: 'End Date',
+                            errorText: formModel.error.endTimeDate),
+                        showCursor: false,
+                        readOnly: true,
+                        onTap: () {
+                          showDatePicker(
+                                  context: context,
+                                  initialDate: endTimeDateController.text == ""
+                                      ? DateTime.now()
+                                      : DateFormat.yMd().parseLoose(
+                                          endTimeDateController.text),
+                                  firstDate: DateTime.utc(2000, 1, 1),
+                                  lastDate: DateTime.utc(2100, 1, 1))
+                              .then((value) {
+                            if (value != null) {
+                              endTimeDateController.text =
+                                  DateFormat.yMd().format(value);
+                              formModel.endTimeDate =
+                                  endTimeDateController.text;
+                            }
+                          });
+                        }),
+                  ),
                 ),
                 const SizedBox(
                     width:
                         8), // Optional: to add some space between text fields.
                 Expanded(
-                  child: TextFormField(
-                    validator: notEmptyValidator,
-                    controller: durationController,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.allow(
-                          RegExp(r'[1-9][0-9]*')), // 只允许输入0到9的数字
-                    ],
-                    decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Duration',
-                        suffix: Text("Day")),
+                  child: Observer(
+                    builder: (context) => TextFormField(
+                      controller: durationController,
+                      onChanged: (value) => formModel.durationText = value,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(
+                            RegExp(r'[1-9][0-9]*')), // 只允许输入0到9的数字
+                      ],
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(),
+                          labelText: 'Duration',
+                          suffix: const Text("Day"),
+                          errorText: formModel.error.duration),
+                    ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField(
-              value: paymentCycle,
-              decoration: const InputDecoration(
-                  labelText: 'Payment Cycle', border: OutlineInputBorder()),
-              items: ["Daily", "Monthly", "Yearly"]
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (newValue) {
-                if (newValue == null) return;
-                setState(() {
-                  paymentCycle = newValue;
-                  updateTotalPaymentAmount();
-                });
-              },
-            ),
+            Observer(
+                builder: (_) => DropdownButtonFormField(
+                      value: formModel.paymentCycleType,
+                      decoration: const InputDecoration(
+                        labelText: 'Payment Cycle',
+                        border: OutlineInputBorder(),
+                      ),
+                      items: PaymentCycleType.values
+                          .map<DropdownMenuItem<PaymentCycleType>>(
+                              (PaymentCycleType value) {
+                        return DropdownMenuItem<PaymentCycleType>(
+                          value: value,
+                          child: Text(PaymentCycleHelper.enum2Str[value]!),
+                        );
+                      }).toList(),
+                      onChanged: (newValue) {
+                        if (newValue == null) return;
+                        setState(() {
+                          formModel.paymentCycleType = newValue;
+                          updateTotalPaymentAmount(formModel);
+                        });
+                      },
+                    )),
             const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
-                    child: TextFormField(
-                  validator: notEmptyValidator,
-                  controller: paymentPerPeriodController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.allow(
-                        RegExp(r'^[1-9][0-9]*\.{0,1}\d*$')), // 只允许输入0到9的数字
-                  ],
-                  focusNode: paymentPerPeriodFocusNode,
-                  decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Payment Per Period',
-                      suffix: Text("\$")),
+                    child: Observer(
+                  builder: (_) => TextFormField(
+                    controller: paymentPerPeriodController,
+                    onChanged: (value) =>
+                        formModel.paymentPerPeriodText = value,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.allow(
+                          RegExp(r'^[1-9][0-9]*\.{0,1}\d*$')), // 只允许输入0到9的数字
+                    ],
+                    focusNode: paymentPerPeriodFocusNode,
+                    decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        labelText: 'Payment Per Period',
+                        suffix: const Text("\$"),
+                        errorText: formModel.error.paymentPerPeriod),
+                  ),
                 )),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: TextFormField(
-                    validator: notEmptyValidator,
+                    child: Observer(
+                  builder: (_) => TextFormField(
                     controller: totalPaymentAmountController,
+                    onChanged: (value) =>
+                        formModel.totalPaymentAmountText = value,
                     keyboardType: TextInputType.number,
                     focusNode: totalPaymentFocusNode,
                     inputFormatters: <TextInputFormatter>[
                       FilteringTextInputFormatter.allow(
                           RegExp(r'^[1-9][0-9]*\.{0,1}\d*$')), // 只允许输入0到9的数字
                     ],
-                    decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
                         labelText: 'Total Payment Amount',
-                        suffix: Text("\$")),
+                        suffix: const Text("\$"),
+                        errorText: formModel.error.totalPaymentAmount),
                   ),
-                )
+                ))
               ],
             )
           ],

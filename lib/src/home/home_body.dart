@@ -14,8 +14,8 @@ class HomeBody extends StatelessWidget {
       child: Column(
         children: [
           HomeSubscriptionSection(),
-          HomeSubscriptionSection(),
-          HomeSubscriptionSection()
+          // HomeSubscriptionSection(),
+          // HomeSubscriptionSection()
         ],
       ),
     );

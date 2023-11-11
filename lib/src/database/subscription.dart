@@ -53,7 +53,7 @@ class Subscription extends BaseModel {
         createdAt: map[BaseModel.columnCreatedAt] as int,
         updatedAt: map[BaseModel.columnUpdatedAt] as int,
         deletedAt: map[BaseModel.columnDeletedAt] as int?,
-        description: map[columnDescription] as String,
+        description: map[columnDescription] as String?,
         title: map[columnTitle] as String,
         orders: map[ordersProperty] as List<Order>? ?? []);
   }

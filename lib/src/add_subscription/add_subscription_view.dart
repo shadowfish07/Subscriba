@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:subscriba/src/add_subscription/add_subscription_form.dart';
+import 'package:subscriba/src/add_subscription/form_model.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/database/subscription.dart';
+import 'package:subscriba/src/store/subscription_model.dart';
 import 'package:subscriba/src/util/payment_cycle.dart';
+
+final formModel = FormModel();
 
 class AddSubscriptionView extends StatefulWidget {
   static const routeName = '/subscription/add';
@@ -14,8 +19,7 @@ class AddSubscriptionView extends StatefulWidget {
   State<StatefulWidget> createState() => _AddSubscriptionView();
 }
 
-class _AddSubscriptionView extends State<AddSubscriptionView>
-    with TickerProviderStateMixin {
+class _AddSubscriptionView extends State<AddSubscriptionView> {
   final GlobalKey<FormState> subscriptionFormKey = GlobalKey();
   final GlobalKey<FormState> recurringFormKey = GlobalKey();
   final TextEditingController subscriptionNameController =
@@ -29,52 +33,48 @@ class _AddSubscriptionView extends State<AddSubscriptionView>
       TextEditingController();
   final TextEditingController paymentPerPeriodController =
       TextEditingController();
-  late final TabController paymentTypeTabController;
+
+  late SubscriptionModel subscriptionModel;
 
   @override
   void initState() {
     super.initState();
-    paymentTypeTabController = TabController(length: 2, vsync: this);
+    formModel.setupValidations();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      subscriptionModel =
+          Provider.of<SubscriptionModel>(context, listen: false);
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
-    paymentTypeTabController.dispose();
+    formModel.dispose();
   }
 
   void saveSubscription() async {
-    final subscriptionFormValidation =
-        subscriptionFormKey.currentState?.validate();
-    final recurringFormValidation = paymentTypeTabController.index == 0
-        ? recurringFormKey.currentState?.validate()
-        : true;
+    formModel.validateAll();
 
-    if (subscriptionFormValidation == true && recurringFormValidation == true) {
+    if (!formModel.error.hasErrors) {
       final subscriptionId = await SubscriptionProvider().insert(
           Subscription.create(
-              title: subscriptionNameController.text,
-              description: subscriptionDescriptionController.text));
+              title: formModel.subscriptionName!,
+              description: formModel.subscriptionDescription));
 
       await OrderProvider().insert(
         Order.create(
-          orderDate: DateFormat.yMd()
-              .parseLoose(startTimeDateController.text)
-              .microsecondsSinceEpoch,
-          paymentType: paymentTypeTabController.index == 0
-              ? PaymentType.recurring
-              : PaymentType.onetime,
-          startDate: DateFormat.yMd()
-              .parseLoose(startTimeDateController.text)
-              .microsecondsSinceEpoch,
-          endDate: DateFormat.yMd()
-              .parseLoose(endTimeDateController.text)
-              .microsecondsSinceEpoch,
-          subscriptionId: subscriptionId,
-          paymentPerPeriodUnit: "\$",
-          // paymentCycleType: PaymentCycleHelper(timeUnit: paymentc)
-        ),
+            orderDate: formModel.startTimeTimestamp!,
+            paymentType: formModel.paymentType,
+            startDate: formModel.startTimeTimestamp!,
+            endDate: formModel.endTimeTimestamp!,
+            subscriptionId: subscriptionId,
+            paymentPerPeriodUnit: "\$",
+            paymentCycleType: formModel.paymentCycleType,
+            paymentPerPeriod: formModel.paymentPerPeriod),
       );
+
+      subscriptionModel.loadSubscriptions();
     }
   }
 
@@ -88,18 +88,20 @@ class _AddSubscriptionView extends State<AddSubscriptionView>
         child: SizedBox(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
-            child: AddSubscriptionForm(
-              subscriptionFormKey: subscriptionFormKey,
-              recurringFormKey: recurringFormKey,
-              paymentTypeTabController: paymentTypeTabController,
-              subscriptionNameController: subscriptionNameController,
-              subscriptionDescriptionController:
-                  subscriptionDescriptionController,
-              startTimeDateController: startTimeDateController,
-              endTimeDateController: endTimeDateController,
-              durationController: durationController,
-              totalPaymentAmountController: totalPaymentAmountController,
-              paymentPerPeriodController: paymentPerPeriodController,
+            child: Provider(
+              create: (_) => formModel,
+              builder: (context, child) => AddSubscriptionForm(
+                subscriptionFormKey: subscriptionFormKey,
+                recurringFormKey: recurringFormKey,
+                subscriptionNameController: subscriptionNameController,
+                subscriptionDescriptionController:
+                    subscriptionDescriptionController,
+                startTimeDateController: startTimeDateController,
+                endTimeDateController: endTimeDateController,
+                durationController: durationController,
+                totalPaymentAmountController: totalPaymentAmountController,
+                paymentPerPeriodController: paymentPerPeriodController,
+              ),
             )),
       ),
       floatingActionButton: FloatingActionButton(
