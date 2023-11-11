@@ -13,12 +13,12 @@ class HomeView extends StatelessWidget {
     void onPressCreateSubscriptionFAB() {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => AddSubscriptionView()),
+        MaterialPageRoute(builder: (context) => const AddSubscriptionView()),
       );
     }
 
     return Scaffold(
-      appBar: HomeAppBar(),
+      appBar: const HomeAppBar(),
       body: const HomeBody(),
       floatingActionButton: FloatingActionButton(
         onPressed: onPressCreateSubscriptionFAB,

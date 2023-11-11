@@ -53,7 +53,7 @@ class _AddSubscriptionView extends State<AddSubscriptionView> {
     formModel.dispose();
   }
 
-  void saveSubscription() async {
+  Future<void> saveSubscription() async {
     formModel.validateAll();
 
     if (!formModel.error.hasErrors) {
@@ -105,7 +105,11 @@ class _AddSubscriptionView extends State<AddSubscriptionView> {
             )),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: saveSubscription,
+        onPressed: () {
+          saveSubscription().then((_) {
+            Navigator.pop(context);
+          });
+        },
         child: const Icon(Icons.save),
       ),
     );

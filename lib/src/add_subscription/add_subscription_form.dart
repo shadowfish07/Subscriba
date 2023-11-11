@@ -243,6 +243,7 @@ class _RecurringTab extends State<RecurringTab> {
 
           if (newEndTimeStr != endTimeDateController.text) {
             endTimeDateController.text = newEndTimeStr;
+            formModel.endTimeDate = newEndTimeStr;
 
             updateTotalPaymentAmount(formModel);
           }
@@ -250,23 +251,25 @@ class _RecurringTab extends State<RecurringTab> {
       });
       paymentPerPeriodController
           .addListener(() => updateTotalPaymentAmount(formModel));
-      totalPaymentAmountController.addListener(() {});
-      if (totalPaymentAmountController.text != '' &&
-          durationController.text != '') {
-        final paymentPerPeriod = PaymentCalculator(
-                duration: util.Duration(
-                    duration: int.parse(durationController.text),
-                    unit: PaymentCycleHelper(timeUnit: "Day").paymentCycle),
-                paymentCycle: formModel.paymentCycleType)
-            .getPaymentPerPeriod(
-                double.parse(totalPaymentAmountController.text))
-            .toStringAsFixed(2);
+      totalPaymentAmountController.addListener(() {
+        if (totalPaymentAmountController.text != '' &&
+            durationController.text != '') {
+          final paymentPerPeriod = PaymentCalculator(
+                  duration: util.Duration(
+                      duration: int.parse(durationController.text),
+                      unit: PaymentCycleHelper(timeUnit: "Day").paymentCycle),
+                  paymentCycle: formModel.paymentCycleType)
+              .getPaymentPerPeriod(
+                  double.parse(totalPaymentAmountController.text))
+              .toStringAsFixed(2);
 
-        if (paymentPerPeriod != paymentPerPeriodController.text &&
-            !paymentPerPeriodFocusNode.hasFocus) {
-          paymentPerPeriodController.text = paymentPerPeriod;
+          if (paymentPerPeriod != paymentPerPeriodController.text &&
+              !paymentPerPeriodFocusNode.hasFocus) {
+            paymentPerPeriodController.text = paymentPerPeriod;
+            formModel.paymentPerPeriodText = paymentPerPeriod;
+          }
         }
-      }
+      });
     });
   }
 

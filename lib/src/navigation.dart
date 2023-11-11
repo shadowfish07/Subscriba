@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:subscriba/src/home/home_view.dart';
 import 'package:subscriba/src/store/subscription_model.dart';
+import 'package:subscriba/src/subscriptions/subscriptions_view.dart';
 
 class Navigation extends StatefulWidget {
   const Navigation({super.key});
@@ -46,7 +47,11 @@ class _NavigationState extends State<Navigation> {
         selectedIndex: currentIndex,
         onDestinationSelected: setCurrentIndex,
       ),
-      body: [const HomeView(), Container(), Container()][currentIndex],
+      body: [
+        const HomeView(),
+        const SubscriptionsView(),
+        Container()
+      ][currentIndex],
     );
   }
 }
