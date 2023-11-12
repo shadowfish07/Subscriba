@@ -69,6 +69,7 @@ class BaseModalProvider<T extends BaseModel> {
 create table ${SubscriptionProvider.tableName} (
   ${BaseModalProvider.createBaseColumns},
   ${Subscription.columnTitle} text not null,
+  ${Subscription.columnIsRenew} integer not null,
   ${Subscription.columnDescription} text)
 ''');
 

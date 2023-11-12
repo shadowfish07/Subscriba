@@ -13,17 +13,20 @@ class Subscription extends BaseModel {
       required this.description,
       required this.title,
       required this.orders,
+      required this.isRenew,
       required super.createdAt,
       required super.updatedAt,
       super.deletedAt});
 
   final String title;
   final String? description;
+  final bool isRenew;
 
   final List<Order> orders;
 
   static const String columnTitle = "title";
   static const String columnDescription = "description";
+  static const String columnIsRenew = "is_renew";
 
   static const String ordersProperty = "orders";
 
@@ -32,18 +35,21 @@ class Subscription extends BaseModel {
     var map = <String, Object?>{
       ...super.toMap(),
       columnTitle: title,
-      columnDescription: description
+      columnDescription: description,
+      columnIsRenew: isRenew
     };
     return map;
   }
 
-  static Subscription create({String? description, required String title}) {
+  static Subscription create(
+      {String? description, required String title, bool isRenew = true}) {
     return Subscription(
         id: -1,
         createdAt: DateTime.now().microsecondsSinceEpoch,
         updatedAt: DateTime.now().microsecondsSinceEpoch,
         description: description,
         title: title,
+        isRenew: isRenew,
         orders: []);
   }
 
@@ -55,12 +61,13 @@ class Subscription extends BaseModel {
         deletedAt: map[BaseModel.columnDeletedAt] as int?,
         description: map[columnDescription] as String?,
         title: map[columnTitle] as String,
+        isRenew: map[columnIsRenew] as int == 1 ? true : false,
         orders: map[ordersProperty] as List<Order>? ?? []);
   }
 
   @override
   String toString() {
-    return "${super.toString()} ,title: $title, description: $description, orders: $orders)";
+    return "${super.toString()} ,title: $title, description: $description, isRenew: $isRenew, orders: $orders)";
   }
 }
 

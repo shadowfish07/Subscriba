@@ -24,7 +24,9 @@ class SubscriptionCard extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => const SubscriptionDetailView()),
+              builder: (context) => SubscriptionDetailView(
+                    subscription: subscription,
+                  )),
         );
       },
       child: Card(

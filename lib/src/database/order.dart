@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as p;
 
-enum PaymentType { recurring, onetime }
+enum PaymentType { recurring, lifetime }
 
 enum PaymentCycleType { daily, monthly, yearly }
 

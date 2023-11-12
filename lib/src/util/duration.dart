@@ -10,7 +10,7 @@ class Duration {
         .difference(DateTime.fromMicrosecondsSinceEpoch(startDate));
 
     return Duration(
-      duration: diff.inDays,
+      duration: diff.inDays + 1,
       unit: unit,
     );
   }
