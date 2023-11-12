@@ -23,7 +23,7 @@ class Order extends BaseModel {
       required this.startDate,
       this.endDate,
       this.paymentCycleType,
-      this.paymentPerPeriod,
+      required this.paymentPerPeriod,
       this.paymentPerPeriodUnit});
 
   final int subscriptionId;
@@ -37,8 +37,8 @@ class Order extends BaseModel {
   // recurring Type only
   // 0-> day 1-> month 2-> year
   final PaymentCycleType? paymentCycleType;
-  // recurring Type only
-  final double? paymentPerPeriod;
+  // 实付
+  final double paymentPerPeriod;
   // recurring Type only
   // $/￥
   final String? paymentPerPeriodUnit;
@@ -78,7 +78,7 @@ class Order extends BaseModel {
       required int subscriptionId,
       int? endDate,
       PaymentCycleType? paymentCycleType,
-      double? paymentPerPeriod,
+      required double paymentPerPeriod,
       String? paymentPerPeriodUnit}) {
     return Order(
       id: -1,
@@ -111,7 +111,7 @@ class Order extends BaseModel {
         paymentCycleType: map[columnPaymentCycleType] != null
             ? PaymentCycleType.values[map[columnPaymentCycleType] as int]
             : null,
-        paymentPerPeriod: map[columnPaymentPerPeriod] as double?,
+        paymentPerPeriod: map[columnPaymentPerPeriod] as double,
         paymentPerPeriodUnit: map[columnPaymentPerPeriodUnit] as String?);
   }
 

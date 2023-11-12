@@ -85,8 +85,9 @@ class SubscriptionProvider extends BaseModalProvider {
     }
 
     final orders = await getOrders(id);
-    map[Subscription.ordersProperty] = orders;
-    return Subscription.fromMap(map);
+    final newMap = {...map};
+    newMap[Subscription.ordersProperty] = orders;
+    return Subscription.fromMap(newMap);
   }
 
   Future<List<Order>> getOrders(int id) async {
@@ -102,5 +103,15 @@ class SubscriptionProvider extends BaseModalProvider {
       return Subscription.fromMap(map);
     })))
         .toList();
+  }
+
+  Future<bool> setIsRenew(int id, bool isRenew) async {
+    final db = await BaseModalProvider.db;
+
+    final count = await db.update(
+        table, {Subscription.columnIsRenew: isRenew ? 1 : 0},
+        where: '${BaseModel.columnId} = ?', whereArgs: [id]);
+
+    return count > 0;
   }
 }

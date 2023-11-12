@@ -10,10 +10,16 @@ class PaymentCycleHelper {
     "Year": PaymentCycleType.yearly
   };
 
-  static const enum2Str = {
+  static const enum2FormalStr = {
     PaymentCycleType.daily: 'Daily',
     PaymentCycleType.monthly: 'Monthly',
-    PaymentCycleType.yearly: 'Yearly'
+    PaymentCycleType.yearly: 'Annually'
+  };
+
+  static const enum2PerUnitStr = {
+    PaymentCycleType.daily: 'day',
+    PaymentCycleType.monthly: 'month',
+    PaymentCycleType.yearly: 'year'
   };
 
   PaymentCycleHelper({required String timeUnit}) {

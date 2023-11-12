@@ -9,6 +9,7 @@ import 'package:subscriba/src/styles/styles.dart';
 import 'package:subscriba/src/subsciption_detail/subscription_detail_model.dart';
 import 'package:subscriba/src/util/date_format_helper.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
+import 'package:subscriba/src/util/payment_cycle.dart';
 
 class SubscriptionDetailView extends StatefulWidget {
   const SubscriptionDetailView({super.key, required this.subscription});
@@ -65,7 +66,7 @@ class _SubscriptionDetailBody extends StatelessWidget {
                 )
               ],
             ),
-            SizedBox(height: 54),
+            const SizedBox(height: 54),
             _PerPeriodCostCardsRow(
               subscriptionDetailModel: subscriptionDetailModel,
             ),
@@ -74,25 +75,9 @@ class _SubscriptionDetailBody extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                      flex: 2,
-                      child: DisplayCard(
-                        title: Text(
-                          "Totally Cost",
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        body: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "\$900",
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            Text("Top 1",
-                                style: Theme.of(context).textTheme.labelMedium)
-                          ],
-                        ),
-                      )),
+                  _TotallyCostCard(
+                    subscriptionDetailModel: subscriptionDetailModel,
+                  ),
                   Expanded(
                       child: DisplayCard(
                     title: Text(
@@ -100,68 +85,217 @@ class _SubscriptionDetailBody extends StatelessWidget {
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     body: Text(
-                      "9",
-                      style: Theme.of(context).textTheme.titleLarge,
+                      subscriptionDetailModel.subscription.orders.length
+                          .toString(),
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium!
+                          .copyWith(fontFamily: "Alibaba"),
                     ),
                   )),
                 ],
               ),
             ),
-            Padding(
-              padding: defaultCenterPadding,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                      child: DisplayCard(
-                    isClickable: true,
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    title: Text(
-                      "Renew",
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    body: Text(
-                      "On",
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  )),
-                  Expanded(
-                      flex: 2,
-                      child: DisplayCard(
-                        title: Text(
-                          "Next Payment",
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        body: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "\$900",
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            Text("In 3 days",
-                                style: Theme.of(context).textTheme.labelMedium)
-                          ],
-                        ),
-                      )),
-                ],
-              ),
-            ),
+            _RecurringCardsRow(
+                subscriptionDetailModel: subscriptionDetailModel),
             const SizedBox(height: 8),
-            Section(
-                title: "Orders",
-                child: Column(children: [
-                  OrderCard(
-                    color: Theme.of(context).colorScheme.surfaceVariant,
-                  ),
-                  OrderCard(
-                    color: Theme.of(context).colorScheme.surfaceVariant,
-                  )
-                ]))
+            _OrdersSection(subscriptionDetailModel: subscriptionDetailModel)
           ],
         ),
       ),
     );
+  }
+}
+
+class _OrdersSection extends StatelessWidget {
+  const _OrdersSection({
+    super.key,
+    required this.subscriptionDetailModel,
+  });
+
+  final SubscriptionDetailModel subscriptionDetailModel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Observer(
+      builder: (_) {
+        final orderCalculator = OrderCalculator(
+            orders: subscriptionDetailModel.subscription.orders);
+
+        return Section(
+            title: "Orders",
+            child: Column(
+                children: List.from(orderCalculator.availableOrders)
+                    .reversed
+                    .map((e) => OrderCard(
+                          order: e,
+                          color: Theme.of(context).colorScheme.surfaceVariant,
+                        ))
+                    .toList()));
+      },
+    );
+  }
+}
+
+class _RecurringCardsRow extends StatelessWidget {
+  const _RecurringCardsRow({
+    super.key,
+    required this.subscriptionDetailModel,
+  });
+
+  final SubscriptionDetailModel subscriptionDetailModel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Observer(
+      builder: (_) {
+        final isLifetime =
+            OrderCalculator(orders: subscriptionDetailModel.subscription.orders)
+                .includeLifetimeOrder;
+
+        if (isLifetime) {
+          return Container();
+        }
+        return Padding(
+          padding: defaultCenterPadding,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _RenewCard(
+                subscriptionDetailModel: subscriptionDetailModel,
+              ),
+              _NextPaymentCard(
+                subscriptionDetailModel: subscriptionDetailModel,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _NextPaymentCard extends StatelessWidget {
+  final SubscriptionDetailModel subscriptionDetailModel;
+
+  const _NextPaymentCard({super.key, required this.subscriptionDetailModel});
+
+  @override
+  Widget build(BuildContext context) {
+    return Observer(
+      builder: (_) {
+        final orderCalculator = OrderCalculator(
+            orders: subscriptionDetailModel.subscription.orders);
+
+        return Expanded(
+            flex: 2,
+            child: DisplayCard(
+              title: Text(
+                "Next Payment",
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              body: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        "\$${orderCalculator.nextPaymentTemplate!.paymentPerPeriod.toStringAsFixed(2)}",
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium!
+                            .copyWith(fontFamily: "Alibaba"),
+                      ),
+                      Text(
+                          "/${PaymentCycleHelper.enum2PerUnitStr[orderCalculator.nextPaymentTemplate!.paymentCycleType]}",
+                          style:
+                              Theme.of(context).textTheme.bodySmall!.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ))
+                    ],
+                  )
+                ],
+              ),
+            ));
+      },
+    );
+  }
+}
+
+class _RenewCard extends StatelessWidget {
+  final SubscriptionDetailModel subscriptionDetailModel;
+
+  const _RenewCard({super.key, required this.subscriptionDetailModel});
+
+  @override
+  Widget build(BuildContext context) {
+    return Observer(
+      builder: (_) {
+        final isRenew = subscriptionDetailModel.subscription.isRenew;
+        final isLifetime =
+            OrderCalculator(orders: subscriptionDetailModel.subscription.orders)
+                .includeLifetimeOrder;
+
+        final onTap = isLifetime
+            ? null
+            : () {
+                subscriptionDetailModel.toggleRenew();
+              };
+
+        return Expanded(
+            child: DisplayCard(
+          onTap: onTap,
+          color: isRenew
+              ? Theme.of(context).colorScheme.primaryContainer
+              : Theme.of(context).colorScheme.tertiaryContainer,
+          title: Text(
+            "Renew",
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          body: Text(
+            isLifetime
+                ? "Lifetime"
+                : isRenew
+                    ? "On"
+                    : "Off",
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        ));
+      },
+    );
+  }
+}
+
+class _TotallyCostCard extends StatelessWidget {
+  final SubscriptionDetailModel subscriptionDetailModel;
+
+  const _TotallyCostCard({super.key, required this.subscriptionDetailModel});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+        flex: 2,
+        child: DisplayCard(
+          title: Text(
+            "Total amount paid",
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          body: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "\$${OrderCalculator(orders: subscriptionDetailModel.subscription.orders).totalPrize}",
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium!
+                    .copyWith(fontFamily: "Alibaba"),
+              ),
+              // Text("Top 1", style: Theme.of(context).textTheme.labelMedium)
+            ],
+          ),
+        ));
   }
 }
 
@@ -214,7 +348,7 @@ class _PerPeriodCostCardsRow extends StatelessWidget {
               Expanded(
                   child: DisplayCard(
                 title: Text(
-                  "Yearly ",
+                  "Annually ",
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 body: Text(
@@ -250,9 +384,13 @@ class _SubscriptionTimeInfoCard extends StatelessWidget {
         final latestSubscriptionDate = orderCalculator.latestSubscriptionDate;
         final subscribingDays = orderCalculator.subscribingDays;
         final expiresIn = orderCalculator.expiresIn;
-        final expirationProgress = (DateTime.now().microsecondsSinceEpoch -
-                lastContinuousSubscriptionDate) /
-            (latestSubscriptionDate - lastContinuousSubscriptionDate);
+        // TODO 处理订阅还没有开始的场景
+        final expirationProgress =
+            latestSubscriptionDate - lastContinuousSubscriptionDate != 0
+                ? (DateTime.now().microsecondsSinceEpoch -
+                        lastContinuousSubscriptionDate) /
+                    (latestSubscriptionDate - lastContinuousSubscriptionDate)
+                : 0.0;
 
         return Positioned(
             left: 24,
@@ -345,40 +483,36 @@ class DisplayCard extends StatelessWidget {
       required this.title,
       required this.body,
       this.color,
-      this.isClickable = false,
       this.onTap});
 
   final Widget title;
   final Widget body;
   final Color? color;
-  final bool isClickable;
   final void Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
     var card = Card(
       color: color ?? Theme.of(context).colorScheme.surfaceVariant,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        child: SizedBox(
-          height: 64,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              title,
-              body,
-            ],
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          child: SizedBox(
+            height: 64,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                title,
+                body,
+              ],
+            ),
           ),
         ),
       ),
     );
-    if (isClickable) {
-      InkWell(
-        onTap: onTap,
-        child: card,
-      );
-    }
 
     return card;
   }

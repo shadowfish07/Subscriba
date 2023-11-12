@@ -52,7 +52,7 @@ class SubscriptionAppBar extends StatelessWidget
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         Text(
-                          '/${PaymentCycleHelper.enum2Str[subscriptionPageModel.paymentCycleType]!.toLowerCase()}',
+                          '/${PaymentCycleHelper.enum2FormalStr[subscriptionPageModel.paymentCycleType]!.toLowerCase()}',
                           style: Theme.of(context)
                               .textTheme
                               .bodyLarge!

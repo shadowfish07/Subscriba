@@ -211,10 +211,11 @@ class _RecurringTab extends State<RecurringTab> {
           .parseLoose(endTimeDateController.text)
           .difference(
               DateFormat.yMd().parseLoose(startTimeDateController.text));
-      if (durationController.text != difference.inDays.toString() &&
-          int.parse(difference.inDays.toString()) > 0) {
-        durationController.text = difference.inDays.toString();
-        formModel.durationText = durationController.text;
+      final diffInDays = difference.inDays + 1;
+      if (durationController.text != diffInDays.toString() &&
+          int.parse(diffInDays.toString()) > 0) {
+        durationController.text = diffInDays.toString();
+        formModel.durationText = diffInDays.toString();
       }
     }
   }
@@ -238,7 +239,7 @@ class _RecurringTab extends State<RecurringTab> {
             durationController.text != "") {
           final newEndTime = DateFormat.yMd()
               .parseLoose(startTimeDateController.text)
-              .add(Duration(days: int.parse(durationController.text)));
+              .add(Duration(days: int.parse(durationController.text) - 1));
           final newEndTimeStr = DateFormat.yMd().format(newEndTime);
 
           if (newEndTimeStr != endTimeDateController.text) {
@@ -398,7 +399,8 @@ class _RecurringTab extends State<RecurringTab> {
                               (PaymentCycleType value) {
                         return DropdownMenuItem<PaymentCycleType>(
                           value: value,
-                          child: Text(PaymentCycleHelper.enum2Str[value]!),
+                          child:
+                              Text(PaymentCycleHelper.enum2FormalStr[value]!),
                         );
                       }).toList(),
                       onChanged: (newValue) {

@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/util/duration.dart' as my;
 import 'package:subscriba/src/util/payment_calculator.dart';
@@ -39,18 +40,10 @@ class OrderCalculator {
     return result;
   }
 
-  // 待重写
-  get totalPrize {
-    return availableOrders
-        .where((e) => e.paymentType == PaymentType.recurring)
-        .map((e) {
-      final duration =
-          my.Duration.fromDate(e.startDate, e.endDate!, e.paymentCycleType!);
-
-      return PaymentCalculator(
-              duration: duration, paymentCycle: e.paymentCycleType!)
-          .getTotalPaymentAmount(e.paymentPerPeriod!);
-    }).reduce((value, element) => value + element);
+  double get totalPrize {
+    return availableOrders.map((e) {
+      return e.paymentPerPeriod;
+    }).fold(0.0, (value, element) => value + element);
   }
 
   double perPrize(PaymentCycleType paymentCycleType) {
@@ -68,9 +61,9 @@ perYear = 10 / 31 * 365 = 117.74..
 这和普通预期中的10 * 12 不匹配，但更灵活普适。
        */
           return getDailyPaymentPerPeriod(
-                  e.paymentCycleType!, e.paymentPerPeriod!) *
+                  e.paymentCycleType!, e.paymentPerPeriod) *
               paymentCycle2Days[paymentCycleType]!;
-        }).reduce((value, element) => value + element) /
+        }).fold(0.0, (value, element) => value + element) /
         orders.length;
   }
 
@@ -90,7 +83,7 @@ perYear = 10 / 31 * 365 = 117.74..
         .map((e) =>
             my.Duration.fromDate(e.startDate, e.endDate!, e.paymentCycleType!)
                 .duration)
-        .reduce((value, element) => value + element);
+        .fold(0, (value, element) => value + element);
   }
 
   /// 无买断返回-1
@@ -110,6 +103,8 @@ perYear = 10 / 31 * 365 = 117.74..
   /// 计算最后一次连续订阅的开始时间
   /// 遇到买断则直接返回买断时间
   int get lastContinuousSubscriptionDate {
+    if (availableOrders.isEmpty) return 0;
+
     for (var i = availableOrders.length - 1; i > 0; i--) {
       final order = availableOrders[i];
       final prevOrder = availableOrders[i - 1];
@@ -135,6 +130,8 @@ perYear = 10 / 31 * 365 = 117.74..
       return -1;
     }
 
+    if (availableOrders.isEmpty) return 0;
+
     return availableOrders[availableOrders.length - 1].endDate!;
   }
 
@@ -144,7 +141,18 @@ perYear = 10 / 31 * 365 = 117.74..
       return null;
     }
 
+    DateTime now = DateTime.now();
+    DateTime nowDate = DateTime(now.year, now.month, now.day);
+
     return DateTime.fromMicrosecondsSinceEpoch(latestSubscriptionDate)
-        .difference(DateTime.now());
+        .difference(nowDate);
+  }
+
+  Order? get nextPaymentTemplate {
+    if (includeLifetimeOrder) {
+      return null;
+    }
+
+    return availableOrders[availableOrders.length - 1];
   }
 }

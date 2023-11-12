@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
 import 'package:subscriba/src/database/subscription.dart';
 
@@ -12,4 +13,12 @@ abstract class _SubscriptionDetailModel with Store {
   Subscription subscription;
 
   _SubscriptionDetailModel({required this.subscription});
+
+  @action
+  Future<void> toggleRenew() async {
+    await SubscriptionProvider()
+        .setIsRenew(subscription.id, !subscription.isRenew);
+    subscription =
+        (await SubscriptionProvider().getSubscription(subscription.id))!;
+  }
 }
