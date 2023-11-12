@@ -37,6 +37,15 @@ flutter:
   # Enable generation of localized Strings from arb files.
   generate: true
 
+  fonts:
+    - family: Alibaba
+      fonts:
+        - asset: assets/fonts/Alibaba-PuHuiTi-Regular.ttf
+        - asset: assets/fonts/Alibaba-PuHuiTi-Bold.ttf
+        - asset: assets/fonts/Alibaba-PuHuiTi-Heavy.ttf
+        - asset: assets/fonts/Alibaba-PuHuiTi-Medium.ttf
+        - asset: assets/fonts/Alibaba-PuHuiTi-Light.ttf
+
   assets:
     # Add assets from the images directory to the application.
     - assets/images/

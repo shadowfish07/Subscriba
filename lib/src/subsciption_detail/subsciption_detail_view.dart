@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:intl/intl.dart';
 import 'package:subscriba/src/component/section.dart';
+import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/database/subscription.dart';
 import 'package:subscriba/src/order/order_card.dart';
 import 'package:subscriba/src/styles/styles.dart';
@@ -65,46 +66,8 @@ class _SubscriptionDetailBody extends StatelessWidget {
               ],
             ),
             SizedBox(height: 54),
-            Padding(
-              padding: defaultCenterPadding,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                      child: DisplayCard(
-                    title: Text(
-                      "Daily ",
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    body: Text(
-                      "\$900",
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  )),
-                  Expanded(
-                      child: DisplayCard(
-                    title: Text(
-                      "Monthly ",
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    body: Text(
-                      "\$900",
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  )),
-                  Expanded(
-                      child: DisplayCard(
-                    title: Text(
-                      "Yearly ",
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    body: Text(
-                      "\$900",
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  )),
-                ],
-              ),
+            _PerPeriodCostCardsRow(
+              subscriptionDetailModel: subscriptionDetailModel,
             ),
             Padding(
               padding: defaultCenterPadding,
@@ -184,7 +147,7 @@ class _SubscriptionDetailBody extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Section(
                 title: "Orders",
                 child: Column(children: [
@@ -198,6 +161,74 @@ class _SubscriptionDetailBody extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _PerPeriodCostCardsRow extends StatelessWidget {
+  final SubscriptionDetailModel subscriptionDetailModel;
+
+  const _PerPeriodCostCardsRow(
+      {super.key, required this.subscriptionDetailModel});
+
+  @override
+  Widget build(BuildContext context) {
+    return Observer(
+      builder: (_) {
+        final orderCalculator = OrderCalculator(
+            orders: subscriptionDetailModel.subscription.orders);
+
+        return Padding(
+          padding: defaultCenterPadding,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                  child: DisplayCard(
+                title: Text(
+                  "Daily ",
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                body: Text(
+                  "\$${orderCalculator.perPrize(PaymentCycleType.daily)}",
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium!
+                      .copyWith(fontFamily: "Alibaba"),
+                ),
+              )),
+              Expanded(
+                  child: DisplayCard(
+                title: Text(
+                  "Monthly ",
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                body: Text(
+                  "\$${orderCalculator.perPrize(PaymentCycleType.monthly)}",
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium!
+                      .copyWith(fontFamily: "Alibaba"),
+                ),
+              )),
+              Expanded(
+                  child: DisplayCard(
+                title: Text(
+                  "Yearly ",
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                body: Text(
+                  "\$${orderCalculator.perPrize(PaymentCycleType.yearly)}",
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium!
+                      .copyWith(fontFamily: "Alibaba"),
+                ),
+              )),
+            ],
+          ),
+        );
+      },
     );
   }
 }
