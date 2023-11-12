@@ -37,19 +37,15 @@ class SubscriptionPerPrize extends StatelessWidget {
           ),
           Text(
             "/${paymentCycleType2Display[mainPaymentCycleType]}",
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall!
-                .copyWith(color: Theme.of(context).colorScheme.secondary),
+            style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant),
           )
         ]),
         mainPaymentCycleType != PaymentCycleType.daily
             ? Text(
                 "\$${perDayPaymentCyclePrize.toStringAsFixed(2)}/day",
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall!
-                    .copyWith(color: Theme.of(context).colorScheme.secondary),
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant),
               )
             : Container()
       ],

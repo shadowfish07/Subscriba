@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:subscriba/src/styles/styles.dart';
 
-class HomeSection extends StatelessWidget {
-  const HomeSection({super.key, required this.title, required this.child});
+class Section extends StatelessWidget {
+  const Section({super.key, required this.title, required this.child});
 
   final String title;
 
