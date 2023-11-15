@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:subscriba/src/store/subscription_model.dart';
+import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/subscriptions/subscriptions_page_model.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
 import 'package:subscriba/src/util/payment_cycle.dart';
@@ -14,7 +14,7 @@ class SubscriptionAppBar extends StatelessWidget
   @override
   Widget build(BuildContext context) {
     final subscriptionPageModel = Provider.of<SubscriptionPageModel>(context);
-    final subscriptionModel = Provider.of<SubscriptionModel>(context);
+    final subscriptionsModel = Provider.of<SubscriptionsModel>(context);
     double statusBarHeight = MediaQuery.of(context).padding.top;
 
     return Container(
@@ -30,14 +30,14 @@ class SubscriptionAppBar extends StatelessWidget
               children: [
                 Observer(
                     builder: (_) => Text(
-                          'A total of ${subscriptionModel.subscriptions.length}',
+                          'A total of ${subscriptionsModel.subscriptions.length}',
                           style: Theme.of(context).textTheme.titleLarge,
                         )),
                 Observer(builder: (_) {
                   final perMainPaymentCyclePrize =
-                      subscriptionModel.subscriptions.map(
+                      subscriptionsModel.subscriptions.map(
                     (e) {
-                      return OrderCalculator(orders: e.orders)
+                      return OrderCalculator(orders: e.instance.orders)
                           .perPrize(subscriptionPageModel.paymentCycleType);
                     },
                   ).reduce((value, element) => value + element);

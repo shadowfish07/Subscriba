@@ -7,7 +7,7 @@ import 'package:subscriba/src/home/home_view.dart';
 import 'package:subscriba/src/navigation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:subscriba/src/store/subscription_model.dart';
+import 'package:subscriba/src/store/subscriptions_model.dart';
 
 import 'sample_feature/sample_item_details_view.dart';
 import 'sample_feature/sample_item_list_view.dart';
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
     // The ListenableBuilder Widget listens to the SettingsController for changes.
     // Whenever the user updates their settings, the MaterialApp is rebuilt.
     return MultiProvider(
-      providers: [Provider(create: (_) => SubscriptionModel())],
+      providers: [Provider(create: (_) => SubscriptionsModel())],
       builder: (context, child) {
         return ListenableBuilder(
           listenable: settingsController,

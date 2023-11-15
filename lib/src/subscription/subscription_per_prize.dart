@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/database/subscription.dart';
+import 'package:subscriba/src/store/subscription_model.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
 
 const paymentCycleType2Display = {
@@ -16,15 +17,16 @@ class SubscriptionPerPrize extends StatelessWidget {
       required this.mainPaymentCycleType});
 
   final PaymentCycleType mainPaymentCycleType;
-  final Subscription subscription;
+  final SubscriptionModel subscription;
 
   @override
   Widget build(BuildContext context) {
     final perMainPaymentCyclePrize =
-        OrderCalculator(orders: subscription.orders)
+        OrderCalculator(orders: subscription.instance.orders)
             .perPrize(mainPaymentCycleType);
-    final perDayPaymentCyclePrize = OrderCalculator(orders: subscription.orders)
-        .perPrize(PaymentCycleType.daily);
+    final perDayPaymentCyclePrize =
+        OrderCalculator(orders: subscription.instance.orders)
+            .perPrize(PaymentCycleType.daily);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:subscriba/src/store/subscription_model.dart';
+import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/styles/styles.dart';
 import 'package:subscriba/src/subscription/subscription_card.dart';
 import 'package:subscriba/src/subscriptions/subscriptions_page_model.dart';
@@ -13,7 +13,7 @@ class SubscriptionsCardList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Observer(
       builder: (context) {
-        final subscriptionModel = Provider.of<SubscriptionModel>(context);
+        final subscriptionModel = Provider.of<SubscriptionsModel>(context);
         final subscriptionPageModel =
             Provider.of<SubscriptionPageModel>(context);
 

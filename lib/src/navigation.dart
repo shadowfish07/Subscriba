@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:subscriba/src/home/home_view.dart';
-import 'package:subscriba/src/store/subscription_model.dart';
+import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/subscriptions/subscriptions_view.dart';
 
 class Navigation extends StatefulWidget {
@@ -13,7 +13,7 @@ class Navigation extends StatefulWidget {
 
 class _NavigationState extends State<Navigation> {
   int currentIndex = 0;
-  late SubscriptionModel subscriptionModel;
+  late SubscriptionsModel subscriptionModel;
 
   void setCurrentIndex(int index) {
     setState(() {
@@ -24,7 +24,7 @@ class _NavigationState extends State<Navigation> {
 
   @override
   Widget build(BuildContext context) {
-    subscriptionModel = Provider.of<SubscriptionModel>(context);
+    subscriptionModel = Provider.of<SubscriptionsModel>(context);
     return Scaffold(
       bottomNavigationBar: NavigationBar(
         destinations: const [

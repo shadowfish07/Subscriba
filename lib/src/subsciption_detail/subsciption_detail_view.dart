@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:subscriba/src/component/section.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/database/subscription.dart';
 import 'package:subscriba/src/order/order_card.dart';
+import 'package:subscriba/src/store/subscription_model.dart';
+import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/styles/styles.dart';
 import 'package:subscriba/src/subsciption_detail/display_card.dart';
 import 'package:subscriba/src/subsciption_detail/per_period_cost_cards_row.dart';
@@ -16,7 +19,7 @@ import 'package:subscriba/src/util/payment_cycle.dart';
 class SubscriptionDetailView extends StatefulWidget {
   const SubscriptionDetailView({super.key, required this.subscription});
 
-  final Subscription subscription;
+  final SubscriptionModel subscription;
 
   @override
   State<SubscriptionDetailView> createState() =>
@@ -25,13 +28,9 @@ class SubscriptionDetailView extends StatefulWidget {
 }
 
 class _SubscriptionDetailViewState extends State<SubscriptionDetailView> {
-  late final SubscriptionDetailModel subscriptionDetailModel;
+  final SubscriptionModel subscription;
 
-  _SubscriptionDetailViewState({required Subscription subscription}) {
-    debugPrint("[subscription detail] subscription $subscription");
-    subscriptionDetailModel =
-        SubscriptionDetailModel(subscription: subscription);
-  }
+  _SubscriptionDetailViewState({required this.subscription});
 
   @override
   Widget build(BuildContext context) {
@@ -40,15 +39,13 @@ class _SubscriptionDetailViewState extends State<SubscriptionDetailView> {
           foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
           backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         ),
-        body: _SubscriptionDetailBody(
-            subscriptionDetailModel: subscriptionDetailModel));
+        body: _SubscriptionDetailBody(subscription: subscription));
   }
 }
 
 class _SubscriptionDetailBody extends StatelessWidget {
-  final SubscriptionDetailModel subscriptionDetailModel;
-  const _SubscriptionDetailBody(
-      {super.key, required this.subscriptionDetailModel});
+  final SubscriptionModel subscription;
+  const _SubscriptionDetailBody({super.key, required this.subscription});
 
   @override
   Widget build(BuildContext context) {
@@ -61,18 +58,14 @@ class _SubscriptionDetailBody extends StatelessWidget {
             Stack(
               clipBehavior: Clip.none,
               children: [
-                _SubscriptionDetailHeader(
-                  subscriptionDetailModel: subscriptionDetailModel,
-                ),
-                _SubscriptionTimeInfoCard(
-                  subscriptionDetailModel: subscriptionDetailModel,
-                )
+                _SubscriptionDetailHeader(subscription: subscription),
+                _SubscriptionTimeInfoCard(subscription: subscription)
               ],
             ),
             const SizedBox(height: 54),
             Observer(builder: (context) {
-              final orderCalculator = OrderCalculator(
-                  orders: subscriptionDetailModel.subscription.orders);
+              final orderCalculator =
+                  OrderCalculator(orders: subscription.instance.orders);
               return Padding(
                 padding: defaultCenterPadding,
                 child: PerPeriodCostCardsRow(
@@ -89,9 +82,7 @@ class _SubscriptionDetailBody extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _TotallyCostCard(
-                    subscriptionDetailModel: subscriptionDetailModel,
-                  ),
+                  _TotallyCostCard(subscription: subscription),
                   Expanded(
                       child: DisplayCard(
                     title: Text(
@@ -99,8 +90,7 @@ class _SubscriptionDetailBody extends StatelessWidget {
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     body: Text(
-                      subscriptionDetailModel.subscription.orders.length
-                          .toString(),
+                      subscription.instance.orders.length.toString(),
                       style: Theme.of(context)
                           .textTheme
                           .titleMedium!
@@ -110,10 +100,9 @@ class _SubscriptionDetailBody extends StatelessWidget {
                 ],
               ),
             ),
-            _RecurringCardsRow(
-                subscriptionDetailModel: subscriptionDetailModel),
+            _RecurringCardsRow(subscription: subscription),
             const SizedBox(height: 8),
-            _OrdersSection(subscriptionDetailModel: subscriptionDetailModel)
+            _OrdersSection(subscription: subscription)
           ],
         ),
       ),
@@ -124,17 +113,17 @@ class _SubscriptionDetailBody extends StatelessWidget {
 class _OrdersSection extends StatelessWidget {
   const _OrdersSection({
     super.key,
-    required this.subscriptionDetailModel,
+    required this.subscription,
   });
 
-  final SubscriptionDetailModel subscriptionDetailModel;
+  final SubscriptionModel subscription;
 
   @override
   Widget build(BuildContext context) {
     return Observer(
       builder: (_) {
-        final orderCalculator = OrderCalculator(
-            orders: subscriptionDetailModel.subscription.orders);
+        final orderCalculator =
+            OrderCalculator(orders: subscription.instance.orders);
 
         return Section(
             title: "Orders",
@@ -154,18 +143,16 @@ class _OrdersSection extends StatelessWidget {
 class _RecurringCardsRow extends StatelessWidget {
   const _RecurringCardsRow({
     super.key,
-    required this.subscriptionDetailModel,
+    required this.subscription,
   });
-
-  final SubscriptionDetailModel subscriptionDetailModel;
+  final SubscriptionModel subscription;
 
   @override
   Widget build(BuildContext context) {
     return Observer(
       builder: (_) {
-        final isLifetime =
-            OrderCalculator(orders: subscriptionDetailModel.subscription.orders)
-                .includeLifetimeOrder;
+        final isLifetime = OrderCalculator(orders: subscription.instance.orders)
+            .includeLifetimeOrder;
 
         if (isLifetime) {
           return Container();
@@ -175,12 +162,8 @@ class _RecurringCardsRow extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _RenewCard(
-                subscriptionDetailModel: subscriptionDetailModel,
-              ),
-              _NextPaymentCard(
-                subscriptionDetailModel: subscriptionDetailModel,
-              ),
+              _RenewCard(subscription: subscription),
+              _NextPaymentCard(subscription: subscription),
             ],
           ),
         );
@@ -190,16 +173,16 @@ class _RecurringCardsRow extends StatelessWidget {
 }
 
 class _NextPaymentCard extends StatelessWidget {
-  final SubscriptionDetailModel subscriptionDetailModel;
+  final SubscriptionModel subscription;
 
-  const _NextPaymentCard({super.key, required this.subscriptionDetailModel});
+  const _NextPaymentCard({super.key, required this.subscription});
 
   @override
   Widget build(BuildContext context) {
     return Observer(
       builder: (_) {
-        final orderCalculator = OrderCalculator(
-            orders: subscriptionDetailModel.subscription.orders);
+        final orderCalculator =
+            OrderCalculator(orders: subscription.instance.orders);
 
         return Expanded(
             flex: 2,
@@ -239,23 +222,22 @@ class _NextPaymentCard extends StatelessWidget {
 }
 
 class _RenewCard extends StatelessWidget {
-  final SubscriptionDetailModel subscriptionDetailModel;
+  final SubscriptionModel subscription;
 
-  const _RenewCard({super.key, required this.subscriptionDetailModel});
+  const _RenewCard({super.key, required this.subscription});
 
   @override
   Widget build(BuildContext context) {
     return Observer(
       builder: (_) {
-        final isRenew = subscriptionDetailModel.subscription.isRenew;
-        final isLifetime =
-            OrderCalculator(orders: subscriptionDetailModel.subscription.orders)
-                .includeLifetimeOrder;
+        final isRenew = subscription.instance.isRenew;
+        final isLifetime = OrderCalculator(orders: subscription.instance.orders)
+            .includeLifetimeOrder;
 
         final onTap = isLifetime
             ? null
             : () {
-                subscriptionDetailModel.toggleRenew();
+                subscription.toggleRenew();
               };
 
         return Expanded(
@@ -283,9 +265,9 @@ class _RenewCard extends StatelessWidget {
 }
 
 class _TotallyCostCard extends StatelessWidget {
-  final SubscriptionDetailModel subscriptionDetailModel;
+  final SubscriptionModel subscription;
 
-  const _TotallyCostCard({super.key, required this.subscriptionDetailModel});
+  const _TotallyCostCard({super.key, required this.subscription});
 
   @override
   Widget build(BuildContext context) {
@@ -300,7 +282,7 @@ class _TotallyCostCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "\$${OrderCalculator(orders: subscriptionDetailModel.subscription.orders).totalPrize}",
+                "\$${OrderCalculator(orders: subscription.instance.orders).totalPrize}",
                 style: Theme.of(context)
                     .textTheme
                     .titleMedium!
@@ -314,17 +296,16 @@ class _TotallyCostCard extends StatelessWidget {
 }
 
 class _SubscriptionTimeInfoCard extends StatelessWidget {
-  final SubscriptionDetailModel subscriptionDetailModel;
+  final SubscriptionModel subscription;
 
-  const _SubscriptionTimeInfoCard(
-      {super.key, required this.subscriptionDetailModel});
+  const _SubscriptionTimeInfoCard({super.key, required this.subscription});
 
   @override
   Widget build(BuildContext context) {
     return Observer(
       builder: (_) {
-        final orderCalculator = OrderCalculator(
-            orders: subscriptionDetailModel.subscription.orders);
+        final orderCalculator =
+            OrderCalculator(orders: subscription.instance.orders);
         final lastContinuousSubscriptionDate =
             orderCalculator.lastContinuousSubscriptionDate;
         final latestSubscriptionDate = orderCalculator.latestSubscriptionDate;
@@ -424,9 +405,9 @@ class _SubscriptionTimeInfoCard extends StatelessWidget {
 }
 
 class _SubscriptionDetailHeader extends StatelessWidget {
-  const _SubscriptionDetailHeader({required this.subscriptionDetailModel});
+  const _SubscriptionDetailHeader({required this.subscription});
 
-  final SubscriptionDetailModel subscriptionDetailModel;
+  final SubscriptionModel subscription;
 
   @override
   Widget build(BuildContext context) {
@@ -443,14 +424,13 @@ class _SubscriptionDetailHeader extends StatelessWidget {
             children: [
               Observer(
                 builder: (_) => Text(
-                  subscriptionDetailModel.subscription.title,
+                  subscription.instance.title,
                   style: Theme.of(context).textTheme.headlineMedium!.copyWith(
                       color: Theme.of(context).colorScheme.onPrimaryContainer),
                 ),
               ),
               Observer(
-                builder: (_) => Text(
-                    subscriptionDetailModel.subscription.description ?? "",
+                builder: (_) => Text(subscription.instance.description ?? "",
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
                         color:
                             Theme.of(context).colorScheme.onPrimaryContainer)),

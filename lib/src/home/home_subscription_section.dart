@@ -3,7 +3,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:subscriba/src/component/section.dart';
 import 'package:subscriba/src/database/order.dart';
-import 'package:subscriba/src/store/subscription_model.dart';
+import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/subscription/subscription_card.dart';
 
 class HomeSubscriptionSection extends StatelessWidget {
@@ -11,7 +11,7 @@ class HomeSubscriptionSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final subscriptionModel = Provider.of<SubscriptionModel>(context);
+    final subscriptionModel = Provider.of<SubscriptionsModel>(context);
 
     return Observer(builder: (context) {
       return Section(

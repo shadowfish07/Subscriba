@@ -5,7 +5,7 @@ import 'package:subscriba/src/add_subscription/add_subscription_form.dart';
 import 'package:subscriba/src/add_subscription/form_model.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/database/subscription.dart';
-import 'package:subscriba/src/store/subscription_model.dart';
+import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/util/payment_cycle.dart';
 
 class AddSubscriptionView extends StatefulWidget {
@@ -32,7 +32,7 @@ class _AddSubscriptionView extends State<AddSubscriptionView> {
   final TextEditingController paymentPerPeriodController =
       TextEditingController();
 
-  late SubscriptionModel subscriptionModel;
+  late SubscriptionsModel subscriptionModel;
   final formModel = FormModel();
 
   @override
@@ -42,7 +42,7 @@ class _AddSubscriptionView extends State<AddSubscriptionView> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       subscriptionModel =
-          Provider.of<SubscriptionModel>(context, listen: false);
+          Provider.of<SubscriptionsModel>(context, listen: false);
     });
   }
 
@@ -50,31 +50,6 @@ class _AddSubscriptionView extends State<AddSubscriptionView> {
   void dispose() {
     super.dispose();
     formModel.dispose();
-  }
-
-  Future<void> saveSubscription() async {
-    formModel.validateAll();
-
-    if (!formModel.error.hasErrors) {
-      final subscriptionId = await SubscriptionProvider().insert(
-          Subscription.create(
-              title: formModel.subscriptionName!,
-              description: formModel.subscriptionDescription));
-
-      await OrderProvider().insert(
-        Order.create(
-            orderDate: formModel.startTimeTimestamp!,
-            paymentType: formModel.paymentType,
-            startDate: formModel.startTimeTimestamp!,
-            endDate: formModel.endTimeTimestamp!,
-            subscriptionId: subscriptionId,
-            paymentPerPeriodUnit: "\$",
-            paymentCycleType: formModel.paymentCycleType,
-            paymentPerPeriod: formModel.paymentPerPeriod),
-      );
-
-      subscriptionModel.loadSubscriptions();
-    }
   }
 
   @override
@@ -97,14 +72,6 @@ class _AddSubscriptionView extends State<AddSubscriptionView> {
           paymentPerPeriodController: paymentPerPeriodController,
         ),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     saveSubscription().then((_) {
-      //       Navigator.pop(context);
-      //     });
-      //   },
-      //   child: const Icon(Icons.save),
-      // ),
     );
   }
 }

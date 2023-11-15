@@ -9,34 +9,42 @@ part of 'subscription_model.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$SubscriptionModel on _SubscriptionModel, Store {
-  late final _$subscriptionsAtom =
-      Atom(name: '_SubscriptionModel.subscriptions', context: context);
+  late final _$instanceAtom =
+      Atom(name: '_SubscriptionModel.instance', context: context);
 
   @override
-  List<Subscription> get subscriptions {
-    _$subscriptionsAtom.reportRead();
-    return super.subscriptions;
+  Subscription get instance {
+    _$instanceAtom.reportRead();
+    return super.instance;
   }
 
   @override
-  set subscriptions(List<Subscription> value) {
-    _$subscriptionsAtom.reportWrite(value, super.subscriptions, () {
-      super.subscriptions = value;
+  set instance(Subscription value) {
+    _$instanceAtom.reportWrite(value, super.instance, () {
+      super.instance = value;
     });
   }
 
-  late final _$loadSubscriptionsAsyncAction =
-      AsyncAction('_SubscriptionModel.loadSubscriptions', context: context);
+  late final _$reloadAsyncAction =
+      AsyncAction('_SubscriptionModel.reload', context: context);
 
   @override
-  Future loadSubscriptions() {
-    return _$loadSubscriptionsAsyncAction.run(() => super.loadSubscriptions());
+  Future<void> reload() {
+    return _$reloadAsyncAction.run(() => super.reload());
+  }
+
+  late final _$toggleRenewAsyncAction =
+      AsyncAction('_SubscriptionModel.toggleRenew', context: context);
+
+  @override
+  Future<void> toggleRenew() {
+    return _$toggleRenewAsyncAction.run(() => super.toggleRenew());
   }
 
   @override
   String toString() {
     return '''
-subscriptions: ${subscriptions}
+instance: ${instance}
     ''';
   }
 }

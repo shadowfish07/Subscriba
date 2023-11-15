@@ -7,15 +7,19 @@ part 'subscription_model.g.dart';
 class SubscriptionModel = _SubscriptionModel with _$SubscriptionModel;
 
 abstract class _SubscriptionModel with Store {
-  _SubscriptionModel() {
-    loadSubscriptions();
-  }
-
   @observable
-  List<Subscription> subscriptions = [];
+  Subscription instance;
+
+  _SubscriptionModel(this.instance);
 
   @action
-  loadSubscriptions() async {
-    subscriptions = await SubscriptionProvider().getSubscriptions();
+  Future<void> reload() async {
+    instance = (await SubscriptionProvider().getSubscription(instance.id))!;
+  }
+
+  @action
+  Future<void> toggleRenew() async {
+    await SubscriptionProvider().setIsRenew(instance.id, !instance.isRenew);
+    reload();
   }
 }

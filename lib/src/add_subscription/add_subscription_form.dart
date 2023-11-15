@@ -8,7 +8,7 @@ import 'package:subscriba/src/add_subscription/recurring_tab.dart';
 import 'package:subscriba/src/component/section.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/database/subscription.dart';
-import 'package:subscriba/src/store/subscription_model.dart';
+import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/styles/styles.dart';
 import 'package:subscriba/src/util/payment_calculator.dart';
 import 'package:subscriba/src/util/duration.dart' as util;
@@ -87,7 +87,7 @@ class _AddSubscriptionFormState extends State<AddSubscriptionForm>
   @override
   Widget build(BuildContext context) {
     final formModel = Provider.of<FormModel>(context);
-    final subscriptionModel = Provider.of<SubscriptionModel>(context);
+    final subscriptionModel = Provider.of<SubscriptionsModel>(context);
 
     Future<bool> saveSubscription() async {
       formModel.validateAll();
