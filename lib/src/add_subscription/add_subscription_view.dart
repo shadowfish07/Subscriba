@@ -8,8 +8,6 @@ import 'package:subscriba/src/database/subscription.dart';
 import 'package:subscriba/src/store/subscription_model.dart';
 import 'package:subscriba/src/util/payment_cycle.dart';
 
-final formModel = FormModel();
-
 class AddSubscriptionView extends StatefulWidget {
   static const routeName = '/subscription/add';
 
@@ -35,6 +33,7 @@ class _AddSubscriptionView extends State<AddSubscriptionView> {
       TextEditingController();
 
   late SubscriptionModel subscriptionModel;
+  final formModel = FormModel();
 
   @override
   void initState() {
@@ -84,34 +83,28 @@ class _AddSubscriptionView extends State<AddSubscriptionView> {
       appBar: AppBar(
         title: const Text("Add New Subscription"),
       ),
-      body: SingleChildScrollView(
-        child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            child: Provider(
-              create: (_) => formModel,
-              builder: (context, child) => AddSubscriptionForm(
-                subscriptionFormKey: subscriptionFormKey,
-                recurringFormKey: recurringFormKey,
-                subscriptionNameController: subscriptionNameController,
-                subscriptionDescriptionController:
-                    subscriptionDescriptionController,
-                startTimeDateController: startTimeDateController,
-                endTimeDateController: endTimeDateController,
-                durationController: durationController,
-                totalPaymentAmountController: totalPaymentAmountController,
-                paymentPerPeriodController: paymentPerPeriodController,
-              ),
-            )),
+      body: Provider(
+        create: (_) => formModel,
+        builder: (context, child) => AddSubscriptionForm(
+          subscriptionFormKey: subscriptionFormKey,
+          recurringFormKey: recurringFormKey,
+          subscriptionNameController: subscriptionNameController,
+          subscriptionDescriptionController: subscriptionDescriptionController,
+          startTimeDateController: startTimeDateController,
+          endTimeDateController: endTimeDateController,
+          durationController: durationController,
+          totalPaymentAmountController: totalPaymentAmountController,
+          paymentPerPeriodController: paymentPerPeriodController,
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          saveSubscription().then((_) {
-            Navigator.pop(context);
-          });
-        },
-        child: const Icon(Icons.save),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     saveSubscription().then((_) {
+      //       Navigator.pop(context);
+      //     });
+      //   },
+      //   child: const Icon(Icons.save),
+      // ),
     );
   }
 }

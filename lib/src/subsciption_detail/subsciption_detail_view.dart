@@ -6,6 +6,8 @@ import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/database/subscription.dart';
 import 'package:subscriba/src/order/order_card.dart';
 import 'package:subscriba/src/styles/styles.dart';
+import 'package:subscriba/src/subsciption_detail/display_card.dart';
+import 'package:subscriba/src/subsciption_detail/per_period_cost_cards_row.dart';
 import 'package:subscriba/src/subsciption_detail/subscription_detail_model.dart';
 import 'package:subscriba/src/util/date_format_helper.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
@@ -26,6 +28,7 @@ class _SubscriptionDetailViewState extends State<SubscriptionDetailView> {
   late final SubscriptionDetailModel subscriptionDetailModel;
 
   _SubscriptionDetailViewState({required Subscription subscription}) {
+    debugPrint("[subscription detail] subscription $subscription");
     subscriptionDetailModel =
         SubscriptionDetailModel(subscription: subscription);
   }
@@ -67,9 +70,20 @@ class _SubscriptionDetailBody extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 54),
-            _PerPeriodCostCardsRow(
-              subscriptionDetailModel: subscriptionDetailModel,
-            ),
+            Observer(builder: (context) {
+              final orderCalculator = OrderCalculator(
+                  orders: subscriptionDetailModel.subscription.orders);
+              return Padding(
+                padding: defaultCenterPadding,
+                child: PerPeriodCostCardsRow(
+                  dailyCost: orderCalculator.perPrize(PaymentCycleType.daily),
+                  monthlyCost:
+                      orderCalculator.perPrize(PaymentCycleType.monthly),
+                  annuallyCost:
+                      orderCalculator.perPrize(PaymentCycleType.yearly),
+                ),
+              );
+            }),
             Padding(
               padding: defaultCenterPadding,
               child: Row(
@@ -299,74 +313,6 @@ class _TotallyCostCard extends StatelessWidget {
   }
 }
 
-class _PerPeriodCostCardsRow extends StatelessWidget {
-  final SubscriptionDetailModel subscriptionDetailModel;
-
-  const _PerPeriodCostCardsRow(
-      {super.key, required this.subscriptionDetailModel});
-
-  @override
-  Widget build(BuildContext context) {
-    return Observer(
-      builder: (_) {
-        final orderCalculator = OrderCalculator(
-            orders: subscriptionDetailModel.subscription.orders);
-
-        return Padding(
-          padding: defaultCenterPadding,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                  child: DisplayCard(
-                title: Text(
-                  "Daily ",
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                body: Text(
-                  "\$${orderCalculator.perPrize(PaymentCycleType.daily)}",
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium!
-                      .copyWith(fontFamily: "Alibaba"),
-                ),
-              )),
-              Expanded(
-                  child: DisplayCard(
-                title: Text(
-                  "Monthly ",
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                body: Text(
-                  "\$${orderCalculator.perPrize(PaymentCycleType.monthly)}",
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium!
-                      .copyWith(fontFamily: "Alibaba"),
-                ),
-              )),
-              Expanded(
-                  child: DisplayCard(
-                title: Text(
-                  "Annually ",
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                body: Text(
-                  "\$${orderCalculator.perPrize(PaymentCycleType.yearly)}",
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium!
-                      .copyWith(fontFamily: "Alibaba"),
-                ),
-              )),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
 class _SubscriptionTimeInfoCard extends StatelessWidget {
   final SubscriptionDetailModel subscriptionDetailModel;
 
@@ -474,47 +420,6 @@ class _SubscriptionTimeInfoCard extends StatelessWidget {
             ));
       },
     );
-  }
-}
-
-class DisplayCard extends StatelessWidget {
-  const DisplayCard(
-      {super.key,
-      required this.title,
-      required this.body,
-      this.color,
-      this.onTap});
-
-  final Widget title;
-  final Widget body;
-  final Color? color;
-  final void Function()? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    var card = Card(
-      color: color ?? Theme.of(context).colorScheme.surfaceVariant,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(10),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-          child: SizedBox(
-            height: 64,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                title,
-                body,
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-
-    return card;
   }
 }
 

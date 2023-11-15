@@ -40,11 +40,10 @@ class SubscriptionCard extends StatelessWidget {
               children: [
                 Text(subscription.title,
                     style: Theme.of(context).textTheme.titleMedium),
-                Observer(
-                    builder: (_) => SubscriptionPerPrize(
-                          subscription: subscription,
-                          mainPaymentCycleType: paymentCycleType,
-                        ))
+                SubscriptionPerPrize(
+                  subscription: subscription,
+                  mainPaymentCycleType: paymentCycleType,
+                )
               ],
             )),
           ),

@@ -66,7 +66,7 @@ class OrderCard extends StatelessWidget {
                               .copyWith(fontFamily: "Alibaba"),
                         ),
                         Text(
-                          "+ ${Duration.fromDate(order.startDate, order.endDate!, order.paymentCycleType!).duration} days",
+                          "+ ${DurationHelper.fromDate(order.startDate, order.endDate!, order.paymentCycleType!).duration} days",
                           style: Theme.of(context)
                               .textTheme
                               .labelMedium!

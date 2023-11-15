@@ -25,6 +25,14 @@ mixin _$SubscriptionDetailModel on _SubscriptionDetailModel, Store {
     });
   }
 
+  late final _$toggleRenewAsyncAction =
+      AsyncAction('_SubscriptionDetailModel.toggleRenew', context: context);
+
+  @override
+  Future<void> toggleRenew() {
+    return _$toggleRenewAsyncAction.run(() => super.toggleRenew());
+  }
+
   @override
   String toString() {
     return '''

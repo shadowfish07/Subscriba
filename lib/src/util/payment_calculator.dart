@@ -6,7 +6,7 @@ import 'duration.dart';
 class PaymentCalculator {
   const PaymentCalculator({required this.duration, required this.paymentCycle});
 
-  final Duration duration;
+  final DurationHelper duration;
   final PaymentCycleType paymentCycle;
 
   double getPaymentPerPeriod(double totalPaymentAmount) {

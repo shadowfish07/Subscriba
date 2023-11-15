@@ -6,6 +6,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as p;
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/database/subscription.dart';
+import 'package:sqflite_common/sqflite_logger.dart';
 
 abstract class BaseModel {
   const BaseModel(
@@ -57,15 +58,19 @@ class BaseModalProvider<T extends BaseModel> {
   ${BaseModel.columnDeletedAt} integer''';
 
   static Future<Database> open() async {
+    var factoryWithLogs = SqfliteDatabaseFactoryLogger(databaseFactory,
+        options:
+            SqfliteLoggerOptions(type: SqfliteDatabaseFactoryLoggerType.all));
     Completer onCreateCompleter = Completer();
     var databasesPath = await getApplicationSupportDirectory();
     debugPrint("databasesPath: ${p.join(databasesPath.path, "subscriba.db")}");
-    final result = openDatabase(
+    final result = factoryWithLogs.openDatabase(
       p.join(databasesPath.path, "subscriba.db"),
-      version: 1,
-      onCreate: (Database db, int version) async {
-        debugPrint("onCreate");
-        await db.execute('''
+      options: OpenDatabaseOptions(
+        version: 1,
+        onCreate: (Database db, int version) async {
+          debugPrint("onCreate");
+          await db.execute('''
 create table ${SubscriptionProvider.tableName} (
   ${BaseModalProvider.createBaseColumns},
   ${Subscription.columnTitle} text not null,
@@ -73,7 +78,7 @@ create table ${SubscriptionProvider.tableName} (
   ${Subscription.columnDescription} text)
 ''');
 
-        await db.execute('''
+          await db.execute('''
 create table "${OrderProvider.tableName}" (
   ${BaseModalProvider.createBaseColumns},
   ${Order.columnSubscriptionId} integer not null,
@@ -86,11 +91,12 @@ create table "${OrderProvider.tableName}" (
   ${Order.columnPaymentPerPeriod} REAL not null,
   ${Order.columnPaymentPerPeriodUnit} text)
 ''');
-      },
-      onOpen: (db) {
-        debugPrint("open");
-        onCreateCompleter.complete();
-      },
+        },
+        onOpen: (db) {
+          debugPrint("open");
+          onCreateCompleter.complete();
+        },
+      ),
     );
 
     await onCreateCompleter.future;

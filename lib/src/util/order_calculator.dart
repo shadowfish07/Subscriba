@@ -7,8 +7,8 @@ import 'package:subscriba/src/util/payment_cycle.dart';
 
 const paymentCycle2Days = {
   PaymentCycleType.daily: 1,
-  PaymentCycleType.monthly: my.Duration.dayPerMonth,
-  PaymentCycleType.yearly: my.Duration.dayPerYear
+  PaymentCycleType.monthly: my.DurationHelper.dayPerMonth,
+  PaymentCycleType.yearly: my.DurationHelper.dayPerYear
 };
 
 double getDailyPaymentPerPeriod(
@@ -18,11 +18,11 @@ double getDailyPaymentPerPeriod(
   }
 
   if (paymentCycle == PaymentCycleType.monthly) {
-    return paymentPerPeriod / my.Duration.dayPerMonth;
+    return paymentPerPeriod / my.DurationHelper.dayPerMonth;
   }
 
   if (paymentCycle == PaymentCycleType.yearly) {
-    return paymentPerPeriod / my.Duration.dayPerYear;
+    return paymentPerPeriod / my.DurationHelper.dayPerYear;
   }
 
   throw ArgumentError('paymentCycle must be one of d, m, or y');
@@ -80,9 +80,9 @@ perYear = 10 / 31 * 365 = 117.74..
     }
 
     return availableOrders
-        .map((e) =>
-            my.Duration.fromDate(e.startDate, e.endDate!, e.paymentCycleType!)
-                .duration)
+        .map((e) => my.DurationHelper.fromDate(
+                e.startDate, e.endDate!, e.paymentCycleType!)
+            .duration)
         .fold(0, (value, element) => value + element);
   }
 

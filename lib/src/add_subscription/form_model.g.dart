@@ -9,13 +9,6 @@ part of 'form_model.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$FormModel on _FormModel, Store {
-  Computed<PaymentType>? _$paymentTypeComputed;
-
-  @override
-  PaymentType get paymentType =>
-      (_$paymentTypeComputed ??= Computed<PaymentType>(() => super.paymentType,
-              name: '_FormModel.paymentType'))
-          .value;
   Computed<int?>? _$startTimeTimestampComputed;
 
   @override
@@ -43,27 +36,20 @@ mixin _$FormModel on _FormModel, Store {
           Computed<double>(() => super.paymentPerPeriod,
               name: '_FormModel.paymentPerPeriod'))
       .value;
-  Computed<double>? _$totalPaymentAmountComputed;
+
+  late final _$paymentTypeAtom =
+      Atom(name: '_FormModel.paymentType', context: context);
 
   @override
-  double get totalPaymentAmount => (_$totalPaymentAmountComputed ??=
-          Computed<double>(() => super.totalPaymentAmount,
-              name: '_FormModel.totalPaymentAmount'))
-      .value;
-
-  late final _$paymentTypeIntAtom =
-      Atom(name: '_FormModel.paymentTypeInt', context: context);
-
-  @override
-  int get paymentTypeInt {
-    _$paymentTypeIntAtom.reportRead();
-    return super.paymentTypeInt;
+  PaymentType get paymentType {
+    _$paymentTypeAtom.reportRead();
+    return super.paymentType;
   }
 
   @override
-  set paymentTypeInt(int value) {
-    _$paymentTypeIntAtom.reportWrite(value, super.paymentTypeInt, () {
-      super.paymentTypeInt = value;
+  set paymentType(PaymentType value) {
+    _$paymentTypeAtom.reportWrite(value, super.paymentType, () {
+      super.paymentType = value;
     });
   }
 
@@ -148,22 +134,6 @@ mixin _$FormModel on _FormModel, Store {
     });
   }
 
-  late final _$durationTextAtom =
-      Atom(name: '_FormModel.durationText', context: context);
-
-  @override
-  String? get durationText {
-    _$durationTextAtom.reportRead();
-    return super.durationText;
-  }
-
-  @override
-  set durationText(String? value) {
-    _$durationTextAtom.reportWrite(value, super.durationText, () {
-      super.durationText = value;
-    });
-  }
-
   late final _$paymentPerPeriodTextAtom =
       Atom(name: '_FormModel.paymentPerPeriodText', context: context);
 
@@ -178,23 +148,6 @@ mixin _$FormModel on _FormModel, Store {
     _$paymentPerPeriodTextAtom.reportWrite(value, super.paymentPerPeriodText,
         () {
       super.paymentPerPeriodText = value;
-    });
-  }
-
-  late final _$totalPaymentAmountTextAtom =
-      Atom(name: '_FormModel.totalPaymentAmountText', context: context);
-
-  @override
-  String? get totalPaymentAmountText {
-    _$totalPaymentAmountTextAtom.reportRead();
-    return super.totalPaymentAmountText;
-  }
-
-  @override
-  set totalPaymentAmountText(String? value) {
-    _$totalPaymentAmountTextAtom
-        .reportWrite(value, super.totalPaymentAmountText, () {
-      super.totalPaymentAmountText = value;
     });
   }
 
@@ -235,17 +188,6 @@ mixin _$FormModel on _FormModel, Store {
   }
 
   @override
-  void validateTotalPaymentAmount(String? totalPaymentAmount) {
-    final _$actionInfo = _$_FormModelActionController.startAction(
-        name: '_FormModel.validateTotalPaymentAmount');
-    try {
-      return super.validateTotalPaymentAmount(totalPaymentAmount);
-    } finally {
-      _$_FormModelActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void validatePaymentPerPeriod(String? paymentPerPeriod) {
     final _$actionInfo = _$_FormModelActionController.startAction(
         name: '_FormModel.validatePaymentPerPeriod');
@@ -257,34 +199,19 @@ mixin _$FormModel on _FormModel, Store {
   }
 
   @override
-  void validateDuration(String? durationText) {
-    final _$actionInfo = _$_FormModelActionController.startAction(
-        name: '_FormModel.validateDuration');
-    try {
-      return super.validateDuration(durationText);
-    } finally {
-      _$_FormModelActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   String toString() {
     return '''
-paymentTypeInt: ${paymentTypeInt},
+paymentType: ${paymentType},
 subscriptionName: ${subscriptionName},
 subscriptionDescription: ${subscriptionDescription},
 startTimeDate: ${startTimeDate},
 endTimeDate: ${endTimeDate},
 paymentCycleType: ${paymentCycleType},
-durationText: ${durationText},
 paymentPerPeriodText: ${paymentPerPeriodText},
-totalPaymentAmountText: ${totalPaymentAmountText},
-paymentType: ${paymentType},
 startTimeTimestamp: ${startTimeTimestamp},
 endTimeTimestamp: ${endTimeTimestamp},
 duration: ${duration},
-paymentPerPeriod: ${paymentPerPeriod},
-totalPaymentAmount: ${totalPaymentAmount}
+paymentPerPeriod: ${paymentPerPeriod}
     ''';
   }
 }
@@ -379,22 +306,6 @@ mixin _$FormErrorState on _FormErrorState, Store {
     });
   }
 
-  late final _$durationAtom =
-      Atom(name: '_FormErrorState.duration', context: context);
-
-  @override
-  String? get duration {
-    _$durationAtom.reportRead();
-    return super.duration;
-  }
-
-  @override
-  set duration(String? value) {
-    _$durationAtom.reportWrite(value, super.duration, () {
-      super.duration = value;
-    });
-  }
-
   late final _$paymentPerPeriodAtom =
       Atom(name: '_FormErrorState.paymentPerPeriod', context: context);
 
@@ -435,7 +346,6 @@ subscriptionDescription: ${subscriptionDescription},
 startTimeDate: ${startTimeDate},
 endTimeDate: ${endTimeDate},
 paymentCycleType: ${paymentCycleType},
-duration: ${duration},
 paymentPerPeriod: ${paymentPerPeriod},
 totalPaymentAmount: ${totalPaymentAmount},
 hasErrors: ${hasErrors}

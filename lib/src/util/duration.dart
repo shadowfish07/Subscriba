@@ -2,14 +2,22 @@ import 'package:intl/intl.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/util/payment_cycle.dart';
 
-class Duration {
-  const Duration({required this.duration, required this.unit});
+int getDateDuration(int startDate, int endDate) {
+  return DateTime.fromMicrosecondsSinceEpoch(endDate)
+          .difference(DateTime.fromMicrosecondsSinceEpoch(startDate))
+          .inDays +
+      1;
+}
 
-  factory Duration.fromDate(int startDate, int endDate, PaymentCycleType unit) {
+class DurationHelper {
+  const DurationHelper({required this.duration, required this.unit});
+
+  factory DurationHelper.fromDate(
+      int startDate, int endDate, PaymentCycleType unit) {
     final diff = DateTime.fromMicrosecondsSinceEpoch(endDate)
         .difference(DateTime.fromMicrosecondsSinceEpoch(startDate));
 
-    return Duration(
+    return DurationHelper(
       duration: diff.inDays + 1,
       unit: unit,
     );

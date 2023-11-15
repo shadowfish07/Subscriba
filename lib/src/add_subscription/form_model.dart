@@ -1,6 +1,7 @@
 import 'package:intl/intl.dart';
 import 'package:mobx/mobx.dart';
 import 'package:subscriba/src/database/order.dart';
+import 'package:subscriba/src/util/duration.dart';
 
 part 'form_model.g.dart';
 
@@ -10,13 +11,8 @@ class FormModel = _FormModel with _$FormModel;
 abstract class _FormModel with Store {
   final FormErrorState error = FormErrorState();
 
-  @computed
-  PaymentType get paymentType {
-    return PaymentType.values[paymentTypeInt];
-  }
-
   @observable
-  int paymentTypeInt = 0;
+  PaymentType paymentType = PaymentType.recurring;
 
   @observable
   String? subscriptionName;
@@ -53,20 +49,17 @@ abstract class _FormModel with Store {
 
   @computed
   int? get duration {
-    if (durationText == null) {
+    if (startTimeTimestamp == null || endTimeTimestamp == null) {
       return null;
     }
 
-    return int.parse(durationText!);
+    return getDateDuration(startTimeTimestamp!, endTimeTimestamp!);
   }
-
-  @observable
-  String? durationText;
 
   @computed
   double get paymentPerPeriod {
-    if (paymentPerPeriodText == null) {
-      return 0;
+    if (paymentPerPeriodText == null || paymentPerPeriodText!.isEmpty == true) {
+      return 0.0;
     }
 
     return double.parse(paymentPerPeriodText!);
@@ -75,18 +68,6 @@ abstract class _FormModel with Store {
   @observable
   String? paymentPerPeriodText;
 
-  @computed
-  double get totalPaymentAmount {
-    if (totalPaymentAmountText == null) {
-      return 0;
-    }
-
-    return double.parse(totalPaymentAmountText!);
-  }
-
-  @observable
-  String? totalPaymentAmountText;
-
   late List<ReactionDisposer> _disposers;
 
   void setupValidations() {
@@ -94,9 +75,7 @@ abstract class _FormModel with Store {
       reaction((_) => subscriptionName, validateSubscriptionName),
       reaction((_) => startTimeDate, validateStartTimeDate),
       reaction((_) => endTimeDate, validateEndTimeDate),
-      reaction((_) => totalPaymentAmountText, validateTotalPaymentAmount),
       reaction((_) => paymentPerPeriodText, validatePaymentPerPeriod),
-      reaction((_) => durationText, validateDuration)
     ];
   }
 
@@ -106,9 +85,7 @@ abstract class _FormModel with Store {
     if (paymentType == PaymentType.recurring) {
       validateStartTimeDate(startTimeDate);
       validateEndTimeDate(endTimeDate);
-      validateTotalPaymentAmount(totalPaymentAmountText);
       validatePaymentPerPeriod(paymentPerPeriodText);
-      validateDuration(durationText);
     }
   }
 
@@ -132,14 +109,14 @@ abstract class _FormModel with Store {
     error.endTimeDate = endTimeDate != null && endTimeDate.isNotEmpty
         ? null
         : "This field is required";
-  }
 
-  @action
-  void validateTotalPaymentAmount(String? totalPaymentAmount) {
-    error.totalPaymentAmount =
-        totalPaymentAmount != null && totalPaymentAmount.isNotEmpty
-            ? null
-            : "This field is required";
+    if (endTimeDate != null && endTimeDate.isNotEmpty) {
+      if (startTimeDate != null && startTimeDate!.isNotEmpty) {
+        if (endTimeTimestamp! <= startTimeTimestamp!) {
+          error.endTimeDate = "End date must be after start date";
+        }
+      }
+    }
   }
 
   @action
@@ -148,13 +125,6 @@ abstract class _FormModel with Store {
         paymentPerPeriod != null && paymentPerPeriod.isNotEmpty
             ? null
             : "This field is required";
-  }
-
-  @action
-  void validateDuration(String? durationText) {
-    error.duration = durationText != null && durationText.isNotEmpty
-        ? null
-        : "This field is required";
   }
 
   void dispose() {
@@ -184,9 +154,6 @@ abstract class _FormErrorState with Store {
   String? paymentCycleType;
 
   @observable
-  String? duration;
-
-  @observable
   String? paymentPerPeriod;
 
   @observable
@@ -199,7 +166,6 @@ abstract class _FormErrorState with Store {
       startTimeDate != null ||
       endTimeDate != null ||
       paymentCycleType != null ||
-      duration != null ||
       paymentPerPeriod != null ||
       totalPaymentAmount != null;
 }
