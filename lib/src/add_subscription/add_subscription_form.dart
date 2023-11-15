@@ -18,65 +18,20 @@ import 'package:intl/intl.dart';
 import '../util/validator.dart';
 
 class AddSubscriptionForm extends StatefulWidget {
-  const AddSubscriptionForm(
-      {super.key,
-      required this.subscriptionFormKey,
-      required this.recurringFormKey,
-      required this.subscriptionNameController,
-      required this.subscriptionDescriptionController,
-      required this.startTimeDateController,
-      required this.endTimeDateController,
-      required this.durationController,
-      required this.totalPaymentAmountController,
-      required this.paymentPerPeriodController});
-
-  final GlobalKey<FormState> subscriptionFormKey;
-  final GlobalKey<FormState> recurringFormKey;
-  final TextEditingController subscriptionNameController;
-  final TextEditingController subscriptionDescriptionController;
-  final TextEditingController startTimeDateController;
-  final TextEditingController endTimeDateController;
-  final TextEditingController durationController;
-  final TextEditingController totalPaymentAmountController;
-  final TextEditingController paymentPerPeriodController;
+  const AddSubscriptionForm({
+    super.key,
+  });
 
   @override
   // ignore: no_logic_in_create_state
-  State<StatefulWidget> createState() => _AddSubscriptionFormState(
-      subscriptionFormKey: subscriptionFormKey,
-      recurringFormKey: recurringFormKey,
-      subscriptionNameController: subscriptionNameController,
-      subscriptionDescriptionController: subscriptionDescriptionController,
-      startTimeDateController: startTimeDateController,
-      endTimeDateController: endTimeDateController,
-      durationController: durationController,
-      totalPaymentAmountController: totalPaymentAmountController,
-      paymentPerPeriodController: paymentPerPeriodController);
+  State<StatefulWidget> createState() => _AddSubscriptionFormState();
 }
 
 class _AddSubscriptionFormState extends State<AddSubscriptionForm>
     with TickerProviderStateMixin {
-  _AddSubscriptionFormState(
-      {required this.subscriptionFormKey,
-      required this.recurringFormKey,
-      required this.subscriptionNameController,
-      required this.subscriptionDescriptionController,
-      required this.startTimeDateController,
-      required this.endTimeDateController,
-      required this.durationController,
-      required this.totalPaymentAmountController,
-      required this.paymentPerPeriodController});
+  _AddSubscriptionFormState();
 
-  final GlobalKey<FormState> subscriptionFormKey;
-  final GlobalKey<FormState> recurringFormKey;
   late final TabController paymentTypeTabController;
-  final TextEditingController subscriptionNameController;
-  final TextEditingController subscriptionDescriptionController;
-  final TextEditingController startTimeDateController;
-  final TextEditingController endTimeDateController;
-  final TextEditingController durationController;
-  final TextEditingController totalPaymentAmountController;
-  final TextEditingController paymentPerPeriodController;
 
   @override
   void initState() {

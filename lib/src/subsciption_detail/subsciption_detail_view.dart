@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:intl/intl.dart';
@@ -312,12 +314,25 @@ class _SubscriptionTimeInfoCard extends StatelessWidget {
         final subscribingDays = orderCalculator.subscribingDays;
         final expiresIn = orderCalculator.expiresIn;
         // TODO 处理订阅还没有开始的场景
-        final expirationProgress =
+        final expirationProgress = min(
+            1.0,
             latestSubscriptionDate - lastContinuousSubscriptionDate != 0
                 ? (DateTime.now().microsecondsSinceEpoch -
                         lastContinuousSubscriptionDate) /
                     (latestSubscriptionDate - lastContinuousSubscriptionDate)
-                : 0.0;
+                : 0.0);
+
+        String getExpiresInStr() {
+          if (expiresIn == null) {
+            return "Lifetime subscription";
+          } else if (expiresIn.inDays == 0) {
+            return "Expires today";
+          } else if (expiresIn.inDays < 0) {
+            return "Expired for ${-expiresIn.inDays} days";
+          } else {
+            return "Expires in ${expiresIn.inDays} days";
+          }
+        }
 
         return Positioned(
             left: 24,
@@ -344,9 +359,7 @@ class _SubscriptionTimeInfoCard extends StatelessWidget {
                               style: Theme.of(context).textTheme.titleSmall,
                             ),
                             Text(
-                              expiresIn != null
-                                  ? "Expires in ${expiresIn.inDays} days"
-                                  : "Lifetime subscription", // Or Buyout
+                              getExpiresInStr(), // Or Buyout
                               style: Theme.of(context)
                                   .textTheme
                                   .labelMedium!
@@ -361,8 +374,18 @@ class _SubscriptionTimeInfoCard extends StatelessWidget {
                             backgroundColor:
                                 Theme.of(context).colorScheme.surfaceVariant,
                             label: Text(
-                                "${(expirationProgress * 100).toStringAsFixed(0)}%",
-                                style: Theme.of(context).textTheme.labelMedium))
+                                isExpired(expiresIn) ? "Expired" : "Active",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelMedium!
+                                    .copyWith(
+                                        color: isExpired(expiresIn)
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .tertiary
+                                            : Theme.of(context)
+                                                .colorScheme
+                                                .primary)))
                       ],
                     ),
                     const SizedBox(height: 24),
@@ -402,6 +425,9 @@ class _SubscriptionTimeInfoCard extends StatelessWidget {
       },
     );
   }
+
+  bool isExpired(Duration? expiresIn) =>
+      expiresIn != null && expiresIn.inDays < 0;
 }
 
 class _SubscriptionDetailHeader extends StatelessWidget {
