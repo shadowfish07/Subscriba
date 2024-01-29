@@ -42,7 +42,7 @@ class _AddSubscriptionFormState extends State<AddSubscriptionForm>
   @override
   Widget build(BuildContext context) {
     final formModel = Provider.of<FormModel>(context);
-    final subscriptionModel = Provider.of<SubscriptionsModel>(context);
+    final subscriptionsModel = Provider.of<SubscriptionsModel>(context);
 
     Future<bool> saveSubscription() async {
       formModel.validateAll();
@@ -65,7 +65,7 @@ class _AddSubscriptionFormState extends State<AddSubscriptionForm>
               paymentPerPeriod: formModel.paymentPerPeriod),
         );
 
-        subscriptionModel.loadSubscriptions();
+        subscriptionsModel.loadSubscriptions();
 
         return true;
       }

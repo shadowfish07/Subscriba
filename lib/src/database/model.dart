@@ -119,7 +119,10 @@ create table "${OrderProvider.tableName}" (
     final db = await BaseModalProvider.db;
 
     List<Map> maps = await db.query(table,
-        columns: null, where: '${BaseModel.columnId} = ?', whereArgs: [id]);
+        columns: null,
+        where:
+            '${BaseModel.columnId} = ? AND ${BaseModel.columnDeletedAt} is null',
+        whereArgs: [id]);
     if (maps.isNotEmpty) {
       return maps.first as Map<String, Object?>;
     }
@@ -129,7 +132,8 @@ create table "${OrderProvider.tableName}" (
   Future<List<Map<String, Object?>>> getAll() async {
     final db = await BaseModalProvider.db;
 
-    return await db.query(table, columns: null);
+    return await db.query(table,
+        columns: null, where: '${BaseModel.columnDeletedAt} is null');
   }
 
   Future<bool> delete(int id) async {

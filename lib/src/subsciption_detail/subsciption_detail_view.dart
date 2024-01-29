@@ -37,12 +37,66 @@ class _SubscriptionDetailViewState extends State<SubscriptionDetailView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        ),
+        appBar: _AppBar(subscription: subscription),
         body: _SubscriptionDetailBody(subscription: subscription));
   }
+}
+
+class _AppBar extends StatelessWidget implements PreferredSizeWidget {
+  final SubscriptionModel subscription;
+  const _AppBar({required this.subscription});
+
+  @override
+  Widget build(BuildContext context) {
+    Future<void> _showConfirmDialog() async {
+      return showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          final subscriptionsModel = Provider.of<SubscriptionsModel>(context);
+
+          return AlertDialog(
+            title: const Text('Delete subscription?'),
+            content: const SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text('This operation is irreversible'),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: const Text('Delete'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  SubscriptionProvider().delete(subscription.instance.id);
+                  subscriptionsModel.loadSubscriptions();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    return AppBar(
+      foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      actions: [
+        IconButton(
+            onPressed: _showConfirmDialog, icon: const Icon(Icons.delete))
+      ],
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
 class _SubscriptionDetailBody extends StatelessWidget {
