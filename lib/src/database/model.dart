@@ -51,7 +51,7 @@ class BaseModalProvider<T extends BaseModel> {
   late String table;
   var createCompleter = Completer();
 
-  static const createBaseColumns = '''
+  static const baseColumns = '''
   ${BaseModel.columnId} integer primary key autoincrement,
   ${BaseModel.columnCreatedAt} integer not null,
   ${BaseModel.columnUpdatedAt} integer not null,
@@ -72,7 +72,7 @@ class BaseModalProvider<T extends BaseModel> {
           debugPrint("onCreate");
           await db.execute('''
 create table ${SubscriptionProvider.tableName} (
-  ${BaseModalProvider.createBaseColumns},
+  ${BaseModalProvider.baseColumns},
   ${Subscription.columnTitle} text not null,
   ${Subscription.columnIsRenew} integer not null,
   ${Subscription.columnDescription} text)
@@ -80,7 +80,7 @@ create table ${SubscriptionProvider.tableName} (
 
           await db.execute('''
 create table "${OrderProvider.tableName}" (
-  ${BaseModalProvider.createBaseColumns},
+  ${BaseModalProvider.baseColumns},
   ${Order.columnSubscriptionId} integer not null,
   ${Order.columnDescription} text,
   ${Order.columnOrderDate} integer not null,

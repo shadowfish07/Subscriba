@@ -155,6 +155,17 @@ mixin _$FormModel on _FormModel, Store {
       ActionController(name: '_FormModel', context: context);
 
   @override
+  void setPaymentType(PaymentType paymentType) {
+    final _$actionInfo = _$_FormModelActionController.startAction(
+        name: '_FormModel.setPaymentType');
+    try {
+      return super.setPaymentType(paymentType);
+    } finally {
+      _$_FormModelActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void validateSubscriptionName(String? subscriptionName) {
     final _$actionInfo = _$_FormModelActionController.startAction(
         name: '_FormModel.validateSubscriptionName');

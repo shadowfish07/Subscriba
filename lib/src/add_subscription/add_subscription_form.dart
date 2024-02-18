@@ -4,6 +4,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:subscriba/src/add_subscription/add_subscription_view.dart';
 import 'package:subscriba/src/add_subscription/form_model.dart';
+import 'package:subscriba/src/add_subscription/lifetime_tab.dart';
 import 'package:subscriba/src/add_subscription/recurring_tab.dart';
 import 'package:subscriba/src/component/section.dart';
 import 'package:subscriba/src/database/order.dart';
@@ -58,7 +59,7 @@ class _AddSubscriptionFormState extends State<AddSubscriptionForm>
               orderDate: formModel.startTimeTimestamp!,
               paymentType: formModel.paymentType,
               startDate: formModel.startTimeTimestamp!,
-              endDate: formModel.endTimeTimestamp!,
+              endDate: formModel.endTimeTimestamp,
               subscriptionId: subscriptionId,
               paymentPerPeriodUnit: "\$",
               paymentCycleType: formModel.paymentCycleType,
@@ -117,7 +118,7 @@ class _AddSubscriptionFormState extends State<AddSubscriptionForm>
                             label: Text("Lifetime"))
                       ],
                       onSelectionChanged: (value) {
-                        formModel.paymentType = value.first;
+                        formModel.setPaymentType(value.first);
                       },
                     );
                   }),
@@ -129,7 +130,7 @@ class _AddSubscriptionFormState extends State<AddSubscriptionForm>
                     builder: (_) =>
                         formModel.paymentType == PaymentType.recurring
                             ? const RecurringTab()
-                            : Container()),
+                            : const LifetimeTab()),
                 SizedBox(
                     width: double.infinity,
                     child: FilledButton(

@@ -21,7 +21,7 @@ abstract class _FormModel with Store {
   String? subscriptionDescription;
 
   @observable
-  String? startTimeDate;
+  String? startTimeDate = DateFormat.yMd().format(DateTime.now());
 
   @computed
   int? get startTimeTimestamp {
@@ -87,6 +87,12 @@ abstract class _FormModel with Store {
       validateEndTimeDate(endTimeDate);
       validatePaymentPerPeriod(paymentPerPeriodText);
     }
+  }
+
+  @action
+  void setPaymentType(PaymentType paymentType) {
+    this.paymentType = paymentType;
+    paymentPerPeriodText = null;
   }
 
   @action

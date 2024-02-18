@@ -10,16 +10,11 @@ import 'package:subscriba/src/subsciption_detail/per_period_cost_cards_row.dart'
 import 'package:subscriba/src/util/order_calculator.dart';
 import 'package:subscriba/src/util/payment_cycle.dart';
 
-class RecurringTab extends StatefulWidget {
+class RecurringTab extends StatelessWidget {
   const RecurringTab({
     super.key,
   });
 
-  @override
-  State<StatefulWidget> createState() => _RecurringTab();
-}
-
-class _RecurringTab extends State<RecurringTab> {
   @override
   Widget build(BuildContext context) {
     final formModel = Provider.of<FormModel>(context);
@@ -29,8 +24,6 @@ class _RecurringTab extends State<RecurringTab> {
         TextEditingController(text: formModel.endTimeDate);
     final paymentPerPeriodController =
         TextEditingController(text: formModel.paymentPerPeriodText);
-
-    debugPrint("build ${formModel.paymentPerPeriodText}");
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
