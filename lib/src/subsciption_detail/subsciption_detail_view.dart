@@ -239,6 +239,10 @@ class _NextPaymentCard extends StatelessWidget {
       builder: (_) {
         final orderCalculator =
             OrderCalculator(orders: subscription.instance.orders);
+        final isRenew = subscription.instance.isRenew;
+        // TODO 永久订阅时的展示
+        final isLifetime = OrderCalculator(orders: subscription.instance.orders)
+            .includeLifetimeOrder;
 
         return Expanded(
             flex: 2,
@@ -251,23 +255,30 @@ class _NextPaymentCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
-                    children: [
-                      Text(
-                        "\$${orderCalculator.nextPaymentTemplate!.paymentPerPeriod.toStringAsFixed(2)}",
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium!
-                            .copyWith(fontFamily: "Alibaba"),
-                      ),
-                      Text(
-                          "/${PaymentCycleHelper.enum2PerUnitStr[orderCalculator.nextPaymentTemplate!.paymentCycleType]}",
-                          style:
-                              Theme.of(context).textTheme.bodySmall!.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant,
-                                  ))
-                    ],
+                    children: isRenew
+                        ? [
+                            Text(
+                              "\$${orderCalculator.nextPaymentTemplate!.paymentPerPeriod.toStringAsFixed(2)}",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(fontFamily: "Alibaba"),
+                            ),
+                            Text(
+                                "/${PaymentCycleHelper.enum2PerUnitStr[orderCalculator.nextPaymentTemplate!.paymentCycleType]}",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall!
+                                    .copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ))
+                          ]
+                        : [
+                            Text("-",
+                                style: Theme.of(context).textTheme.titleMedium!)
+                          ],
                   )
                 ],
               ),
