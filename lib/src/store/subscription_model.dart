@@ -1,4 +1,5 @@
 import 'package:mobx/mobx.dart';
+import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/database/subscription.dart';
 
 part 'subscription_model.g.dart';
@@ -20,6 +21,12 @@ abstract class _SubscriptionModel with Store {
   @action
   Future<void> toggleRenew() async {
     await SubscriptionProvider().setIsRenew(instance.id, !instance.isRenew);
+    reload();
+  }
+
+  @action
+  Future<void> deleteOrder(int id) async {
+    await OrderProvider().delete(id);
     reload();
   }
 }

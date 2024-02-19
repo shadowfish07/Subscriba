@@ -141,7 +141,8 @@ class OrderProvider extends BaseModalProvider {
     final db = await BaseModalProvider.db;
 
     final List<Map<String, Object?>> maps = await db.query(tableName,
-        where: "subscription_id = ?", whereArgs: [subscriptionId]);
+        where: "subscription_id = ? AND ${BaseModel.columnDeletedAt} is null",
+        whereArgs: [subscriptionId]);
 
     return maps.map((e) => Order.fromMap(e)).toList();
   }

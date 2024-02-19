@@ -41,6 +41,14 @@ mixin _$SubscriptionModel on _SubscriptionModel, Store {
     return _$toggleRenewAsyncAction.run(() => super.toggleRenew());
   }
 
+  late final _$deleteOrderAsyncAction =
+      AsyncAction('_SubscriptionModel.deleteOrder', context: context);
+
+  @override
+  Future<void> deleteOrder(int id) {
+    return _$deleteOrderAsyncAction.run(() => super.deleteOrder(id));
+  }
+
   @override
   String toString() {
     return '''

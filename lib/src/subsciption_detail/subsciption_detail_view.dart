@@ -48,7 +48,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future<void> _showConfirmDialog() async {
+    Future<void> showConfirmDialog() async {
       return showDialog<void>(
         context: context,
         builder: (BuildContext context) {
@@ -72,11 +72,11 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
               TextButton(
                 child: const Text('Delete'),
-                onPressed: () {
+                onPressed: () async {
                   Navigator.of(context).pop();
-                  SubscriptionProvider().delete(subscription.instance.id);
+                  await SubscriptionProvider().delete(subscription.instance.id);
+                  Navigator.of(context).pop();
                   subscriptionsModel.loadSubscriptions();
-                  Navigator.of(context).pop();
                 },
               ),
             ],
@@ -89,8 +89,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
       foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
       backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       actions: [
-        IconButton(
-            onPressed: _showConfirmDialog, icon: const Icon(Icons.delete))
+        IconButton(onPressed: showConfirmDialog, icon: const Icon(Icons.delete))
       ],
     );
   }
@@ -183,12 +182,14 @@ class _OrdersSection extends StatelessWidget {
 
         return Section(
             title: "Orders",
+            titleBottomMargin: 0,
             child: Column(
                 children: List.from(orderCalculator.availableOrders)
                     .reversed
                     .map((e) => OrderCard(
                           order: e,
                           color: Theme.of(context).colorScheme.surfaceVariant,
+                          onDelete: subscription.deleteOrder,
                         ))
                     .toList()));
       },
@@ -258,14 +259,14 @@ class _NextPaymentCard extends StatelessWidget {
                     children: isRenew
                         ? [
                             Text(
-                              "\$${orderCalculator.nextPaymentTemplate!.paymentPerPeriod.toStringAsFixed(2)}",
+                              "\$${orderCalculator.nextPaymentTemplate?.paymentPerPeriod.toStringAsFixed(2)}",
                               style: Theme.of(context)
                                   .textTheme
                                   .titleMedium!
                                   .copyWith(fontFamily: "Alibaba"),
                             ),
                             Text(
-                                "/${PaymentCycleHelper.enum2PerUnitStr[orderCalculator.nextPaymentTemplate!.paymentCycleType]}",
+                                "/${PaymentCycleHelper.enum2PerUnitStr[orderCalculator.nextPaymentTemplate?.paymentCycleType]}",
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall!
