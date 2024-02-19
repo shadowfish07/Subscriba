@@ -5,10 +5,8 @@ import 'package:subscriba/src/add_subscription/form_model.dart';
 import 'package:subscriba/src/add_subscription/lifetime_tab.dart';
 import 'package:subscriba/src/add_subscription/recurring_tab.dart';
 import 'package:subscriba/src/database/order.dart';
-import 'package:subscriba/src/order/order_card.dart';
 import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/styles/styles.dart';
-import 'package:subscriba/src/subsciption_detail/subsciption_detail_view.dart';
 
 class OrderEdit extends StatelessWidget {
   static const routeName = '/order/edit';
