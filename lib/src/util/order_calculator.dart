@@ -149,7 +149,7 @@ perYear = 10 / 31 * 365 = 117.74..
   }
 
   Order? get nextPaymentTemplate {
-    if (includeLifetimeOrder) {
+    if (includeLifetimeOrder || availableOrders.isEmpty) {
       return null;
     }
 
