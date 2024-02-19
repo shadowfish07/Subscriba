@@ -71,7 +71,8 @@ class Order extends BaseModel {
   }
 
   static Order create(
-      {String? description,
+      {int? id,
+      String? description,
       required int orderDate,
       required PaymentType paymentType,
       required int startDate,
@@ -81,7 +82,7 @@ class Order extends BaseModel {
       required double paymentPerPeriod,
       String? paymentPerPeriodUnit}) {
     return Order(
-      id: -1,
+      id: id ?? -1,
       createdAt: DateTime.now().microsecondsSinceEpoch,
       updatedAt: DateTime.now().microsecondsSinceEpoch,
       subscriptionId: subscriptionId,

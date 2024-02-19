@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
+import 'package:subscriba/src/add_subscription/form_model.dart';
 import 'package:subscriba/src/database/order.dart';
+import 'package:subscriba/src/order/order_edit.dart';
 import 'package:subscriba/src/store/subscription_model.dart';
 import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/util/date_format_helper.dart';
@@ -9,11 +11,13 @@ import 'package:subscriba/src/util/duration.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
 
 class OrderCard extends StatelessWidget {
-  const OrderCard({super.key, this.color, this.onDelete, required this.order});
+  const OrderCard(
+      {super.key, this.color, this.onDelete, this.onEdit, required this.order});
 
   final Order order;
   final Color? color;
   final Function? onDelete;
+  final Function? onEdit;
   @override
   Widget build(BuildContext context) {
     return Observer(
@@ -70,8 +74,16 @@ class OrderCard extends StatelessWidget {
                         padding: const EdgeInsets.all(16.0),
                         child: Column(children: [
                           InkWell(
-                            onTap: () {
-                              debugPrint("1233");
+                            onTap: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => OrderEdit(
+                                          orderId: order.id,
+                                        )),
+                              );
+                              Navigator.of(context).pop();
+                              onEdit?.call(order.id);
                             },
                             child: const ListTile(
                               leading: Icon(Icons.edit),

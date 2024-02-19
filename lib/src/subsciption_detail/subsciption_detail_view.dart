@@ -19,6 +19,8 @@ import 'package:subscriba/src/util/order_calculator.dart';
 import 'package:subscriba/src/util/payment_cycle.dart';
 
 class SubscriptionDetailView extends StatefulWidget {
+  static const routeName = '/subscription/detail';
+
   const SubscriptionDetailView({super.key, required this.subscription});
 
   final SubscriptionModel subscription;
@@ -190,6 +192,7 @@ class _OrdersSection extends StatelessWidget {
                           order: e,
                           color: Theme.of(context).colorScheme.surfaceVariant,
                           onDelete: subscription.deleteOrder,
+                          onEdit: (id) => subscription.reload(),
                         ))
                     .toList()));
       },
