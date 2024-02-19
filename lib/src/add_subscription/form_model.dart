@@ -11,6 +11,22 @@ class FormModel = _FormModel with _$FormModel;
 abstract class _FormModel with Store {
   final FormErrorState error = FormErrorState();
 
+  Order? order;
+
+  @action
+  fromOrder(Order order) {
+    this.order = order;
+    paymentType = order.paymentType;
+    startTimeDate = DateFormat.yMd()
+        .format(DateTime.fromMicrosecondsSinceEpoch(order.startDate));
+    endTimeDate = order.endDate != null
+        ? DateFormat.yMd()
+            .format(DateTime.fromMicrosecondsSinceEpoch(order.endDate!))
+        : null;
+    paymentCycleType = order.paymentCycleType ?? PaymentCycleType.monthly;
+    paymentPerPeriodText = order.paymentPerPeriod.toString();
+  }
+
   @observable
   PaymentType paymentType = PaymentType.recurring;
 
@@ -79,12 +95,15 @@ abstract class _FormModel with Store {
     ];
   }
 
-  void validateAll() {
-    validateSubscriptionName(subscriptionName);
+  void validateAll([bool orderOnly = false]) {
+    if (!orderOnly) validateSubscriptionName(subscriptionName);
 
     if (paymentType == PaymentType.recurring) {
       validateStartTimeDate(startTimeDate);
       validateEndTimeDate(endTimeDate);
+      validatePaymentPerPeriod(paymentPerPeriodText);
+    } else if (paymentType == PaymentType.lifetime) {
+      validateStartTimeDate(startTimeDate);
       validatePaymentPerPeriod(paymentPerPeriodText);
     }
   }
@@ -92,7 +111,14 @@ abstract class _FormModel with Store {
   @action
   void setPaymentType(PaymentType paymentType) {
     this.paymentType = paymentType;
-    paymentPerPeriodText = null;
+    if (order == null || paymentType != order!.paymentType) {
+      paymentPerPeriodText = null;
+      startTimeDate = DateFormat.yMd().format(DateTime.now());
+      endTimeDate = null;
+      paymentCycleType = PaymentCycleType.monthly;
+    } else {
+      fromOrder(order!);
+    }
   }
 
   @action
