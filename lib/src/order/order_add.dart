@@ -9,27 +9,27 @@ import 'package:subscriba/src/order/order_form.dart';
 import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/styles/styles.dart';
 
-class OrderEdit extends StatelessWidget {
-  static const routeName = '/order/edit';
-  final int orderId;
+class OrderAdd extends StatelessWidget {
+  static const routeName = '/order/add';
+  final int subscriptionId;
 
-  const OrderEdit({super.key, required this.orderId});
+  const OrderAdd({super.key, required this.subscriptionId});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Edit Order"),
+        title: const Text("Create Order"),
       ),
-      body: _Form(orderId: orderId),
+      body: _Form(subscriptionId: subscriptionId),
     );
   }
 }
 
 class _Form extends StatefulWidget {
-  final int orderId;
+  final int subscriptionId;
 
-  const _Form({super.key, required this.orderId});
+  const _Form({super.key, required this.subscriptionId});
 
   @override
   State<_Form> createState() => __FormState();
@@ -38,12 +38,6 @@ class _Form extends StatefulWidget {
 class __FormState extends State<_Form> with TickerProviderStateMixin {
   late final TabController paymentTypeTabController;
   final formModel = FormModel();
-  late Order originOrder;
-
-  Future<void> init() async {
-    originOrder = (await OrderProvider().getOrder(widget.orderId))!;
-    formModel.fromOrder(originOrder);
-  }
 
   @override
   void initState() {
@@ -59,10 +53,9 @@ class __FormState extends State<_Form> with TickerProviderStateMixin {
       formModel.validateAll(true);
 
       if (!formModel.error.hasErrors) {
-        await OrderProvider().update(
+        await OrderProvider().insert(
           Order.create(
-              id: originOrder.id,
-              subscriptionId: originOrder.subscriptionId,
+              subscriptionId: widget.subscriptionId,
               orderDate: formModel.startTimeTimestamp!,
               paymentType: formModel.paymentType,
               startDate: formModel.startTimeTimestamp!,
@@ -76,7 +69,7 @@ class __FormState extends State<_Form> with TickerProviderStateMixin {
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Successfully Updated'),
+            content: Text('Successfully Created'),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -87,22 +80,14 @@ class __FormState extends State<_Form> with TickerProviderStateMixin {
       return false;
     }
 
-    return FutureBuilder(
-        future: init(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Container();
-          }
-
-          return ListView(children: [
-            Padding(
-              padding: defaultCenterPadding.add(const EdgeInsets.only(top: 16)),
-              child: OrderForm(
-                formModel: formModel,
-                onSave: saveOrder,
-              ),
-            ),
-          ]);
-        });
+    return ListView(children: [
+      Padding(
+        padding: defaultCenterPadding.add(const EdgeInsets.only(top: 16)),
+        child: OrderForm(
+          formModel: formModel,
+          onSave: saveOrder,
+        ),
+      ),
+    ]);
   }
 }

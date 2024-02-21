@@ -47,6 +47,8 @@ class OrderCalculator {
   }
 
   double perPrize(PaymentCycleType paymentCycleType) {
+    if (availableOrders.isEmpty) return 0;
+
     return availableOrders.map((e) {
           /**
        * 
@@ -64,7 +66,7 @@ perYear = 10 / 31 * 365 = 117.74..
                   e.paymentCycleType!, e.paymentPerPeriod) *
               paymentCycle2Days[paymentCycleType]!;
         }).fold(0.0, (value, element) => value + element) /
-        orders.length;
+        availableOrders.length;
   }
 
   bool get includeLifetimeOrder {
