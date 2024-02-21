@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:subscriba/src/component/section.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/database/subscription.dart';
+import 'package:subscriba/src/order/order_add.dart';
 import 'package:subscriba/src/order/order_card.dart';
 import 'package:subscriba/src/store/subscription_model.dart';
 import 'package:subscriba/src/store/subscriptions_model.dart';
@@ -116,10 +117,16 @@ class _SubscriptionDetailBody extends StatelessWidget {
               clipBehavior: Clip.none,
               children: [
                 _SubscriptionDetailHeader(subscription: subscription),
-                _SubscriptionTimeInfoCard(subscription: subscription)
+                Observer(builder: (context) {
+                  final orderCalculator =
+                      OrderCalculator(orders: subscription.instance.orders);
+                  return orderCalculator.availableOrders.isEmpty
+                      ? _CreateFirstOrderCard(subscription: subscription)
+                      : _SubscriptionTimeInfoCard(subscription: subscription);
+                })
               ],
             ),
-            const SizedBox(height: 54),
+            // const SizedBox(height: 54),
             Observer(builder: (context) {
               final orderCalculator =
                   OrderCalculator(orders: subscription.instance.orders);
@@ -157,7 +164,13 @@ class _SubscriptionDetailBody extends StatelessWidget {
                 ],
               ),
             ),
-            _RecurringCardsRow(subscription: subscription),
+            Observer(builder: (context) {
+              final orderCalculator =
+                  OrderCalculator(orders: subscription.instance.orders);
+              return orderCalculator.availableOrders.isEmpty
+                  ? Container()
+                  : _RecurringCardsRow(subscription: subscription);
+            }),
             const SizedBox(height: 8),
             _OrdersSection(subscription: subscription)
           ],
@@ -366,6 +379,54 @@ class _TotallyCostCard extends StatelessWidget {
   }
 }
 
+class _CreateFirstOrderCard extends StatelessWidget {
+  const _CreateFirstOrderCard({super.key, required this.subscription});
+
+  final SubscriptionModel subscription;
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+        left: 24,
+        right: 24,
+        top: 90,
+        child: Card(
+            color: Theme.of(context).colorScheme.surfaceVariant,
+            child: Padding(
+              padding:
+                  const EdgeInsets.only(top: 8, bottom: 8, left: 16, right: 16),
+              child: SizedBox(
+                height: 100,
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                          "No order yet? Create your first order to track costs."),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                            onPressed: () async {
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => OrderAdd(
+                                          subscriptionId:
+                                              subscription.instance.id,
+                                        )),
+                              );
+                              subscription.reload();
+                            },
+                            child: Text(
+                              "Create one now!",
+                            )),
+                      ),
+                    ]),
+              ),
+            )));
+  }
+}
+
 class _SubscriptionTimeInfoCard extends StatelessWidget {
   final SubscriptionModel subscription;
 
@@ -506,34 +567,49 @@ class _SubscriptionDetailHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primaryContainer,
-          borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(20),
-              bottomRight: Radius.circular(20))),
-      child: SizedBox(
-        height: 160,
-        child: Center(
-          child: Column(
-            children: [
-              Observer(
-                builder: (_) => Text(
-                  subscription.instance.title,
-                  style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onPrimaryContainer),
-                ),
+    return Column(
+      children: [
+        DecoratedBox(
+          decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20))),
+          child: SizedBox(
+            height: 160,
+            child: Center(
+              child: Column(
+                children: [
+                  Observer(
+                    builder: (_) => Text(
+                      subscription.instance.title,
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium!
+                          .copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer),
+                    ),
+                  ),
+                  Observer(
+                    builder: (_) => Text(
+                        subscription.instance.description ?? "",
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium!
+                            .copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer)),
+                  ),
+                ],
               ),
-              Observer(
-                builder: (_) => Text(subscription.instance.description ?? "",
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                        color:
-                            Theme.of(context).colorScheme.onPrimaryContainer)),
-              )
-            ],
+            ),
           ),
         ),
-      ),
+        const SizedBox(height: 54)
+      ],
     );
   }
 }
