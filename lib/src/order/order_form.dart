@@ -5,7 +5,6 @@ import 'package:subscriba/src/add_subscription/form_model.dart';
 import 'package:subscriba/src/add_subscription/lifetime_tab.dart';
 import 'package:subscriba/src/add_subscription/recurring_tab.dart';
 import 'package:subscriba/src/database/order.dart';
-import 'package:subscriba/src/order/order_edit.dart';
 
 typedef OnSave = Future<bool> Function();
 

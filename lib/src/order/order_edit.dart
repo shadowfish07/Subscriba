@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:subscriba/src/add_subscription/form_model.dart';
-import 'package:subscriba/src/add_subscription/lifetime_tab.dart';
-import 'package:subscriba/src/add_subscription/recurring_tab.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/order/order_form.dart';
 import 'package:subscriba/src/store/subscriptions_model.dart';
