@@ -1,15 +1,12 @@
 import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
 import 'package:subscriba/src/home/home_subscription_section.dart';
-import 'package:subscriba/src/store/subscriptions_model.dart';
-import 'package:subscriba/src/subscription/subscription_card.dart';
 
 class HomeBody extends StatelessWidget {
   const HomeBody({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return const SingleChildScrollView(
       child: Column(
         children: [
           HomeSubscriptionSection(),

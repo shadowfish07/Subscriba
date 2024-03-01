@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:subscriba/src/styles/styles.dart';
 import 'package:subscriba/src/subscription_detail/display_card.dart';
 
 class PerPeriodCostCardsRow extends StatelessWidget {

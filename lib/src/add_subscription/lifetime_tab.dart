@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:subscriba/src/add_subscription/form_model.dart';
-import 'package:subscriba/src/component/section.dart';
 
 class LifetimeTab extends StatelessWidget {
   const LifetimeTab({super.key});

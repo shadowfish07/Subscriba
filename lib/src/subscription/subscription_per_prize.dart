@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:subscriba/src/database/order.dart';
-import 'package:subscriba/src/database/subscription.dart';
 import 'package:subscriba/src/store/subscription_model.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
 

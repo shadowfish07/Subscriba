@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:subscriba/src/styles/styles.dart';
 
 enum TitleSize { h1, h2 }
@@ -28,8 +27,8 @@ class Section extends StatelessWidget {
         title: title,
         padding: const EdgeInsets.all(0),
         titleSize: TitleSize.h2,
-        child: child,
-        titleBottomMargin: titleBottomMargin);
+        titleBottomMargin: titleBottomMargin,
+        child: child);
   }
 
   final String title;

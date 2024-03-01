@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:provider/provider.dart';
 import 'package:subscriba/src/database/order.dart';
-import 'package:subscriba/src/database/subscription.dart';
 import 'package:subscriba/src/store/subscription_model.dart';
 import 'package:subscriba/src/subscription/subscription_per_prize.dart';
 import 'package:subscriba/src/subscription_detail/subscription_detail_view.dart';
-import 'package:subscriba/src/subscriptions/subscriptions_page_model.dart';
-import 'package:subscriba/src/util/order_calculator.dart';
 
 class SubscriptionCard extends StatelessWidget {
   const SubscriptionCard(
