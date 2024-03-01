@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:subscriba/src/database/order.dart';
@@ -46,27 +48,40 @@ class OrderCalculator {
     }).fold(0.0, (value, element) => value + element);
   }
 
-  double perPrize(PaymentCycleType paymentCycleType) {
+  /// 协议均值花费算法，计算按协议价格计算的花费：
+  /// 订阅周期 1月视为31天
+  /// 1年视为365天
+  /// 计算月均、年均花费时，均会将订阅费用以上述单位均分到日均后再计算周期金额。
+  ///
+  /// 比如设置了10元/月的订阅，
+  /// 在计算年均花费时，算法为：
+  /// perYear = 10 / 31 * 365 = 117.74..
+  /// 这和普通预期中的10 * 12 不匹配，但更灵活普适。
+  double perPrizeByProtocol(PaymentCycleType paymentCycleType) {
     if (availableOrders.isEmpty) return 0;
 
     return availableOrders.map((e) {
-          /**
-       * 
-均值花费算法：
-订阅周期 1月视为31天
-1年视为365天
-计算月均、年均花费时，均会将订阅费用以上述单位均分到日均后再计算周期金额。
-
-比如设置了10元/月的订阅，
-在计算年均花费时，算法为：
-perYear = 10 / 31 * 365 = 117.74..
-这和普通预期中的10 * 12 不匹配，但更灵活普适。
-       */
           return getDailyPaymentPerPeriod(
                   e.paymentCycleType!, e.paymentPerPeriod) *
               paymentCycle2Days[paymentCycleType]!;
         }).fold(0.0, (value, element) => value + element) /
         availableOrders.length;
+  }
+
+  /// 实际均值花费算法，计算实际使用时长折算到每天的花费
+  /// 如果使用时间不足31天/365天，则月均/年均花费为-1（没有意义）
+  double perPrizeByActual(PaymentCycleType paymentCycleType) {
+    if (availableOrders.isEmpty || subscribingDaysByActual == 0) return 0;
+    if (paymentCycleType != PaymentCycleType.daily &&
+        subscribingDaysByActual < paymentCycle2Days[paymentCycleType]!) {
+      return -1;
+    }
+
+    return availableOrders
+            .map((e) => e.paymentPerPeriod)
+            .fold(0.0, (value, element) => value + element) /
+        subscribingDaysByActual *
+        paymentCycle2Days[paymentCycleType]!;
   }
 
   bool get includeLifetimeOrder {
@@ -75,8 +90,33 @@ perYear = 10 / 31 * 365 = 117.74..
         null;
   }
 
+  /// 已使用订阅总天数
   /// -1 则是买断
-  int get subscribingDays {
+  int get subscribingDaysByActual {
+    int result = 0;
+    for (var order in availableOrders) {
+      if (order.startDate > DateTime.now().microsecondsSinceEpoch) {
+        return result;
+      }
+      if (order.paymentType == PaymentType.lifetime ||
+          order.endDate! > DateTime.now().microsecondsSinceEpoch) {
+        result += DateTime.now()
+            .difference(DateTime.fromMicrosecondsSinceEpoch(order.startDate))
+            .inDays;
+        return result;
+      }
+
+      result += my.DurationHelper.fromDate(
+              order.startDate, order.endDate!, order.paymentCycleType!)
+          .duration;
+    }
+
+    return result;
+  }
+
+  /// 协议订阅总天数
+  /// -1 则是买断
+  int get subscribingDaysByProtocol {
     if (includeLifetimeOrder) {
       return -1;
     }
@@ -98,8 +138,9 @@ perYear = 10 / 31 * 365 = 117.74..
         .firstWhere((element) => element.paymentType == PaymentType.lifetime);
 
     return DateTime.fromMicrosecondsSinceEpoch(order.startDate)
-        .difference(DateTime.now())
-        .inDays;
+            .difference(DateTime.now())
+            .inDays +
+        1;
   }
 
   /// 计算最后一次连续订阅的开始时间

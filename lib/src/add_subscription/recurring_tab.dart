@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:subscriba/src/add_subscription/form_model.dart';
 import 'package:subscriba/src/component/section.dart';
 import 'package:subscriba/src/database/order.dart';
-import 'package:subscriba/src/subsciption_detail/per_period_cost_cards_row.dart';
+import 'package:subscriba/src/subscription_detail/per_period_cost_cards_row.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
 import 'package:subscriba/src/util/payment_cycle.dart';
 
@@ -166,13 +166,16 @@ class RecurringTab extends StatelessWidget {
                   final orderCalculator = OrderCalculator(orders: [tempOrder]);
                   final dailyCost = formModel.paymentPerPeriodText == null
                       ? 0.0
-                      : orderCalculator.perPrize(PaymentCycleType.daily);
+                      : orderCalculator
+                          .perPrizeByProtocol(PaymentCycleType.daily);
                   final monthlyCost = formModel.paymentPerPeriodText == null
                       ? 0.0
-                      : orderCalculator.perPrize(PaymentCycleType.monthly);
+                      : orderCalculator
+                          .perPrizeByProtocol(PaymentCycleType.monthly);
                   final annuallyCost = formModel.paymentPerPeriodText == null
                       ? 0.0
-                      : orderCalculator.perPrize(PaymentCycleType.yearly);
+                      : orderCalculator
+                          .perPrizeByProtocol(PaymentCycleType.yearly);
                   return PerPeriodCostCardsRow(
                       dailyCost: dailyCost,
                       monthlyCost: monthlyCost,

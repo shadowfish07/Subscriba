@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:subscriba/src/styles/styles.dart';
-import 'package:subscriba/src/subsciption_detail/display_card.dart';
+import 'package:subscriba/src/subscription_detail/display_card.dart';
 
 class PerPeriodCostCardsRow extends StatelessWidget {
   const PerPeriodCostCardsRow(
@@ -25,7 +25,7 @@ class PerPeriodCostCardsRow extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           body: Text(
-            "\$${dailyCost.toStringAsFixed(2)}",
+            dailyCost == -1 ? '-' : "\$${dailyCost.toStringAsFixed(2)}",
             style: Theme.of(context)
                 .textTheme
                 .titleMedium!
@@ -39,7 +39,7 @@ class PerPeriodCostCardsRow extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           body: Text(
-            "\$${monthlyCost.toStringAsFixed(2)}",
+            monthlyCost == -1 ? '-' : "\$${monthlyCost.toStringAsFixed(2)}",
             style: Theme.of(context)
                 .textTheme
                 .titleMedium!
@@ -53,7 +53,7 @@ class PerPeriodCostCardsRow extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           body: Text(
-            "\$${annuallyCost.toStringAsFixed(2)}",
+            annuallyCost == -1 ? '-' : "\$${annuallyCost.toStringAsFixed(2)}",
             style: Theme.of(context)
                 .textTheme
                 .titleMedium!
