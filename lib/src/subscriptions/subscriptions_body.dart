@@ -1,8 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
-import 'package:subscriba/src/home/home_subscription_section.dart';
-import 'package:subscriba/src/store/subscriptions_model.dart';
-import 'package:subscriba/src/subscription/subscription_card.dart';
 import 'package:subscriba/src/subscriptions/subscriptions_card_list.dart';
 
 class SubscriptionsBody extends StatelessWidget {
@@ -10,7 +6,7 @@ class SubscriptionsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return const SingleChildScrollView(
       child: Column(
         children: [
           SubscriptionsCardList()

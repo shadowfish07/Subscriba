@@ -26,7 +26,7 @@ class OrderEdit extends StatelessWidget {
 class _Form extends StatefulWidget {
   final int orderId;
 
-  const _Form({super.key, required this.orderId});
+  const _Form({required this.orderId});
 
   @override
   State<_Form> createState() => __FormState();

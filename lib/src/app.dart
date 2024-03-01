@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:subscriba/src/add_subscription/add_subscription_view.dart';
-import 'package:subscriba/src/database/order.dart';
-import 'package:subscriba/src/database/subscription.dart';
-import 'package:subscriba/src/home/home_view.dart';
 import 'package:subscriba/src/navigation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:subscriba/src/store/subscriptions_model.dart';
 
 import 'sample_feature/sample_item_details_view.dart';
-import 'sample_feature/sample_item_list_view.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 
@@ -84,7 +80,7 @@ class MyApp extends StatelessWidget {
                   builder: (BuildContext context) {
                     switch (routeSettings.name) {
                       case AddSubscriptionView.routeName:
-                        return AddSubscriptionView();
+                        return const AddSubscriptionView();
                       case SettingsView.routeName:
                         return SettingsView(controller: settingsController);
                       case SampleItemDetailsView.routeName:

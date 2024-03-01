@@ -1,11 +1,7 @@
-import 'dart:math';
 
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/util/duration.dart' as my;
-import 'package:subscriba/src/util/payment_calculator.dart';
-import 'package:subscriba/src/util/payment_cycle.dart';
 
 const paymentCycle2Days = {
   PaymentCycleType.daily: 1,

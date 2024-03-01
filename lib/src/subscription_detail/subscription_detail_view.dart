@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:subscriba/src/component/section.dart';
 import 'package:subscriba/src/database/order.dart';
@@ -102,7 +101,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
 
 class _SubscriptionDetailBody extends StatelessWidget {
   final SubscriptionModel subscription;
-  const _SubscriptionDetailBody({super.key, required this.subscription});
+  const _SubscriptionDetailBody({required this.subscription});
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +189,6 @@ class _SubscriptionDetailBody extends StatelessWidget {
 
 class _OrdersSection extends StatelessWidget {
   const _OrdersSection({
-    super.key,
     required this.subscription,
   });
 
@@ -223,7 +221,6 @@ class _OrdersSection extends StatelessWidget {
 
 class _RecurringCardsRow extends StatelessWidget {
   const _RecurringCardsRow({
-    super.key,
     required this.subscription,
   });
   final SubscriptionModel subscription;
@@ -256,7 +253,7 @@ class _RecurringCardsRow extends StatelessWidget {
 class _NextPaymentCard extends StatelessWidget {
   final SubscriptionModel subscription;
 
-  const _NextPaymentCard({super.key, required this.subscription});
+  const _NextPaymentCard({required this.subscription});
 
   @override
   Widget build(BuildContext context) {
@@ -316,7 +313,7 @@ class _NextPaymentCard extends StatelessWidget {
 class _RenewCard extends StatelessWidget {
   final SubscriptionModel subscription;
 
-  const _RenewCard({super.key, required this.subscription});
+  const _RenewCard({required this.subscription});
 
   @override
   Widget build(BuildContext context) {
@@ -359,7 +356,7 @@ class _RenewCard extends StatelessWidget {
 class _TotallyCostCard extends StatelessWidget {
   final SubscriptionModel subscription;
 
-  const _TotallyCostCard({super.key, required this.subscription});
+  const _TotallyCostCard({required this.subscription});
 
   @override
   Widget build(BuildContext context) {
@@ -388,7 +385,7 @@ class _TotallyCostCard extends StatelessWidget {
 }
 
 class _CreateFirstOrderCard extends StatelessWidget {
-  const _CreateFirstOrderCard({super.key, required this.subscription});
+  const _CreateFirstOrderCard({required this.subscription});
 
   final SubscriptionModel subscription;
 
@@ -425,7 +422,7 @@ class _CreateFirstOrderCard extends StatelessWidget {
                               );
                               subscription.reload();
                             },
-                            child: Text(
+                            child: const Text(
                               "Create one now!",
                             )),
                       ),
@@ -438,7 +435,7 @@ class _CreateFirstOrderCard extends StatelessWidget {
 class _SubscriptionTimeInfoCard extends StatelessWidget {
   final SubscriptionModel subscription;
 
-  const _SubscriptionTimeInfoCard({super.key, required this.subscription});
+  const _SubscriptionTimeInfoCard({required this.subscription});
 
   @override
   Widget build(BuildContext context) {
