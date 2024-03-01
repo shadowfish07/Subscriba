@@ -128,23 +128,19 @@ class _SubscriptionDetailBody extends StatelessWidget {
             Observer(builder: (context) {
               final orderCalculator =
                   OrderCalculator(orders: subscription.instance.orders);
+
+              double calculateCost(PaymentCycleType cycleType) {
+                return orderCalculator.includeLifetimeOrder
+                    ? orderCalculator.perPrizeByActual(cycleType)
+                    : orderCalculator.perPrizeByProtocol(cycleType);
+              }
+
               return Padding(
                 padding: defaultCenterPadding,
                 child: PerPeriodCostCardsRow(
-                  dailyCost: orderCalculator.includeLifetimeOrder
-                      ? orderCalculator.perPrizeByActual(PaymentCycleType.daily)
-                      : orderCalculator
-                          .perPrizeByProtocol(PaymentCycleType.daily),
-                  monthlyCost: orderCalculator.includeLifetimeOrder
-                      ? orderCalculator
-                          .perPrizeByActual(PaymentCycleType.monthly)
-                      : orderCalculator
-                          .perPrizeByProtocol(PaymentCycleType.monthly),
-                  annuallyCost: orderCalculator.includeLifetimeOrder
-                      ? orderCalculator
-                          .perPrizeByActual(PaymentCycleType.yearly)
-                      : orderCalculator
-                          .perPrizeByProtocol(PaymentCycleType.yearly),
+                  dailyCost: calculateCost(PaymentCycleType.daily),
+                  monthlyCost: calculateCost(PaymentCycleType.monthly),
+                  annuallyCost: calculateCost(PaymentCycleType.yearly),
                 ),
               );
             }),
