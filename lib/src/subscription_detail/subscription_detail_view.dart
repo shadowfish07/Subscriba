@@ -12,9 +12,8 @@ import 'package:subscriba/src/order/order_card.dart';
 import 'package:subscriba/src/store/subscription_model.dart';
 import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/styles/styles.dart';
-import 'package:subscriba/src/subsciption_detail/display_card.dart';
-import 'package:subscriba/src/subsciption_detail/per_period_cost_cards_row.dart';
-import 'package:subscriba/src/subsciption_detail/subscription_detail_model.dart';
+import 'package:subscriba/src/subscription_detail/display_card.dart';
+import 'package:subscriba/src/subscription_detail/per_period_cost_cards_row.dart';
 import 'package:subscriba/src/util/date_format_helper.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
 import 'package:subscriba/src/util/payment_cycle.dart';
@@ -133,11 +132,20 @@ class _SubscriptionDetailBody extends StatelessWidget {
               return Padding(
                 padding: defaultCenterPadding,
                 child: PerPeriodCostCardsRow(
-                  dailyCost: orderCalculator.perPrize(PaymentCycleType.daily),
-                  monthlyCost:
-                      orderCalculator.perPrize(PaymentCycleType.monthly),
-                  annuallyCost:
-                      orderCalculator.perPrize(PaymentCycleType.yearly),
+                  dailyCost: orderCalculator.includeLifetimeOrder
+                      ? orderCalculator.perPrizeByActual(PaymentCycleType.daily)
+                      : orderCalculator
+                          .perPrizeByProtocol(PaymentCycleType.daily),
+                  monthlyCost: orderCalculator.includeLifetimeOrder
+                      ? orderCalculator
+                          .perPrizeByActual(PaymentCycleType.monthly)
+                      : orderCalculator
+                          .perPrizeByProtocol(PaymentCycleType.monthly),
+                  annuallyCost: orderCalculator.includeLifetimeOrder
+                      ? orderCalculator
+                          .perPrizeByActual(PaymentCycleType.yearly)
+                      : orderCalculator
+                          .perPrizeByProtocol(PaymentCycleType.yearly),
                 ),
               );
             }),
@@ -441,20 +449,23 @@ class _SubscriptionTimeInfoCard extends StatelessWidget {
         final lastContinuousSubscriptionDate =
             orderCalculator.lastContinuousSubscriptionDate;
         final latestSubscriptionDate = orderCalculator.latestSubscriptionDate;
-        final subscribingDays = orderCalculator.subscribingDays;
+        final subscribingDays = orderCalculator.subscribingDaysByProtocol;
         final expiresIn = orderCalculator.expiresIn;
         // TODO 处理订阅还没有开始的场景
-        final expirationProgress = min(
-            1.0,
-            latestSubscriptionDate - lastContinuousSubscriptionDate != 0
-                ? (DateTime.now().microsecondsSinceEpoch -
-                        lastContinuousSubscriptionDate) /
-                    (latestSubscriptionDate - lastContinuousSubscriptionDate)
-                : 0.0);
+        final expirationProgress = latestSubscriptionDate == -1
+            ? 1.0
+            : min(
+                1.0,
+                latestSubscriptionDate - lastContinuousSubscriptionDate != 0
+                    ? (DateTime.now().microsecondsSinceEpoch -
+                            lastContinuousSubscriptionDate) /
+                        (latestSubscriptionDate -
+                            lastContinuousSubscriptionDate)
+                    : 0.0);
 
         String getExpiresInStr() {
           if (expiresIn == null) {
-            return "Lifetime subscription";
+            return "";
           } else if (expiresIn.inDays == 0) {
             return "Expires today";
           } else if (expiresIn.inDays < 0) {
@@ -533,8 +544,10 @@ class _SubscriptionTimeInfoCard extends StatelessWidget {
                                         .colorScheme
                                         .onSurfaceVariant)),
                         Text(
-                            DateFormatHelper.fromMicrosecondsSinceEpoch(
-                                latestSubscriptionDate),
+                            latestSubscriptionDate == -1
+                                ? "∞"
+                                : DateFormatHelper.fromMicrosecondsSinceEpoch(
+                                    latestSubscriptionDate),
                             style: Theme.of(context)
                                 .textTheme
                                 .labelMedium!

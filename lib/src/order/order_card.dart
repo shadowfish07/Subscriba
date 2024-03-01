@@ -24,7 +24,8 @@ class OrderCard extends StatelessWidget {
         };
 
         final description = order.description ??
-            paymentCycleType2Description[order.paymentCycleType]!;
+            paymentCycleType2Description[order.paymentCycleType] ??
+            "";
 
         Future<bool?> showConfirmDialog() async {
           return await showDialog<bool>(
@@ -120,7 +121,9 @@ class OrderCard extends StatelessWidget {
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         Text(
-                          "${DateFormatHelper.fromMicrosecondsSinceEpoch(order.startDate)} - ${DateFormatHelper.fromMicrosecondsSinceEpoch(order.endDate!)}",
+                          order.paymentType == PaymentType.lifetime
+                              ? "${DateFormatHelper.fromMicrosecondsSinceEpoch(order.startDate)} - ∞"
+                              : "${DateFormatHelper.fromMicrosecondsSinceEpoch(order.startDate)} - ${DateFormatHelper.fromMicrosecondsSinceEpoch(order.endDate!)}",
                           style: Theme.of(context)
                               .textTheme
                               .labelMedium!
@@ -143,7 +146,9 @@ class OrderCard extends StatelessWidget {
                               .copyWith(fontFamily: "Alibaba"),
                         ),
                         Text(
-                          "+ ${DurationHelper.fromDate(order.startDate, order.endDate!, order.paymentCycleType!).duration} days",
+                          order.paymentType == PaymentType.lifetime
+                              ? "lifetime"
+                              : "+ ${DurationHelper.fromDate(order.startDate, order.endDate!, order.paymentCycleType!).duration} days",
                           style: Theme.of(context)
                               .textTheme
                               .labelMedium!

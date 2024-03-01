@@ -38,7 +38,8 @@ class SubscriptionAppBar extends StatelessWidget
                       subscriptionsModel.subscriptions.map(
                     (e) {
                       return OrderCalculator(orders: e.instance.orders)
-                          .perPrize(subscriptionPageModel.paymentCycleType);
+                          .perPrizeByProtocol(
+                              subscriptionPageModel.paymentCycleType);
                     },
                   ).reduce((value, element) => value + element);
                   return InkWell(

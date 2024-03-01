@@ -23,10 +23,10 @@ class SubscriptionPerPrize extends StatelessWidget {
   Widget build(BuildContext context) {
     final perMainPaymentCyclePrize =
         OrderCalculator(orders: subscription.instance.orders)
-            .perPrize(mainPaymentCycleType);
+            .perPrizeByProtocol(mainPaymentCycleType);
     final perDayPaymentCyclePrize =
         OrderCalculator(orders: subscription.instance.orders)
-            .perPrize(PaymentCycleType.daily);
+            .perPrizeByProtocol(PaymentCycleType.daily);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
