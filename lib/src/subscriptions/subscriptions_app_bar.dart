@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
+import 'package:subscriba/src/component/MoneyText.dart';
 import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/subscriptions/subscriptions_page_model.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
@@ -47,10 +48,9 @@ class SubscriptionAppBar extends StatelessWidget
                     },
                     child: Row(
                       children: [
-                        Text(
-                          '\$${perMainPaymentCyclePrize.toStringAsFixed(2)}',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
+                        MoneyText(
+                            money: perMainPaymentCyclePrize,
+                            style: Theme.of(context).textTheme.titleLarge),
                         Text(
                           '/${PaymentCycleHelper.enum2FormalStr[subscriptionPageModel.paymentCycleType]!.toLowerCase()}',
                           style: Theme.of(context)
