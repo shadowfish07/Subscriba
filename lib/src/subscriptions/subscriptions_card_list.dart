@@ -17,6 +17,12 @@ class SubscriptionsCardList extends StatelessWidget {
         final subscriptionPageModel =
             Provider.of<SubscriptionPageModel>(context);
 
+        if (subscriptionModel.subscriptions.isEmpty) {
+          return const Center(
+            child: Text("Nothing to subscribe now, create one!"),
+          );
+        }
+
         return ListView.builder(
             padding:
                 defaultCenterPadding.add(const EdgeInsets.only(bottom: 48)),
