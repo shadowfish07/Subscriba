@@ -49,6 +49,14 @@ mixin _$SubscriptionModel on _SubscriptionModel, Store {
     return _$deleteOrderAsyncAction.run(() => super.deleteOrder(id));
   }
 
+  late final _$tryRenewAsyncAction =
+      AsyncAction('_SubscriptionModel.tryRenew', context: context);
+
+  @override
+  Future<bool> tryRenew() {
+    return _$tryRenewAsyncAction.run(() => super.tryRenew());
+  }
+
   @override
   String toString() {
     return '''

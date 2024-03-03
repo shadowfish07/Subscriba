@@ -7,6 +7,8 @@ import 'package:subscriba/src/database/model.dart';
 import 'package:subscriba/src/util/file_helper.dart';
 
 class AboutView extends StatelessWidget {
+  static const routeName = '/about';
+
   const AboutView({super.key});
 
   @override

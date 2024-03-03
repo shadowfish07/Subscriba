@@ -28,6 +28,12 @@ class DurationHelper {
   static const double dayPerMonth = 31; //dayPerYear / 12;
   static const double dayPerYear = 365;
 
+  static const paymentCycle2Days = {
+    PaymentCycleType.daily: 1.0,
+    PaymentCycleType.monthly: DurationHelper.dayPerMonth,
+    PaymentCycleType.yearly: DurationHelper.dayPerYear
+  };
+
   double toDays() {
     if (unit == PaymentCycleType.daily) {
       return duration.toDouble();

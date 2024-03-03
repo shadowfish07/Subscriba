@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:subscriba/src/about/about_view.dart';
 import 'package:subscriba/src/add_subscription/add_subscription_view.dart';
 import 'package:subscriba/src/navigation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:subscriba/src/store/subscriptions_model.dart';
+import 'package:subscriba/src/store_route_observer.dart';
 
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
+
+final subscriptionsModel = SubscriptionsModel();
 
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {
@@ -31,7 +35,7 @@ class MyApp extends StatelessWidget {
     // The ListenableBuilder Widget listens to the SettingsController for changes.
     // Whenever the user updates their settings, the MaterialApp is rebuilt.
     return MultiProvider(
-      providers: [Provider(create: (_) => SubscriptionsModel())],
+      providers: [Provider(create: (_) => subscriptionsModel)],
       builder: (context, child) {
         return ListenableBuilder(
           listenable: settingsController,
@@ -71,6 +75,9 @@ class MyApp extends StatelessWidget {
               darkTheme: ThemeData.dark(useMaterial3: true),
               themeMode: ThemeMode.dark, //settingsController.themeMode,
 
+              navigatorObservers: [
+                StoreRouteObserver(subscriptionsModel: subscriptionsModel)
+              ],
               // Define a function to handle named routes in order to support
               // Flutter web url navigation and deep linking.
               onGenerateRoute: (RouteSettings routeSettings) {
@@ -82,6 +89,8 @@ class MyApp extends StatelessWidget {
                         return const AddSubscriptionView();
                       case SettingsView.routeName:
                         return SettingsView(controller: settingsController);
+                      case AboutView.routeName:
+                        return const AboutView();
                       default:
                         return const Navigation();
                     }
