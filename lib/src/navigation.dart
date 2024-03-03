@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:subscriba/src/about/about_view.dart';
 import 'package:subscriba/src/home/home_view.dart';
 import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/subscriptions/subscriptions_page_model.dart';
@@ -56,7 +57,7 @@ class _NavigationState extends State<Navigation> {
             body: [
               const HomeView(),
               const SubscriptionsView(),
-              Container()
+              const AboutView()
             ][currentIndex],
           );
         });

@@ -46,6 +46,8 @@ abstract class BaseModel {
   }
 }
 
+const currentDBVersion = 1;
+
 class BaseModalProvider<T extends BaseModel> {
   static final Future<Database> db = open();
   late String table;
@@ -67,7 +69,7 @@ class BaseModalProvider<T extends BaseModel> {
     final result = factoryWithLogs.openDatabase(
       p.join(databasesPath.path, "subscriba.db"),
       options: OpenDatabaseOptions(
-        version: 1,
+        version: currentDBVersion,
         onCreate: (Database db, int version) async {
           debugPrint("onCreate");
           await db.execute('''
@@ -102,6 +104,30 @@ create table "${OrderProvider.tableName}" (
     await onCreateCompleter.future;
 
     return result;
+  }
+
+  static Future<Map<String, dynamic>> export() async {
+    final Map<String, dynamic> result = {};
+    result['version'] = currentDBVersion;
+    result[SubscriptionProvider.tableName] =
+        await SubscriptionProvider().getAll();
+    result[OrderProvider.tableName] = await OrderProvider().getAll();
+    return result;
+  }
+
+  static Future<void> import(Map<String, dynamic> data) async {
+    await _insertAll(
+        SubscriptionProvider.tableName, data[SubscriptionProvider.tableName]);
+    await _insertAll(OrderProvider.tableName, data[OrderProvider.tableName]);
+  }
+
+  static Future<void> _insertAll(String table, List<dynamic> maps) async {
+    if (maps.isEmpty) return;
+    final db = await BaseModalProvider.db;
+    for (var data in maps) {
+      data.remove("id");
+      await db.insert(table, data);
+    }
   }
 
   Future<int> insert(T modal) async {
