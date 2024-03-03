@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:provider/provider.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/store/subscription_model.dart';
 import 'package:subscriba/src/subscription/subscription_per_prize.dart';
