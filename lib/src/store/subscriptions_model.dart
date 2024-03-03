@@ -16,7 +16,8 @@ abstract class _SubscriptionsModel with Store {
   ObservableList<SubscriptionModel> subscriptions =
       ObservableList<SubscriptionModel>();
 
-  Map<int, SubscriptionModel> subscriptionsMap = {};
+  @observable
+  ObservableMap<int, SubscriptionModel> subscriptionsMap = ObservableMap();
 
   getSubscription(int id) {
     return subscriptionsMap[id];
@@ -29,6 +30,13 @@ abstract class _SubscriptionsModel with Store {
             .map((e) => SubscriptionModel(e))));
     for (var element in subscriptions) {
       subscriptionsMap[element.instance.id] = element;
+    }
+  }
+
+  @action
+  Future<void> tryRenewAll() async {
+    for (var element in subscriptions) {
+      await element.tryRenew();
     }
   }
 }

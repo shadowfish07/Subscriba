@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:subscriba/src/component/section.dart';
 import 'package:subscriba/src/database/order.dart';
@@ -17,29 +18,45 @@ import 'package:subscriba/src/util/date_format_helper.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
 import 'package:subscriba/src/util/payment_cycle.dart';
 
-class SubscriptionDetailView extends StatefulWidget {
+class SubscriptionDetailView extends StatelessWidget {
   static const routeName = '/subscription/detail';
 
-  const SubscriptionDetailView({super.key, required this.subscription});
+  late final Future<SubscriptionModel> subscription;
 
-  final SubscriptionModel subscription;
+  Future<SubscriptionModel> _getSubscription(int subscriptionId) async {
+    final data = await SubscriptionProvider().getSubscription(subscriptionId);
+    // TODO: 找不到的兜底UI
+    return SubscriptionModel(data!);
+  }
 
-  @override
-  State<SubscriptionDetailView> createState() =>
-      // ignore: no_logic_in_create_state
-      _SubscriptionDetailViewState(subscription: subscription);
-}
-
-class _SubscriptionDetailViewState extends State<SubscriptionDetailView> {
-  final SubscriptionModel subscription;
-
-  _SubscriptionDetailViewState({required this.subscription});
+  SubscriptionDetailView({super.key, required int subscriptionId}) {
+    subscription = _getSubscription(subscriptionId);
+  }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: _AppBar(subscription: subscription),
-        body: _SubscriptionDetailBody(subscription: subscription));
+  Widget build(context) {
+    return FutureBuilder<SubscriptionModel>(
+        future: subscription,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final subscription = snapshot.data!;
+            subscription.tryRenew().then((hasRenewed) {
+              if (hasRenewed) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('This subscription has been auto-renewed'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
+            });
+            return Scaffold(
+                appBar: _AppBar(subscription: subscription),
+                body: _SubscriptionDetailBody(subscription: subscription));
+          }
+
+          return Container();
+        });
   }
 }
 
@@ -107,7 +124,6 @@ class _SubscriptionDetailBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: SizedBox(
-        height: MediaQuery.of(context).size.height,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -175,7 +191,7 @@ class _SubscriptionDetailBody extends StatelessWidget {
                   : _RecurringCardsRow(subscription: subscription);
             }),
             const SizedBox(height: 8),
-            _OrdersSection(subscription: subscription)
+            _OrdersSection(subscription: subscription),
           ],
         ),
       ),

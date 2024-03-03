@@ -25,6 +25,22 @@ mixin _$SubscriptionsModel on _SubscriptionsModel, Store {
     });
   }
 
+  late final _$subscriptionsMapAtom =
+      Atom(name: '_SubscriptionsModel.subscriptionsMap', context: context);
+
+  @override
+  ObservableMap<int, SubscriptionModel> get subscriptionsMap {
+    _$subscriptionsMapAtom.reportRead();
+    return super.subscriptionsMap;
+  }
+
+  @override
+  set subscriptionsMap(ObservableMap<int, SubscriptionModel> value) {
+    _$subscriptionsMapAtom.reportWrite(value, super.subscriptionsMap, () {
+      super.subscriptionsMap = value;
+    });
+  }
+
   late final _$loadSubscriptionsAsyncAction =
       AsyncAction('_SubscriptionsModel.loadSubscriptions', context: context);
 
@@ -33,10 +49,19 @@ mixin _$SubscriptionsModel on _SubscriptionsModel, Store {
     return _$loadSubscriptionsAsyncAction.run(() => super.loadSubscriptions());
   }
 
+  late final _$tryRenewAllAsyncAction =
+      AsyncAction('_SubscriptionsModel.tryRenewAll', context: context);
+
+  @override
+  Future<void> tryRenewAll() {
+    return _$tryRenewAllAsyncAction.run(() => super.tryRenewAll());
+  }
+
   @override
   String toString() {
     return '''
-subscriptions: ${subscriptions}
+subscriptions: ${subscriptions},
+subscriptionsMap: ${subscriptionsMap}
     ''';
   }
 }

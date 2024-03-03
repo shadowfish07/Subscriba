@@ -1,13 +1,6 @@
-
 import 'package:collection/collection.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/util/duration.dart' as my;
-
-const paymentCycle2Days = {
-  PaymentCycleType.daily: 1,
-  PaymentCycleType.monthly: my.DurationHelper.dayPerMonth,
-  PaymentCycleType.yearly: my.DurationHelper.dayPerYear
-};
 
 double getDailyPaymentPerPeriod(
     PaymentCycleType paymentCycle, double paymentPerPeriod) {
@@ -59,7 +52,7 @@ class OrderCalculator {
     return availableOrders.map((e) {
           return getDailyPaymentPerPeriod(
                   e.paymentCycleType!, e.paymentPerPeriod) *
-              paymentCycle2Days[paymentCycleType]!;
+              my.DurationHelper.paymentCycle2Days[paymentCycleType]!;
         }).fold(0.0, (value, element) => value + element) /
         availableOrders.length;
   }
@@ -69,7 +62,8 @@ class OrderCalculator {
   double perPrizeByActual(PaymentCycleType paymentCycleType) {
     if (availableOrders.isEmpty || subscribingDaysByActual == 0) return 0;
     if (paymentCycleType != PaymentCycleType.daily &&
-        subscribingDaysByActual < paymentCycle2Days[paymentCycleType]!) {
+        subscribingDaysByActual <
+            my.DurationHelper.paymentCycle2Days[paymentCycleType]!) {
       return -1;
     }
 
@@ -77,7 +71,7 @@ class OrderCalculator {
             .map((e) => e.paymentPerPeriod)
             .fold(0.0, (value, element) => value + element) /
         subscribingDaysByActual *
-        paymentCycle2Days[paymentCycleType]!;
+        my.DurationHelper.paymentCycle2Days[paymentCycleType]!;
   }
 
   bool get includeLifetimeOrder {
@@ -175,6 +169,9 @@ class OrderCalculator {
   }
 
   /// null 则是买断
+  /// 0 则今天将过期
+  /// >0 则还有多少天过期
+  /// <0 则已经过期几天
   Duration? get expiresIn {
     if (includeLifetimeOrder) {
       return null;
@@ -187,6 +184,7 @@ class OrderCalculator {
         .difference(nowDate);
   }
 
+  /// 获取用于自动续订的订单模板（以最后一次订单为准）
   Order? get nextPaymentTemplate {
     if (includeLifetimeOrder || availableOrders.isEmpty) {
       return null;
