@@ -3,10 +3,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:subscriba/src/database/model.dart';
-import 'package:subscriba/src/database/order.dart';
-import 'package:subscriba/src/database/subscription.dart';
 import 'package:subscriba/src/util/file_helper.dart';
 
 class AboutView extends StatelessWidget {
@@ -14,7 +11,7 @@ class AboutView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
         body: Column(
       children: [_AppInfo(), _Settings()],
     ));
@@ -22,7 +19,7 @@ class AboutView extends StatelessWidget {
 }
 
 class _AppInfo extends StatelessWidget {
-  const _AppInfo({super.key});
+  const _AppInfo();
 
   @override
   Widget build(BuildContext context) {
@@ -31,24 +28,24 @@ class _AppInfo extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          SizedBox(height: 100.0),
+          const SizedBox(height: 100.0),
           ClipRRect(
             borderRadius: BorderRadius.circular(24),
             child: const Image(
                 width: 100,
                 image: AssetImage('assets/images/play_store_512.png')),
           ), // Replace 'images/app_icon.png' with the path of app logo
-          SizedBox(height: 20.0),
+          const SizedBox(height: 20.0),
           Text(
             "Subscriba",
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-          SizedBox(height: 10.0),
+          const SizedBox(height: 10.0),
           Text(
             "v1.0.0",
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          SizedBox(height: 30.0),
+          const SizedBox(height: 30.0),
           // Add more ListTile for more settings
         ],
       ),
@@ -57,7 +54,7 @@ class _AppInfo extends StatelessWidget {
 }
 
 class _Settings extends StatelessWidget {
-  const _Settings({super.key});
+  const _Settings();
 
   @override
   Widget build(BuildContext context) {
@@ -88,8 +85,8 @@ class _Settings extends StatelessWidget {
     return Column(
       children: [
         ListTile(
-          leading: Icon(Icons.file_upload),
-          title: Text('导出数据'),
+          leading: const Icon(Icons.file_upload),
+          title: const Text('导出数据'),
           onTap: () async {
             final data = await BaseModalProvider.export();
             debugPrint(jsonEncode(data));
@@ -97,8 +94,8 @@ class _Settings extends StatelessWidget {
           },
         ),
         ListTile(
-          leading: Icon(Icons.file_download),
-          title: Text('导入数据'),
+          leading: const Icon(Icons.file_download),
+          title: const Text('导入数据'),
           onTap: () async {
             FilePickerResult? result = await FilePicker.platform.pickFiles();
             if (result != null) {
