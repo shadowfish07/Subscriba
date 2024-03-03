@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:subscriba/src/component/MoneyText.dart';
+import 'package:subscriba/src/component/money_text.dart';
 import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/subscriptions/subscriptions_page_model.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
@@ -31,7 +31,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                       .perPrizeByProtocol(
                           subscriptionPageModel.paymentCycleType);
                 },
-              ).reduce((value, element) => value + element);
+              ).fold(0.0, (value, element) => value + element);
               return InkWell(
                 onTap: () {
                   subscriptionPageModel.toNextPaymentCycleType();
