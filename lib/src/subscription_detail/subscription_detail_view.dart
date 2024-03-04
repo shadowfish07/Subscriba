@@ -274,6 +274,7 @@ class _NextPaymentCard extends StatelessWidget {
             OrderCalculator(orders: subscription.instance.orders);
         final isRenew = subscription.instance.isRenew;
         // TODO 永久订阅时的展示
+        // ignore: unused_local_variable
         final isLifetime = OrderCalculator(orders: subscription.instance.orders)
             .isIncludeLifetimeOrder;
 
