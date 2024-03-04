@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:subscriba/src/component/money_text.dart';
 import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/subscriptions/subscriptions_page_model.dart';
-import 'package:subscriba/src/util/order_calculator.dart';
 import 'package:subscriba/src/util/payment_cycle.dart';
 import 'package:subscriba/src/util/subscription_calculator.dart';
 
