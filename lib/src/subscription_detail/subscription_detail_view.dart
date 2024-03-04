@@ -145,9 +145,9 @@ class _SubscriptionDetailBody extends StatelessWidget {
                   OrderCalculator(orders: subscription.instance.orders);
 
               double calculateCost(PaymentCycleType cycleType) {
-                return orderCalculator.includeLifetimeOrder
-                    ? orderCalculator.perPrizeByActual(cycleType)
-                    : orderCalculator.perPrizeByProtocol(cycleType);
+                return orderCalculator.isIncludeLifetimeOrder
+                    ? orderCalculator.perCostByActual(cycleType)
+                    : orderCalculator.perCostByProtocol(cycleType);
               }
 
               return Padding(
@@ -241,7 +241,7 @@ class _RecurringCardsRow extends StatelessWidget {
     return Observer(
       builder: (_) {
         final isLifetime = OrderCalculator(orders: subscription.instance.orders)
-            .includeLifetimeOrder;
+            .isIncludeLifetimeOrder;
 
         if (isLifetime) {
           return Container();
@@ -275,7 +275,7 @@ class _NextPaymentCard extends StatelessWidget {
         final isRenew = subscription.instance.isRenew;
         // TODO 永久订阅时的展示
         final isLifetime = OrderCalculator(orders: subscription.instance.orders)
-            .includeLifetimeOrder;
+            .isIncludeLifetimeOrder;
 
         return Expanded(
             flex: 2,
@@ -332,7 +332,7 @@ class _RenewCard extends StatelessWidget {
       builder: (_) {
         final isRenew = subscription.instance.isRenew;
         final isLifetime = OrderCalculator(orders: subscription.instance.orders)
-            .includeLifetimeOrder;
+            .isIncludeLifetimeOrder;
 
         final onTap = isLifetime
             ? null
@@ -382,7 +382,7 @@ class _TotallyCostCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "\$${OrderCalculator(orders: subscription.instance.orders).totalPrize}",
+                "\$${OrderCalculator(orders: subscription.instance.orders).totalCost}",
                 style: Theme.of(context)
                     .textTheme
                     .titleMedium!

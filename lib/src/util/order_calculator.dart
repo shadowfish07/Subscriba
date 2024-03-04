@@ -2,7 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/util/duration.dart' as my;
 
-double getDailyPaymentPerPeriod(
+double getDailyCostPerPeriod(
     PaymentCycleType paymentCycle, double paymentPerPeriod) {
   if (paymentCycle == PaymentCycleType.daily) {
     return paymentPerPeriod;
@@ -31,10 +31,18 @@ class OrderCalculator {
     return result;
   }
 
-  double get totalPrize {
+  double get totalCost {
     return availableOrders.map((e) {
       return e.paymentPerPeriod;
     }).fold(0.0, (value, element) => value + element);
+  }
+
+  /// 目前暂时不会有多个lifetime订单，后续看规划
+  double get lifetimeCost {
+    return availableOrders
+        .where((element) => element.paymentType == PaymentType.lifetime)
+        .map((e) => e.paymentPerPeriod)
+        .fold(0.0, (value, element) => value + element);
   }
 
   /// 协议均值花费算法，计算按协议价格计算的花费：
@@ -46,11 +54,14 @@ class OrderCalculator {
   /// 在计算年均花费时，算法为：
   /// perYear = 10 / 31 * 365 = 117.74..
   /// 这和普通预期中的10 * 12 不匹配，但更灵活普适。
-  double perPrizeByProtocol(PaymentCycleType paymentCycleType) {
+  ///
+  /// 如果订单中包含Lifetime订单，则返回-1
+  double perCostByProtocol(PaymentCycleType paymentCycleType) {
     if (availableOrders.isEmpty) return 0;
+    if (isIncludeLifetimeOrder) return -1;
 
     return availableOrders.map((e) {
-          return getDailyPaymentPerPeriod(
+          return getDailyCostPerPeriod(
                   e.paymentCycleType!, e.paymentPerPeriod) *
               my.DurationHelper.paymentCycle2Days[paymentCycleType]!;
         }).fold(0.0, (value, element) => value + element) /
@@ -59,7 +70,7 @@ class OrderCalculator {
 
   /// 实际均值花费算法，计算实际使用时长折算到每天的花费
   /// 如果使用时间不足31天/365天，则月均/年均花费为-1（没有意义）
-  double perPrizeByActual(PaymentCycleType paymentCycleType) {
+  double perCostByActual(PaymentCycleType paymentCycleType) {
     if (availableOrders.isEmpty || subscribingDaysByActual == 0) return 0;
     if (paymentCycleType != PaymentCycleType.daily &&
         subscribingDaysByActual <
@@ -74,7 +85,7 @@ class OrderCalculator {
         my.DurationHelper.paymentCycle2Days[paymentCycleType]!;
   }
 
-  bool get includeLifetimeOrder {
+  bool get isIncludeLifetimeOrder {
     return availableOrders.firstWhereOrNull(
             (element) => element.paymentType == PaymentType.lifetime) !=
         null;
@@ -107,7 +118,7 @@ class OrderCalculator {
   /// 协议订阅总天数
   /// -1 则是买断
   int get subscribingDaysByProtocol {
-    if (includeLifetimeOrder) {
+    if (isIncludeLifetimeOrder) {
       return -1;
     }
 
@@ -120,7 +131,7 @@ class OrderCalculator {
 
   /// 无买断返回-1
   int get daysAfterLifetimeSubscription {
-    if (!includeLifetimeOrder) {
+    if (!isIncludeLifetimeOrder) {
       return -1;
     }
 
@@ -159,7 +170,7 @@ class OrderCalculator {
 
   /// -1 则是买断
   int get latestSubscriptionDate {
-    if (includeLifetimeOrder) {
+    if (isIncludeLifetimeOrder) {
       return -1;
     }
 
@@ -173,7 +184,7 @@ class OrderCalculator {
   /// >0 则还有多少天过期
   /// <0 则已经过期几天
   Duration? get expiresIn {
-    if (includeLifetimeOrder) {
+    if (isIncludeLifetimeOrder) {
       return null;
     }
 
@@ -186,7 +197,7 @@ class OrderCalculator {
 
   /// 获取用于自动续订的订单模板（以最后一次订单为准）
   Order? get nextPaymentTemplate {
-    if (includeLifetimeOrder || availableOrders.isEmpty) {
+    if (isIncludeLifetimeOrder || availableOrders.isEmpty) {
       return null;
     }
 

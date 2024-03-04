@@ -6,6 +6,7 @@ import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/subscriptions/subscriptions_page_model.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
 import 'package:subscriba/src/util/payment_cycle.dart';
+import 'package:subscriba/src/util/subscription_calculator.dart';
 
 class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppBar({super.key});
@@ -24,14 +25,11 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
         child: Column(
           children: [
             Observer(builder: (context) {
-              final perMainPaymentCyclePrize =
-                  subscriptionsModel.subscriptions.map(
-                (e) {
-                  return OrderCalculator(orders: e.instance.orders)
-                      .perPrizeByProtocol(
-                          subscriptionPageModel.paymentCycleType);
-                },
-              ).fold(0.0, (value, element) => value + element);
+              final perMainPaymentCyclePrize = SubscriptionCalculator(
+                      subscriptions: subscriptionsModel.subscriptions
+                          .map((e) => e.instance)
+                          .toList())
+                  .perPrizeByProtocol(subscriptionPageModel.paymentCycleType);
               return InkWell(
                 onTap: () {
                   subscriptionPageModel.toNextPaymentCycleType();

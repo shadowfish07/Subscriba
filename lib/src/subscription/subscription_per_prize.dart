@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:subscriba/src/component/money_text.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/store/subscription_model.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
@@ -20,40 +21,46 @@ class SubscriptionPerPrize extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final perMainPaymentCyclePrize =
-        OrderCalculator(orders: subscription.instance.orders)
-            .perPrizeByProtocol(mainPaymentCycleType);
+    final orderCalculator =
+        OrderCalculator(orders: subscription.instance.orders);
+    final perMainPaymentCyclePrize = orderCalculator.isIncludeLifetimeOrder
+        ? orderCalculator.lifetimeCost
+        : orderCalculator.perCostByProtocol(mainPaymentCycleType);
     final perDayPaymentCyclePrize =
-        OrderCalculator(orders: subscription.instance.orders)
-            .perPrizeByProtocol(PaymentCycleType.daily);
+        orderCalculator.perCostByProtocol(PaymentCycleType.daily);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Row(children: [
-          Text(
-            "\$${perMainPaymentCyclePrize.toStringAsFixed(2)}",
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium!
-                .copyWith(fontFamily: "Alibaba"),
+          MoneyText(
+            money: perMainPaymentCyclePrize,
+            style: Theme.of(context).textTheme.titleMedium,
           ),
-          Text(
-            "/${paymentCycleType2Display[mainPaymentCycleType]}",
-            style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-          )
+          !orderCalculator.isIncludeLifetimeOrder
+              ? Text(
+                  "/${paymentCycleType2Display[mainPaymentCycleType]}",
+                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                )
+              : const SizedBox.shrink()
         ]),
-        mainPaymentCycleType != PaymentCycleType.daily
-            ? Text(
-                "\$${perDayPaymentCyclePrize.toStringAsFixed(2)}/day",
+        orderCalculator.isIncludeLifetimeOrder
+            ? Text("lifetime",
                 style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontFamily: "Alibaba"),
-              )
-            : Container()
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ))
+            : mainPaymentCycleType != PaymentCycleType.daily
+                ? MoneyText(
+                    money: perDayPaymentCyclePrize,
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                    suffix: "/day",
+                  )
+                : Container()
       ],
     );
   }
