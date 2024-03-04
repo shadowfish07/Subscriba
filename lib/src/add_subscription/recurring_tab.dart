@@ -167,15 +167,15 @@ class RecurringTab extends StatelessWidget {
                   final dailyCost = formModel.paymentPerPeriodText == null
                       ? 0.0
                       : orderCalculator
-                          .perPrizeByProtocol(PaymentCycleType.daily);
+                          .perCostByProtocol(PaymentCycleType.daily);
                   final monthlyCost = formModel.paymentPerPeriodText == null
                       ? 0.0
                       : orderCalculator
-                          .perPrizeByProtocol(PaymentCycleType.monthly);
+                          .perCostByProtocol(PaymentCycleType.monthly);
                   final annuallyCost = formModel.paymentPerPeriodText == null
                       ? 0.0
                       : orderCalculator
-                          .perPrizeByProtocol(PaymentCycleType.yearly);
+                          .perCostByProtocol(PaymentCycleType.yearly);
                   return PerPeriodCostCardsRow(
                       dailyCost: dailyCost,
                       monthlyCost: monthlyCost,
