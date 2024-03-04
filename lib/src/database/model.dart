@@ -115,7 +115,18 @@ create table "${OrderProvider.tableName}" (
     return result;
   }
 
+  static Future<void> clearAllTable() async {
+    final db = await BaseModalProvider.db;
+    db.execute("DELETE FROM ${SubscriptionProvider.tableName};");
+    db.execute(
+        "UPDATE SQLITE_SEQUENCE SET seq = 0 WHERE name = '${SubscriptionProvider.tableName}';");
+    db.execute("DELETE FROM ${OrderProvider.tableName};");
+    db.execute(
+        "UPDATE SQLITE_SEQUENCE SET seq = 0 WHERE name = '${OrderProvider.tableName}';");
+  }
+
   static Future<void> import(Map<String, dynamic> data) async {
+    await clearAllTable();
     await _insertAll(
         SubscriptionProvider.tableName, data[SubscriptionProvider.tableName]);
     await _insertAll(OrderProvider.tableName, data[OrderProvider.tableName]);
@@ -125,7 +136,6 @@ create table "${OrderProvider.tableName}" (
     if (maps.isEmpty) return;
     final db = await BaseModalProvider.db;
     for (var data in maps) {
-      data.remove("id");
       await db.insert(table, data);
     }
   }
