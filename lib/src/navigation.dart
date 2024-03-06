@@ -17,18 +17,19 @@ class Navigation extends StatefulWidget {
 
 class _NavigationState extends State<Navigation> {
   int currentIndex = 0;
-  late SubscriptionsModel subscriptionModel;
+  late SubscriptionsModel subscriptionsModel;
 
   void setCurrentIndex(int index) {
     setState(() {
       currentIndex = index;
-      subscriptionModel.loadSubscriptions();
+      subscriptionsModel.loadSubscriptions();
+      subscriptionsModel.tryRenewAll();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    subscriptionModel = Provider.of<SubscriptionsModel>(context);
+    subscriptionsModel = Provider.of<SubscriptionsModel>(context);
     return Provider(
         create: (_) => subscriptionsPageModel,
         builder: (context, child) {
