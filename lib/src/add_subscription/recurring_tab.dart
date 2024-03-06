@@ -105,22 +105,22 @@ class RecurringTab extends StatelessWidget {
               children: [
                 Observer(builder: (context) {
                   return DropdownButtonFormField(
-                    value: formModel.paymentCycleType,
+                    value: formModel.paymentFrequency,
                     decoration: const InputDecoration(
                       labelText: 'Payment Cycle',
                       border: OutlineInputBorder(),
                     ),
-                    items: PaymentCycleType.values
-                        .map<DropdownMenuItem<PaymentCycleType>>(
-                            (PaymentCycleType value) {
-                      return DropdownMenuItem<PaymentCycleType>(
+                    items: PaymentFrequency.values
+                        .map<DropdownMenuItem<PaymentFrequency>>(
+                            (PaymentFrequency value) {
+                      return DropdownMenuItem<PaymentFrequency>(
                         value: value,
                         child: Text(PaymentCycleHelper.enum2FormalStr[value]!),
                       );
                     }).toList(),
                     onChanged: (newValue) {
                       if (newValue == null) return;
-                      formModel.paymentCycleType = newValue;
+                      formModel.paymentFrequency = newValue;
                     },
                   );
                 }),
@@ -161,21 +161,21 @@ class RecurringTab extends StatelessWidget {
                       startDate: formModel.startTimeTimestamp ?? 0,
                       endDate: formModel.endTimeTimestamp,
                       paymentPerPeriod: formModel.paymentPerPeriod,
-                      paymentCycleType: formModel.paymentCycleType);
+                      paymentFrequency: formModel.paymentFrequency);
 
                   final orderCalculator = OrderCalculator(orders: [tempOrder]);
                   final dailyCost = formModel.paymentPerPeriodText == null
                       ? 0.0
                       : orderCalculator
-                          .perCostByProtocol(PaymentCycleType.daily);
+                          .perCostByProtocol(PaymentFrequency.daily);
                   final monthlyCost = formModel.paymentPerPeriodText == null
                       ? 0.0
                       : orderCalculator
-                          .perCostByProtocol(PaymentCycleType.monthly);
+                          .perCostByProtocol(PaymentFrequency.monthly);
                   final annuallyCost = formModel.paymentPerPeriodText == null
                       ? 0.0
                       : orderCalculator
-                          .perCostByProtocol(PaymentCycleType.yearly);
+                          .perCostByProtocol(PaymentFrequency.yearly);
                   return PerPeriodCostCardsRow(
                       dailyCost: dailyCost,
                       monthlyCost: monthlyCost,

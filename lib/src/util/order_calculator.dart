@@ -3,16 +3,16 @@ import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/util/duration.dart' as my;
 
 double getDailyCostPerPeriod(
-    PaymentCycleType paymentCycle, double paymentPerPeriod) {
-  if (paymentCycle == PaymentCycleType.daily) {
+    PaymentFrequency paymentCycle, double paymentPerPeriod) {
+  if (paymentCycle == PaymentFrequency.daily) {
     return paymentPerPeriod;
   }
 
-  if (paymentCycle == PaymentCycleType.monthly) {
+  if (paymentCycle == PaymentFrequency.monthly) {
     return paymentPerPeriod / my.DurationHelper.dayPerMonth;
   }
 
-  if (paymentCycle == PaymentCycleType.yearly) {
+  if (paymentCycle == PaymentFrequency.yearly) {
     return paymentPerPeriod / my.DurationHelper.dayPerYear;
   }
 
@@ -56,25 +56,25 @@ class OrderCalculator {
   /// 这和普通预期中的10 * 12 不匹配，但更灵活普适。
   ///
   /// 如果订单中包含Lifetime订单，则返回-1
-  double perCostByProtocol(PaymentCycleType paymentCycleType) {
+  double perCostByProtocol(PaymentFrequency paymentFrequency) {
     if (availableOrders.isEmpty) return 0;
     if (isIncludeLifetimeOrder) return -1;
 
     return availableOrders.map((e) {
           return getDailyCostPerPeriod(
-                  e.paymentCycleType!, e.paymentPerPeriod) *
-              my.DurationHelper.paymentCycle2Days[paymentCycleType]!;
+                  e.paymentFrequency!, e.paymentPerPeriod) *
+              my.DurationHelper.paymentCycle2Days[paymentFrequency]!;
         }).fold(0.0, (value, element) => value + element) /
         availableOrders.length;
   }
 
   /// 实际均值花费算法，计算实际使用时长折算到每天的花费
   /// 如果使用时间不足31天/365天，则月均/年均花费为-1（没有意义）
-  double perCostByActual(PaymentCycleType paymentCycleType) {
+  double perCostByActual(PaymentFrequency paymentFrequency) {
     if (availableOrders.isEmpty || subscribingDaysByActual == 0) return 0;
-    if (paymentCycleType != PaymentCycleType.daily &&
+    if (paymentFrequency != PaymentFrequency.daily &&
         subscribingDaysByActual <
-            my.DurationHelper.paymentCycle2Days[paymentCycleType]!) {
+            my.DurationHelper.paymentCycle2Days[paymentFrequency]!) {
       return -1;
     }
 
@@ -82,7 +82,7 @@ class OrderCalculator {
             .map((e) => e.paymentPerPeriod)
             .fold(0.0, (value, element) => value + element) /
         subscribingDaysByActual *
-        my.DurationHelper.paymentCycle2Days[paymentCycleType]!;
+        my.DurationHelper.paymentCycle2Days[paymentFrequency]!;
   }
 
   bool get isIncludeLifetimeOrder {
@@ -108,7 +108,7 @@ class OrderCalculator {
       }
 
       result += my.DurationHelper.fromDate(
-              order.startDate, order.endDate!, order.paymentCycleType!)
+              order.startDate, order.endDate!, order.paymentFrequency!)
           .duration;
     }
 
@@ -124,7 +124,7 @@ class OrderCalculator {
 
     return availableOrders
         .map((e) => my.DurationHelper.fromDate(
-                e.startDate, e.endDate!, e.paymentCycleType!)
+                e.startDate, e.endDate!, e.paymentFrequency!)
             .duration)
         .fold(0, (value, element) => value + element);
   }

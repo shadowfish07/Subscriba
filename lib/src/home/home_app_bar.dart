@@ -28,10 +28,10 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                       subscriptions: subscriptionsModel.subscriptions
                           .map((e) => e.instance)
                           .toList())
-                  .perPrizeByProtocol(subscriptionPageModel.paymentCycleType);
+                  .perPrizeByProtocol(subscriptionPageModel.paymentFrequency);
               return InkWell(
                 onTap: () {
-                  subscriptionPageModel.toNextPaymentCycleType();
+                  subscriptionPageModel.toNextPaymentFrequency();
                 },
                 child: SizedBox(
                   width: double.infinity,
@@ -42,7 +42,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
                           money: perMainPaymentCyclePrize,
                           style: Theme.of(context).textTheme.displayMedium),
                       Text(
-                        'per ${PaymentCycleHelper.enum2PerUnitStr[subscriptionPageModel.paymentCycleType]}',
+                        'per ${PaymentCycleHelper.enum2PerUnitStr[subscriptionPageModel.paymentFrequency]}',
                         style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                             color: Theme.of(context).colorScheme.secondary),
                       ),

@@ -89,7 +89,7 @@ create table "${OrderProvider.tableName}" (
   ${Order.columnPaymentType} integer not null,
   ${Order.columnStartDate} integer not null,
   ${Order.columnEndDate} integer,
-  ${Order.columnPaymentCycleType} integer,
+  ${Order.columnPaymentFrequency} integer,
   ${Order.columnPaymentPerPeriod} REAL not null,
   ${Order.columnPaymentPerPeriodUnit} text)
 ''');

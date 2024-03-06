@@ -144,7 +144,7 @@ class _SubscriptionDetailBody extends StatelessWidget {
               final orderCalculator =
                   OrderCalculator(orders: subscription.instance.orders);
 
-              double calculateCost(PaymentCycleType cycleType) {
+              double calculateCost(PaymentFrequency cycleType) {
                 return orderCalculator.isIncludeLifetimeOrder
                     ? orderCalculator.perCostByActual(cycleType)
                     : orderCalculator.perCostByProtocol(cycleType);
@@ -153,9 +153,9 @@ class _SubscriptionDetailBody extends StatelessWidget {
               return Padding(
                 padding: defaultCenterPadding,
                 child: PerPeriodCostCardsRow(
-                  dailyCost: calculateCost(PaymentCycleType.daily),
-                  monthlyCost: calculateCost(PaymentCycleType.monthly),
-                  annuallyCost: calculateCost(PaymentCycleType.yearly),
+                  dailyCost: calculateCost(PaymentFrequency.daily),
+                  monthlyCost: calculateCost(PaymentFrequency.monthly),
+                  annuallyCost: calculateCost(PaymentFrequency.yearly),
                 ),
               );
             }),
@@ -319,7 +319,7 @@ class _NextPaymentCard extends StatelessWidget {
                                   .copyWith(fontFamily: "Alibaba"),
                             ),
                             Text(
-                                "/${PaymentCycleHelper.enum2PerUnitStr[orderCalculator.nextPaymentTemplate?.paymentCycleType]}",
+                                "/${PaymentCycleHelper.enum2PerUnitStr[orderCalculator.nextPaymentTemplate?.paymentFrequency]}",
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall!

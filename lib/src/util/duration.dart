@@ -11,7 +11,7 @@ class DurationHelper {
   const DurationHelper({required this.duration, required this.unit});
 
   factory DurationHelper.fromDate(
-      int startDate, int endDate, PaymentCycleType unit) {
+      int startDate, int endDate, PaymentFrequency unit) {
     final diff = DateTime.fromMicrosecondsSinceEpoch(endDate)
         .difference(DateTime.fromMicrosecondsSinceEpoch(startDate));
 
@@ -22,28 +22,28 @@ class DurationHelper {
   }
 
   final int duration;
-  final PaymentCycleType unit;
+  final PaymentFrequency unit;
 
   // 每个月都视为31天，每年都视为365天（对于付款周期来说）
   static const double dayPerMonth = 31; //dayPerYear / 12;
   static const double dayPerYear = 365;
 
   static const paymentCycle2Days = {
-    PaymentCycleType.daily: 1.0,
-    PaymentCycleType.monthly: DurationHelper.dayPerMonth,
-    PaymentCycleType.yearly: DurationHelper.dayPerYear
+    PaymentFrequency.daily: 1.0,
+    PaymentFrequency.monthly: DurationHelper.dayPerMonth,
+    PaymentFrequency.yearly: DurationHelper.dayPerYear
   };
 
   double toDays() {
-    if (unit == PaymentCycleType.daily) {
+    if (unit == PaymentFrequency.daily) {
       return duration.toDouble();
     }
 
-    if (unit == PaymentCycleType.monthly) {
+    if (unit == PaymentFrequency.monthly) {
       return duration * dayPerMonth;
     }
 
-    if (unit == PaymentCycleType.yearly) {
+    if (unit == PaymentFrequency.yearly) {
       return duration * dayPerYear;
     }
 
@@ -51,15 +51,15 @@ class DurationHelper {
   }
 
   double toMonths() {
-    if (unit == PaymentCycleType.daily) {
+    if (unit == PaymentFrequency.daily) {
       return duration / dayPerMonth;
     }
 
-    if (unit == PaymentCycleType.monthly) {
+    if (unit == PaymentFrequency.monthly) {
       return duration * dayPerMonth;
     }
 
-    if (unit == PaymentCycleType.yearly) {
+    if (unit == PaymentFrequency.yearly) {
       return duration * 12;
     }
 
@@ -67,15 +67,15 @@ class DurationHelper {
   }
 
   double toYears() {
-    if (unit == PaymentCycleType.daily) {
+    if (unit == PaymentFrequency.daily) {
       return duration / dayPerYear;
     }
 
-    if (unit == PaymentCycleType.monthly) {
+    if (unit == PaymentFrequency.monthly) {
       return duration / 12;
     }
 
-    if (unit == PaymentCycleType.yearly) {
+    if (unit == PaymentFrequency.yearly) {
       return duration.toDouble();
     }
 

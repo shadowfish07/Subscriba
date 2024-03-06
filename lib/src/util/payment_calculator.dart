@@ -6,18 +6,18 @@ class PaymentCalculator {
   const PaymentCalculator({required this.duration, required this.paymentCycle});
 
   final DurationHelper duration;
-  final PaymentCycleType paymentCycle;
+  final PaymentFrequency paymentCycle;
 
   double getPaymentPerPeriod(double totalPaymentAmount) {
-    if (paymentCycle == PaymentCycleType.daily) {
+    if (paymentCycle == PaymentFrequency.daily) {
       return totalPaymentAmount / duration.toDays();
     }
 
-    if (paymentCycle == PaymentCycleType.monthly) {
+    if (paymentCycle == PaymentFrequency.monthly) {
       return totalPaymentAmount / duration.toMonths();
     }
 
-    if (paymentCycle == PaymentCycleType.yearly) {
+    if (paymentCycle == PaymentFrequency.yearly) {
       return totalPaymentAmount / duration.toYears();
     }
 
@@ -25,15 +25,15 @@ class PaymentCalculator {
   }
 
   double getTotalPaymentAmount(double paymentPerPeriod) {
-    if (paymentCycle == PaymentCycleType.daily) {
+    if (paymentCycle == PaymentFrequency.daily) {
       return paymentPerPeriod * duration.toDays();
     }
 
-    if (paymentCycle == PaymentCycleType.monthly) {
+    if (paymentCycle == PaymentFrequency.monthly) {
       return paymentPerPeriod * duration.toMonths();
     }
 
-    if (paymentCycle == PaymentCycleType.yearly) {
+    if (paymentCycle == PaymentFrequency.yearly) {
       return paymentPerPeriod * duration.toYears();
     }
 

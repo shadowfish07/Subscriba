@@ -52,7 +52,7 @@ abstract class _SubscriptionModel with Store {
       final endDate = DateTime.fromMicrosecondsSinceEpoch(startDate)
           .add(Duration(
               days: DurationHelper
-                      .paymentCycle2Days[nextPaymentTemplate.paymentCycleType]!
+                      .paymentCycle2Days[nextPaymentTemplate.paymentFrequency]!
                       .toInt() -
                   1))
           .microsecondsSinceEpoch;
@@ -65,7 +65,7 @@ abstract class _SubscriptionModel with Store {
           endDate: endDate,
           subscriptionId: instance.id,
           paymentPerPeriodUnit: nextPaymentTemplate.paymentPerPeriodUnit,
-          paymentCycleType: nextPaymentTemplate.paymentCycleType,
+          paymentFrequency: nextPaymentTemplate.paymentFrequency,
           paymentPerPeriod: nextPaymentTemplate.paymentPerPeriod,
         ),
       );

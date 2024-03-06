@@ -24,7 +24,7 @@ class HomeSubscriptionSection extends StatelessWidget {
             final subscription = subscriptionModel.subscriptions[index];
             return SubscriptionCard(
               subscription: subscription,
-              paymentCycleType: PaymentCycleType.yearly,
+              paymentFrequency: PaymentFrequency.yearly,
             );
           },
         ),

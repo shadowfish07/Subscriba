@@ -7,10 +7,10 @@ import 'package:subscriba/src/subscription_detail/subscription_detail_view.dart'
 
 class SubscriptionCard extends StatelessWidget {
   const SubscriptionCard(
-      {super.key, required this.subscription, required this.paymentCycleType});
+      {super.key, required this.subscription, required this.paymentFrequency});
 
   final SubscriptionModel subscription;
-  final PaymentCycleType paymentCycleType;
+  final PaymentFrequency paymentFrequency;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +41,7 @@ class SubscriptionCard extends StatelessWidget {
                 }),
                 SubscriptionPerPrize(
                   subscription: subscription,
-                  mainPaymentCycleType: paymentCycleType,
+                  mainPaymentFrequency: paymentFrequency,
                 )
               ],
             )),

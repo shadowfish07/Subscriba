@@ -9,19 +9,19 @@ part of 'subscriptions_page_model.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$SubscriptionPageModel on _SubscriptionPageModel, Store {
-  late final _$paymentCycleTypeAtom =
-      Atom(name: '_SubscriptionPageModel.paymentCycleType', context: context);
+  late final _$paymentFrequencyAtom =
+      Atom(name: '_SubscriptionPageModel.paymentFrequency', context: context);
 
   @override
-  PaymentCycleType get paymentCycleType {
-    _$paymentCycleTypeAtom.reportRead();
-    return super.paymentCycleType;
+  PaymentFrequency get paymentFrequency {
+    _$paymentFrequencyAtom.reportRead();
+    return super.paymentFrequency;
   }
 
   @override
-  set paymentCycleType(PaymentCycleType value) {
-    _$paymentCycleTypeAtom.reportWrite(value, super.paymentCycleType, () {
-      super.paymentCycleType = value;
+  set paymentFrequency(PaymentFrequency value) {
+    _$paymentFrequencyAtom.reportWrite(value, super.paymentFrequency, () {
+      super.paymentFrequency = value;
     });
   }
 
@@ -29,11 +29,11 @@ mixin _$SubscriptionPageModel on _SubscriptionPageModel, Store {
       ActionController(name: '_SubscriptionPageModel', context: context);
 
   @override
-  void toNextPaymentCycleType() {
+  void toNextPaymentFrequency() {
     final _$actionInfo = _$_SubscriptionPageModelActionController.startAction(
-        name: '_SubscriptionPageModel.toNextPaymentCycleType');
+        name: '_SubscriptionPageModel.toNextPaymentFrequency');
     try {
-      return super.toNextPaymentCycleType();
+      return super.toNextPaymentFrequency();
     } finally {
       _$_SubscriptionPageModelActionController.endAction(_$actionInfo);
     }
@@ -42,7 +42,7 @@ mixin _$SubscriptionPageModel on _SubscriptionPageModel, Store {
   @override
   String toString() {
     return '''
-paymentCycleType: ${paymentCycleType}
+paymentFrequency: ${paymentFrequency}
     ''';
   }
 }
