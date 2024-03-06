@@ -17,14 +17,14 @@ class OrderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Observer(
       builder: (_) {
-        const paymentCycleType2Description = {
-          PaymentCycleType.daily: "Daily subscription",
-          PaymentCycleType.monthly: "Monthly subscription",
-          PaymentCycleType.yearly: "Annual subscription"
+        const paymentFrequency2Description = {
+          PaymentFrequency.daily: "Daily subscription",
+          PaymentFrequency.monthly: "Monthly subscription",
+          PaymentFrequency.yearly: "Annual subscription"
         };
 
         final description = order.description ??
-            paymentCycleType2Description[order.paymentCycleType] ??
+            paymentFrequency2Description[order.paymentFrequency] ??
             "";
 
         Future<bool?> showConfirmDialog() async {
@@ -148,7 +148,7 @@ class OrderCard extends StatelessWidget {
                         Text(
                           order.paymentType == PaymentType.lifetime
                               ? "lifetime"
-                              : "+ ${DurationHelper.fromDate(order.startDate, order.endDate!, order.paymentCycleType!).duration} days",
+                              : "+ ${DurationHelper.fromDate(order.startDate, order.endDate!, order.paymentFrequency!).duration} days",
                           style: Theme.of(context)
                               .textTheme
                               .labelMedium!

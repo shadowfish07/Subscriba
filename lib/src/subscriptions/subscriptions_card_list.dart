@@ -34,8 +34,8 @@ class SubscriptionsCardList extends StatelessWidget {
               return Observer(
                   builder: (_) => SubscriptionCard(
                         subscription: subscription,
-                        paymentCycleType:
-                            subscriptionPageModel.paymentCycleType,
+                        paymentFrequency:
+                            subscriptionPageModel.paymentFrequency,
                       ));
             });
       },

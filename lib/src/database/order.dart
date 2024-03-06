@@ -4,7 +4,7 @@ import 'package:subscriba/src/database/model.dart';
 
 enum PaymentType { recurring, lifetime }
 
-enum PaymentCycleType { daily, monthly, yearly }
+enum PaymentFrequency { daily, monthly, yearly }
 
 class Order extends BaseModel {
   const Order(
@@ -18,7 +18,7 @@ class Order extends BaseModel {
       required this.paymentType,
       required this.startDate,
       this.endDate,
-      this.paymentCycleType,
+      this.paymentFrequency,
       required this.paymentPerPeriod,
       this.paymentPerPeriodUnit});
 
@@ -32,7 +32,7 @@ class Order extends BaseModel {
   final int? endDate;
   // recurring Type only
   // 0-> day 1-> month 2-> year
-  final PaymentCycleType? paymentCycleType;
+  final PaymentFrequency? paymentFrequency;
   // 实付
   final double paymentPerPeriod;
   // recurring Type only
@@ -45,7 +45,7 @@ class Order extends BaseModel {
   static const String columnPaymentType = "payment_type";
   static const String columnStartDate = "start_date";
   static const String columnEndDate = "end_date";
-  static const String columnPaymentCycleType = "payment_cycle_type";
+  static const String columnPaymentFrequency = "payment_frequency";
   static const String columnPaymentPerPeriod = "payment_per_period";
   static const String columnPaymentPerPeriodUnit = "payment_per_period_unit";
 
@@ -59,7 +59,7 @@ class Order extends BaseModel {
       columnPaymentType: paymentType.index,
       columnStartDate: startDate,
       columnEndDate: endDate,
-      columnPaymentCycleType: paymentCycleType?.index,
+      columnPaymentFrequency: paymentFrequency?.index,
       columnPaymentPerPeriod: paymentPerPeriod,
       columnPaymentPerPeriodUnit: paymentPerPeriodUnit
     };
@@ -74,7 +74,7 @@ class Order extends BaseModel {
       required int startDate,
       required int subscriptionId,
       int? endDate,
-      PaymentCycleType? paymentCycleType,
+      PaymentFrequency? paymentFrequency,
       required double paymentPerPeriod,
       String? paymentPerPeriodUnit}) {
     return Order(
@@ -87,7 +87,7 @@ class Order extends BaseModel {
       paymentType: paymentType,
       startDate: startDate,
       endDate: endDate,
-      paymentCycleType: paymentCycleType,
+      paymentFrequency: paymentFrequency,
       paymentPerPeriod: paymentPerPeriod,
       paymentPerPeriodUnit: paymentPerPeriodUnit,
     );
@@ -105,8 +105,8 @@ class Order extends BaseModel {
         paymentType: PaymentType.values[map[columnPaymentType] as int],
         startDate: map[columnStartDate] as int,
         endDate: map[columnEndDate] as int?,
-        paymentCycleType: map[columnPaymentCycleType] != null
-            ? PaymentCycleType.values[map[columnPaymentCycleType] as int]
+        paymentFrequency: map[columnPaymentFrequency] != null
+            ? PaymentFrequency.values[map[columnPaymentFrequency] as int]
             : null,
         paymentPerPeriod: map[columnPaymentPerPeriod] as double,
         paymentPerPeriodUnit: map[columnPaymentPerPeriodUnit] as String?);
@@ -114,7 +114,7 @@ class Order extends BaseModel {
 
   @override
   String toString() {
-    return "${super.toString()} , subscriptionId: $subscriptionId, description: $description, orderDate: $orderDate, paymentType: $paymentType, startDate: $startDate, endDate: $endDate, paymentCycleType: $paymentCycleType, paymentPerPeriod: $paymentPerPeriod, paymentPerPeriodUnit: $paymentPerPeriodUnit)";
+    return "${super.toString()} , subscriptionId: $subscriptionId, description: $description, orderDate: $orderDate, paymentType: $paymentType, startDate: $startDate, endDate: $endDate, paymentFrequency: $paymentFrequency, paymentPerPeriod: $paymentPerPeriod, paymentPerPeriodUnit: $paymentPerPeriodUnit)";
   }
 }
 

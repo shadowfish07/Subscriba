@@ -58,7 +58,7 @@ class __FormState extends State<_Form> with TickerProviderStateMixin {
               startDate: formModel.startTimeTimestamp!,
               endDate: formModel.endTimeTimestamp,
               paymentPerPeriodUnit: "\$",
-              paymentCycleType: formModel.paymentCycleType,
+              paymentFrequency: formModel.paymentFrequency,
               paymentPerPeriod: formModel.paymentPerPeriod),
         );
 

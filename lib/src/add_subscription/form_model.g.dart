@@ -118,19 +118,19 @@ mixin _$FormModel on _FormModel, Store {
     });
   }
 
-  late final _$paymentCycleTypeAtom =
-      Atom(name: '_FormModel.paymentCycleType', context: context);
+  late final _$paymentFrequencyAtom =
+      Atom(name: '_FormModel.paymentFrequency', context: context);
 
   @override
-  PaymentCycleType get paymentCycleType {
-    _$paymentCycleTypeAtom.reportRead();
-    return super.paymentCycleType;
+  PaymentFrequency get paymentFrequency {
+    _$paymentFrequencyAtom.reportRead();
+    return super.paymentFrequency;
   }
 
   @override
-  set paymentCycleType(PaymentCycleType value) {
-    _$paymentCycleTypeAtom.reportWrite(value, super.paymentCycleType, () {
-      super.paymentCycleType = value;
+  set paymentFrequency(PaymentFrequency value) {
+    _$paymentFrequencyAtom.reportWrite(value, super.paymentFrequency, () {
+      super.paymentFrequency = value;
     });
   }
 
@@ -228,7 +228,7 @@ subscriptionName: ${subscriptionName},
 subscriptionDescription: ${subscriptionDescription},
 startTimeDate: ${startTimeDate},
 endTimeDate: ${endTimeDate},
-paymentCycleType: ${paymentCycleType},
+paymentFrequency: ${paymentFrequency},
 paymentPerPeriodText: ${paymentPerPeriodText},
 startTimeTimestamp: ${startTimeTimestamp},
 endTimeTimestamp: ${endTimeTimestamp},
@@ -312,19 +312,19 @@ mixin _$FormErrorState on _FormErrorState, Store {
     });
   }
 
-  late final _$paymentCycleTypeAtom =
-      Atom(name: '_FormErrorState.paymentCycleType', context: context);
+  late final _$paymentFrequencyAtom =
+      Atom(name: '_FormErrorState.paymentFrequency', context: context);
 
   @override
-  String? get paymentCycleType {
-    _$paymentCycleTypeAtom.reportRead();
-    return super.paymentCycleType;
+  String? get paymentFrequency {
+    _$paymentFrequencyAtom.reportRead();
+    return super.paymentFrequency;
   }
 
   @override
-  set paymentCycleType(String? value) {
-    _$paymentCycleTypeAtom.reportWrite(value, super.paymentCycleType, () {
-      super.paymentCycleType = value;
+  set paymentFrequency(String? value) {
+    _$paymentFrequencyAtom.reportWrite(value, super.paymentFrequency, () {
+      super.paymentFrequency = value;
     });
   }
 
@@ -367,7 +367,7 @@ subscriptionName: ${subscriptionName},
 subscriptionDescription: ${subscriptionDescription},
 startTimeDate: ${startTimeDate},
 endTimeDate: ${endTimeDate},
-paymentCycleType: ${paymentCycleType},
+paymentFrequency: ${paymentFrequency},
 paymentPerPeriod: ${paymentPerPeriod},
 totalPaymentAmount: ${totalPaymentAmount},
 hasErrors: ${hasErrors}

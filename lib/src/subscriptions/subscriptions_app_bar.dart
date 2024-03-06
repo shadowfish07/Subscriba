@@ -39,10 +39,10 @@ class SubscriptionAppBar extends StatelessWidget
                               .map((e) => e.instance)
                               .toList())
                       .perPrizeByProtocol(
-                          subscriptionPageModel.paymentCycleType);
+                          subscriptionPageModel.paymentFrequency);
                   return InkWell(
                     onTap: () {
-                      subscriptionPageModel.toNextPaymentCycleType();
+                      subscriptionPageModel.toNextPaymentFrequency();
                     },
                     child: Row(
                       children: [
@@ -50,7 +50,7 @@ class SubscriptionAppBar extends StatelessWidget
                             money: perMainPaymentCyclePrize,
                             style: Theme.of(context).textTheme.titleLarge),
                         Text(
-                          '/${PaymentCycleHelper.enum2FormalStr[subscriptionPageModel.paymentCycleType]!.toLowerCase()}',
+                          '/${PaymentCycleHelper.enum2FormalStr[subscriptionPageModel.paymentFrequency]!.toLowerCase()}',
                           style: Theme.of(context)
                               .textTheme
                               .bodyLarge!

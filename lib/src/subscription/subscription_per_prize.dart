@@ -4,19 +4,19 @@ import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/store/subscription_model.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
 
-const paymentCycleType2Display = {
-  PaymentCycleType.daily: "d",
-  PaymentCycleType.monthly: "m",
-  PaymentCycleType.yearly: "y"
+const paymentFrequency2Display = {
+  PaymentFrequency.daily: "d",
+  PaymentFrequency.monthly: "m",
+  PaymentFrequency.yearly: "y"
 };
 
 class SubscriptionPerPrize extends StatelessWidget {
   const SubscriptionPerPrize(
       {super.key,
       required this.subscription,
-      required this.mainPaymentCycleType});
+      required this.mainPaymentFrequency});
 
-  final PaymentCycleType mainPaymentCycleType;
+  final PaymentFrequency mainPaymentFrequency;
   final SubscriptionModel subscription;
 
   @override
@@ -25,9 +25,9 @@ class SubscriptionPerPrize extends StatelessWidget {
         OrderCalculator(orders: subscription.instance.orders);
     final perMainPaymentCyclePrize = orderCalculator.isIncludeLifetimeOrder
         ? orderCalculator.lifetimeCost
-        : orderCalculator.perCostByProtocol(mainPaymentCycleType);
+        : orderCalculator.perCostByProtocol(mainPaymentFrequency);
     final perDayPaymentCyclePrize =
-        orderCalculator.perCostByProtocol(PaymentCycleType.daily);
+        orderCalculator.perCostByProtocol(PaymentFrequency.daily);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -40,7 +40,7 @@ class SubscriptionPerPrize extends StatelessWidget {
           ),
           !orderCalculator.isIncludeLifetimeOrder
               ? Text(
-                  "/${paymentCycleType2Display[mainPaymentCycleType]}",
+                  "/${paymentFrequency2Display[mainPaymentFrequency]}",
                   style: Theme.of(context).textTheme.bodySmall!.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
@@ -52,7 +52,7 @@ class SubscriptionPerPrize extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodySmall!.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ))
-            : mainPaymentCycleType != PaymentCycleType.daily
+            : mainPaymentFrequency != PaymentFrequency.daily
                 ? MoneyText(
                     money: perDayPaymentCyclePrize,
                     style: Theme.of(context).textTheme.bodySmall!.copyWith(

@@ -15,13 +15,13 @@ class SubscriptionCalculator {
 
   /// 协议均值算法，累加每个subscription的均值
   /// lifetime订单会被忽略
-  double perPrizeByProtocol(PaymentCycleType paymentCycleType) {
+  double perPrizeByProtocol(PaymentFrequency paymentFrequency) {
     if (availableSubscriptions.isEmpty) return 0;
 
     return availableSubscriptions
         .map((e) {
           return OrderCalculator(orders: e.orders)
-              .perCostByProtocol(paymentCycleType);
+              .perCostByProtocol(paymentFrequency);
         })
         .where((element) => element != -1)
         .fold(0.0, (previousValue, element) => previousValue + element);

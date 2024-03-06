@@ -9,16 +9,16 @@ class SubscriptionPageModel = _SubscriptionPageModel
 
 abstract class _SubscriptionPageModel with Store {
   @observable
-  PaymentCycleType paymentCycleType = PaymentCycleType.yearly;
+  PaymentFrequency paymentFrequency = PaymentFrequency.yearly;
 
   @action
-  void toNextPaymentCycleType() {
-    if (paymentCycleType == PaymentCycleType.daily) {
-      paymentCycleType = PaymentCycleType.monthly;
-    } else if (paymentCycleType == PaymentCycleType.monthly) {
-      paymentCycleType = PaymentCycleType.yearly;
+  void toNextPaymentFrequency() {
+    if (paymentFrequency == PaymentFrequency.daily) {
+      paymentFrequency = PaymentFrequency.monthly;
+    } else if (paymentFrequency == PaymentFrequency.monthly) {
+      paymentFrequency = PaymentFrequency.yearly;
     } else {
-      paymentCycleType = PaymentCycleType.daily;
+      paymentFrequency = PaymentFrequency.daily;
     }
   }
 }

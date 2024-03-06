@@ -23,7 +23,7 @@ abstract class _FormModel with Store {
         ? DateFormat.yMd()
             .format(DateTime.fromMicrosecondsSinceEpoch(order.endDate!))
         : null;
-    paymentCycleType = order.paymentCycleType ?? PaymentCycleType.monthly;
+    paymentFrequency = order.paymentFrequency ?? PaymentFrequency.monthly;
     paymentPerPeriodText = order.paymentPerPeriod.toString();
   }
 
@@ -61,7 +61,7 @@ abstract class _FormModel with Store {
   }
 
   @observable
-  PaymentCycleType paymentCycleType = PaymentCycleType.monthly;
+  PaymentFrequency paymentFrequency = PaymentFrequency.monthly;
 
   @computed
   int? get duration {
@@ -115,7 +115,7 @@ abstract class _FormModel with Store {
       paymentPerPeriodText = null;
       startTimeDate = DateFormat.yMd().format(DateTime.now());
       endTimeDate = null;
-      paymentCycleType = PaymentCycleType.monthly;
+      paymentFrequency = PaymentFrequency.monthly;
     } else {
       fromOrder(order!);
     }
@@ -183,7 +183,7 @@ abstract class _FormErrorState with Store {
   String? endTimeDate;
 
   @observable
-  String? paymentCycleType;
+  String? paymentFrequency;
 
   @observable
   String? paymentPerPeriod;
@@ -197,7 +197,7 @@ abstract class _FormErrorState with Store {
       subscriptionDescription != null ||
       startTimeDate != null ||
       endTimeDate != null ||
-      paymentCycleType != null ||
+      paymentFrequency != null ||
       paymentPerPeriod != null ||
       totalPaymentAmount != null;
 }
