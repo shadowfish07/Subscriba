@@ -10,24 +10,26 @@ class Section extends StatelessWidget {
       required this.child,
       EdgeInsetsGeometry? padding,
       double? titleBottomMargin,
-      this.titleSize = TitleSize.h1}) {
+      this.titleSize = TitleSize.h1,
+      this.action = const SizedBox.shrink()}) {
     this.padding =
         padding ?? defaultCenterPadding.add(const EdgeInsets.only(bottom: 16));
     this.titleBottomMargin = titleBottomMargin ?? 8;
   }
 
-  factory Section.subSectionH2({
-    key,
-    required String title,
-    required Widget child,
-    double? titleBottomMargin,
-  }) {
+  factory Section.subSectionH2(
+      {key,
+      required String title,
+      required Widget child,
+      double? titleBottomMargin,
+      Widget action = const SizedBox.shrink()}) {
     return Section(
         key: key,
         title: title,
         padding: const EdgeInsets.all(0),
         titleSize: TitleSize.h2,
         titleBottomMargin: titleBottomMargin,
+        action: action,
         child: child);
   }
 
@@ -40,6 +42,8 @@ class Section extends StatelessWidget {
   final TitleSize titleSize;
 
   late final double titleBottomMargin;
+
+  final Widget action;
 
   @override
   Widget build(BuildContext context) {
@@ -59,9 +63,15 @@ class Section extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Padding(
           padding: const EdgeInsets.only(bottom: 8),
-          child: Text(
-            title,
-            style: titleStyles[titleSize],
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: titleStyles[titleSize],
+              ),
+              action,
+            ],
           ),
         ),
         SizedBox(
