@@ -215,6 +215,26 @@ class _OrdersSection extends StatelessWidget {
         return Section(
             title: "Orders",
             titleBottomMargin: 0,
+            action: SizedBox(
+              height: 28,
+              width: 28,
+              child: IconButton(
+                padding: const EdgeInsets.all(0.0),
+                icon: const Icon(
+                  Icons.add,
+                ),
+                onPressed: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => OrderAdd(
+                              subscriptionId: subscription.instance.id,
+                            )),
+                  );
+                  subscription.reload();
+                },
+              ),
+            ),
             child: Column(
                 children: List.from(orderCalculator.availableOrders)
                     .reversed
