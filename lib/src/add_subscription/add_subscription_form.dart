@@ -53,7 +53,7 @@ class _AddSubscriptionFormState extends State<AddSubscriptionForm>
               startDate: formModel.startTimeTimestamp!,
               endDate: formModel.endTimeTimestamp,
               subscriptionId: subscriptionId,
-              paymentPerPeriodUnit: "\$",
+              paymentCurrencyPerPeriod: "\$",
               paymentFrequency: formModel.paymentFrequency,
               paymentPerPeriod: formModel.paymentPerPeriod),
         );
