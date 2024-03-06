@@ -91,7 +91,7 @@ create table "${OrderProvider.tableName}" (
   ${Order.columnEndDate} integer,
   ${Order.columnPaymentFrequency} integer,
   ${Order.columnPaymentPerPeriod} REAL not null,
-  ${Order.columnPaymentPerPeriodUnit} text)
+  ${Order.columnPaymentCurrencyPerPeriod} text)
 ''');
         },
         onOpen: (db) {

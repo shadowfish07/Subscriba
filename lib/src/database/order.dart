@@ -20,7 +20,7 @@ class Order extends BaseModel {
       this.endDate,
       this.paymentFrequency,
       required this.paymentPerPeriod,
-      this.paymentPerPeriodUnit});
+      this.paymentCurrencyPerPeriod});
 
   final int subscriptionId;
   final String? description;
@@ -37,7 +37,7 @@ class Order extends BaseModel {
   final double paymentPerPeriod;
   // recurring Type only
   // $/￥
-  final String? paymentPerPeriodUnit;
+  final String? paymentCurrencyPerPeriod;
 
   static const String columnSubscriptionId = "subscription_id";
   static const String columnDescription = "description";
@@ -47,7 +47,8 @@ class Order extends BaseModel {
   static const String columnEndDate = "end_date";
   static const String columnPaymentFrequency = "payment_frequency";
   static const String columnPaymentPerPeriod = "payment_per_period";
-  static const String columnPaymentPerPeriodUnit = "payment_per_period_unit";
+  static const String columnPaymentCurrencyPerPeriod =
+      "payment_currency_per_period";
 
   @override
   Map<String, Object?> toMap() {
@@ -61,7 +62,7 @@ class Order extends BaseModel {
       columnEndDate: endDate,
       columnPaymentFrequency: paymentFrequency?.index,
       columnPaymentPerPeriod: paymentPerPeriod,
-      columnPaymentPerPeriodUnit: paymentPerPeriodUnit
+      columnPaymentCurrencyPerPeriod: paymentCurrencyPerPeriod
     };
     return map;
   }
@@ -76,7 +77,7 @@ class Order extends BaseModel {
       int? endDate,
       PaymentFrequency? paymentFrequency,
       required double paymentPerPeriod,
-      String? paymentPerPeriodUnit}) {
+      String? paymentCurrencyPerPeriod}) {
     return Order(
       id: id ?? -1,
       createdAt: DateTime.now().microsecondsSinceEpoch,
@@ -89,7 +90,7 @@ class Order extends BaseModel {
       endDate: endDate,
       paymentFrequency: paymentFrequency,
       paymentPerPeriod: paymentPerPeriod,
-      paymentPerPeriodUnit: paymentPerPeriodUnit,
+      paymentCurrencyPerPeriod: paymentCurrencyPerPeriod,
     );
   }
 
@@ -109,12 +110,13 @@ class Order extends BaseModel {
             ? PaymentFrequency.values[map[columnPaymentFrequency] as int]
             : null,
         paymentPerPeriod: map[columnPaymentPerPeriod] as double,
-        paymentPerPeriodUnit: map[columnPaymentPerPeriodUnit] as String?);
+        paymentCurrencyPerPeriod:
+            map[columnPaymentCurrencyPerPeriod] as String?);
   }
 
   @override
   String toString() {
-    return "${super.toString()} , subscriptionId: $subscriptionId, description: $description, orderDate: $orderDate, paymentType: $paymentType, startDate: $startDate, endDate: $endDate, paymentFrequency: $paymentFrequency, paymentPerPeriod: $paymentPerPeriod, paymentPerPeriodUnit: $paymentPerPeriodUnit)";
+    return "${super.toString()} , subscriptionId: $subscriptionId, description: $description, orderDate: $orderDate, paymentType: $paymentType, startDate: $startDate, endDate: $endDate, paymentFrequency: $paymentFrequency, paymentPerPeriod: $paymentPerPeriod, paymentCurrencyPerPeriod: $paymentCurrencyPerPeriod)";
   }
 }
 
