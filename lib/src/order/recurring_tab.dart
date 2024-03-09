@@ -8,7 +8,14 @@ import 'package:subscriba/src/component/section.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/subscription_detail/per_period_cost_cards_row.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
-import 'package:subscriba/src/util/payment_cycle.dart';
+import 'package:subscriba/src/util/payment_frequency_helper.dart';
+
+// TODO 这个信息再想想交互怎么做，可能考虑放在弹窗里展示
+const onetimeCalculationHint = '''
+Average Cost Calculation Rule: 
+The daily average cost is determined by dividing the total cost amount by the subscription period. 
+The daily, monthly, and annual average costs are then calculated by multiplying this value by 1, 31, and 365 respectively.
+''';
 
 class RecurringTab extends StatelessWidget {
   const RecurringTab({
@@ -104,30 +111,6 @@ class RecurringTab extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Observer(builder: (context) {
-                  return DropdownButtonFormField(
-                    value: formModel.paymentFrequency,
-                    decoration: const InputDecoration(
-                      labelText: 'Payment Cycle',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: PaymentFrequency.values
-                        .map<DropdownMenuItem<PaymentFrequency>>(
-                            (PaymentFrequency value) {
-                      return DropdownMenuItem<PaymentFrequency>(
-                        value: value,
-                        child: Text(PaymentCycleHelper.enum2FormalStr[value]!),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
-                      if (newValue == null) return;
-                      formModel.paymentFrequency = newValue;
-                    },
-                  );
-                }),
-                const SizedBox(
-                  height: 16,
-                ),
-                Observer(builder: (context) {
                   return TextField(
                     style: const TextStyle(fontFamily: "Alibaba"),
                     controller: paymentPerPeriodController,
@@ -144,6 +127,9 @@ class RecurringTab extends StatelessWidget {
                         border: const OutlineInputBorder(),
                         labelText: 'Payment Per Period',
                         prefix: const Text("\$"),
+                        helperText: formModel.paymentFrequency == null
+                            ? ''
+                            : "${PaymentFrequencyHelper.enum2FormalStr[formModel.paymentFrequency]} payment",
                         errorText: formModel.error.paymentPerPeriod),
                   );
                 }),
@@ -183,11 +169,6 @@ class RecurringTab extends StatelessWidget {
                 }),
                 const SizedBox(
                   height: 8,
-                ),
-                Text(
-                  "*The calculated average does not meet expectations?",
-                  style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(
                   height: 32,

@@ -36,6 +36,13 @@ mixin _$FormModel on _FormModel, Store {
           Computed<double>(() => super.paymentPerPeriod,
               name: '_FormModel.paymentPerPeriod'))
       .value;
+  Computed<PaymentFrequency?>? _$paymentFrequencyComputed;
+
+  @override
+  PaymentFrequency? get paymentFrequency => (_$paymentFrequencyComputed ??=
+          Computed<PaymentFrequency?>(() => super.paymentFrequency,
+              name: '_FormModel.paymentFrequency'))
+      .value;
 
   late final _$paymentTypeAtom =
       Atom(name: '_FormModel.paymentType', context: context);
@@ -115,22 +122,6 @@ mixin _$FormModel on _FormModel, Store {
   set endTimeDate(String? value) {
     _$endTimeDateAtom.reportWrite(value, super.endTimeDate, () {
       super.endTimeDate = value;
-    });
-  }
-
-  late final _$paymentFrequencyAtom =
-      Atom(name: '_FormModel.paymentFrequency', context: context);
-
-  @override
-  PaymentFrequency get paymentFrequency {
-    _$paymentFrequencyAtom.reportRead();
-    return super.paymentFrequency;
-  }
-
-  @override
-  set paymentFrequency(PaymentFrequency value) {
-    _$paymentFrequencyAtom.reportWrite(value, super.paymentFrequency, () {
-      super.paymentFrequency = value;
     });
   }
 
@@ -228,12 +219,12 @@ subscriptionName: ${subscriptionName},
 subscriptionDescription: ${subscriptionDescription},
 startTimeDate: ${startTimeDate},
 endTimeDate: ${endTimeDate},
-paymentFrequency: ${paymentFrequency},
 paymentPerPeriodText: ${paymentPerPeriodText},
 startTimeTimestamp: ${startTimeTimestamp},
 endTimeTimestamp: ${endTimeTimestamp},
 duration: ${duration},
-paymentPerPeriod: ${paymentPerPeriod}
+paymentPerPeriod: ${paymentPerPeriod},
+paymentFrequency: ${paymentFrequency}
     ''';
   }
 }
@@ -312,22 +303,6 @@ mixin _$FormErrorState on _FormErrorState, Store {
     });
   }
 
-  late final _$paymentFrequencyAtom =
-      Atom(name: '_FormErrorState.paymentFrequency', context: context);
-
-  @override
-  String? get paymentFrequency {
-    _$paymentFrequencyAtom.reportRead();
-    return super.paymentFrequency;
-  }
-
-  @override
-  set paymentFrequency(String? value) {
-    _$paymentFrequencyAtom.reportWrite(value, super.paymentFrequency, () {
-      super.paymentFrequency = value;
-    });
-  }
-
   late final _$paymentPerPeriodAtom =
       Atom(name: '_FormErrorState.paymentPerPeriod', context: context);
 
@@ -344,22 +319,6 @@ mixin _$FormErrorState on _FormErrorState, Store {
     });
   }
 
-  late final _$totalPaymentAmountAtom =
-      Atom(name: '_FormErrorState.totalPaymentAmount', context: context);
-
-  @override
-  String? get totalPaymentAmount {
-    _$totalPaymentAmountAtom.reportRead();
-    return super.totalPaymentAmount;
-  }
-
-  @override
-  set totalPaymentAmount(String? value) {
-    _$totalPaymentAmountAtom.reportWrite(value, super.totalPaymentAmount, () {
-      super.totalPaymentAmount = value;
-    });
-  }
-
   @override
   String toString() {
     return '''
@@ -367,9 +326,7 @@ subscriptionName: ${subscriptionName},
 subscriptionDescription: ${subscriptionDescription},
 startTimeDate: ${startTimeDate},
 endTimeDate: ${endTimeDate},
-paymentFrequency: ${paymentFrequency},
 paymentPerPeriod: ${paymentPerPeriod},
-totalPaymentAmount: ${totalPaymentAmount},
 hasErrors: ${hasErrors}
     ''';
   }

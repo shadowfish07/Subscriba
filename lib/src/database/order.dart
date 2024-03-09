@@ -4,7 +4,7 @@ import 'package:subscriba/src/database/model.dart';
 
 enum PaymentType { recurring, lifetime }
 
-enum PaymentFrequency { daily, monthly, yearly }
+enum PaymentFrequency { daily, monthly, yearly, oneTime }
 
 class Order extends BaseModel {
   const Order(
@@ -31,7 +31,7 @@ class Order extends BaseModel {
   // recurring Type only
   final int? endDate;
   // recurring Type only
-  // 0-> day 1-> month 2-> year
+  // 0-> day 1-> month 2-> year 3-> one-time
   final PaymentFrequency? paymentFrequency;
   // 实付
   final double paymentPerPeriod;

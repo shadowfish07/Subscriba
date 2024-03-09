@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 import 'package:mobx/mobx.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/util/duration.dart';
+import 'package:subscriba/src/util/payment_frequency_helper.dart';
 
 part 'form_model.g.dart';
 
@@ -23,7 +24,6 @@ abstract class _FormModel with Store {
         ? DateFormat.yMd()
             .format(DateTime.fromMicrosecondsSinceEpoch(order.endDate!))
         : null;
-    paymentFrequency = order.paymentFrequency ?? PaymentFrequency.monthly;
     paymentPerPeriodText = order.paymentPerPeriod.toString();
   }
 
@@ -60,9 +60,6 @@ abstract class _FormModel with Store {
     return DateFormat.yMd().parseLoose(endTimeDate!).microsecondsSinceEpoch;
   }
 
-  @observable
-  PaymentFrequency paymentFrequency = PaymentFrequency.monthly;
-
   @computed
   int? get duration {
     if (startTimeTimestamp == null || endTimeTimestamp == null) {
@@ -79,6 +76,12 @@ abstract class _FormModel with Store {
     }
 
     return double.parse(paymentPerPeriodText!);
+  }
+
+  @computed
+  PaymentFrequency? get paymentFrequency {
+    if (duration == null) return null;
+    return PaymentFrequencyHelper.dayAmountToPaymentFrequency(duration!);
   }
 
   @observable
@@ -115,7 +118,6 @@ abstract class _FormModel with Store {
       paymentPerPeriodText = null;
       startTimeDate = DateFormat.yMd().format(DateTime.now());
       endTimeDate = null;
-      paymentFrequency = PaymentFrequency.monthly;
     } else {
       fromOrder(order!);
     }
@@ -183,13 +185,7 @@ abstract class _FormErrorState with Store {
   String? endTimeDate;
 
   @observable
-  String? paymentFrequency;
-
-  @observable
   String? paymentPerPeriod;
-
-  @observable
-  String? totalPaymentAmount;
 
   @computed
   bool get hasErrors =>
@@ -197,7 +193,5 @@ abstract class _FormErrorState with Store {
       subscriptionDescription != null ||
       startTimeDate != null ||
       endTimeDate != null ||
-      paymentFrequency != null ||
-      paymentPerPeriod != null ||
-      totalPaymentAmount != null;
+      paymentPerPeriod != null;
 }

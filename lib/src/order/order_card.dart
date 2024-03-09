@@ -20,7 +20,8 @@ class OrderCard extends StatelessWidget {
         const paymentFrequency2Description = {
           PaymentFrequency.daily: "Daily subscription",
           PaymentFrequency.monthly: "Monthly subscription",
-          PaymentFrequency.yearly: "Annual subscription"
+          PaymentFrequency.yearly: "Annual subscription",
+          PaymentFrequency.oneTime: "One-time purchase",
         };
 
         final description = order.description ??

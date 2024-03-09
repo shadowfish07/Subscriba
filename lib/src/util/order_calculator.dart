@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/util/duration.dart' as my;
 
@@ -45,6 +46,25 @@ class OrderCalculator {
         .fold(0.0, (value, element) => value + element);
   }
 
+  double oneTimeOrdersCost(PaymentFrequency paymentFrequency) {
+    if (availableOrders.isEmpty) return 0;
+    if (!isIncludeOneTimeOrder) return 0;
+
+    final oneTimeOrders = availableOrders.where(
+        (element) => element.paymentFrequency == PaymentFrequency.oneTime);
+
+    return oneTimeOrders.map((e) {
+          final duration = my.DurationHelper.fromDate(
+                  e.startDate, e.endDate!, PaymentFrequency.daily)
+              .toDays();
+          final dailyCost = e.paymentPerPeriod / duration;
+          debugPrint("duration: $duration $dailyCost");
+          return dailyCost *
+              my.DurationHelper.paymentCycle2Days[paymentFrequency]!;
+        }).fold(0.0, (value, element) => value + element) /
+        oneTimeOrders.length;
+  }
+
   /// 协议均值花费算法，计算按协议价格计算的花费：
   /// 订阅周期 1月视为31天
   /// 1年视为365天
@@ -59,13 +79,23 @@ class OrderCalculator {
   double perCostByProtocol(PaymentFrequency paymentFrequency) {
     if (availableOrders.isEmpty) return 0;
     if (isIncludeLifetimeOrder) return -1;
-
-    return availableOrders.map((e) {
+    final ordersWithoutOneTime = availableOrders.where(
+        (element) => element.paymentFrequency != PaymentFrequency.oneTime);
+    final costWithoutOneTimeOrders = ordersWithoutOneTime.map((e) {
           return getDailyCostPerPeriod(
                   e.paymentFrequency!, e.paymentPerPeriod) *
               my.DurationHelper.paymentCycle2Days[paymentFrequency]!;
         }).fold(0.0, (value, element) => value + element) /
-        availableOrders.length;
+        ordersWithoutOneTime.length;
+
+    return _ensureDouble(costWithoutOneTimeOrders) +
+        _ensureDouble(oneTimeOrdersCost(paymentFrequency));
+  }
+
+  double _ensureDouble(double value) {
+    if (value.isNaN) return 0.0;
+    if (value.isInfinite) return 0.0;
+    return value;
   }
 
   /// 实际均值花费算法，计算实际使用时长折算到每天的花费
@@ -88,6 +118,12 @@ class OrderCalculator {
   bool get isIncludeLifetimeOrder {
     return availableOrders.firstWhereOrNull(
             (element) => element.paymentType == PaymentType.lifetime) !=
+        null;
+  }
+
+  bool get isIncludeOneTimeOrder {
+    return availableOrders.firstWhereOrNull((element) =>
+            element.paymentFrequency == PaymentFrequency.oneTime) !=
         null;
   }
 
@@ -142,6 +178,11 @@ class OrderCalculator {
             .difference(DateTime.now())
             .inDays +
         1;
+  }
+
+  bool get isLastOrderOneTime {
+    if (availableOrders.isEmpty) return false;
+    return availableOrders.last.paymentFrequency == PaymentFrequency.oneTime;
   }
 
   /// 计算最后一次连续订阅的开始时间
