@@ -15,7 +15,7 @@ import 'package:subscriba/src/subscription_detail/display_card.dart';
 import 'package:subscriba/src/subscription_detail/per_period_cost_cards_row.dart';
 import 'package:subscriba/src/util/date_format_helper.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
-import 'package:subscriba/src/util/payment_cycle.dart';
+import 'package:subscriba/src/util/payment_frequency_helper.dart';
 
 class SubscriptionDetailView extends StatelessWidget {
   static const routeName = '/subscription/detail';
@@ -262,10 +262,14 @@ class _RecurringCardsRow extends StatelessWidget {
       builder: (_) {
         final isLifetime = OrderCalculator(orders: subscription.instance.orders)
             .isIncludeLifetimeOrder;
+        final isLastOrderOneTime =
+            OrderCalculator(orders: subscription.instance.orders)
+                .isLastOrderOneTime;
 
-        if (isLifetime) {
-          return Container();
+        if (isLifetime || isLastOrderOneTime) {
+          return const SizedBox.shrink();
         }
+
         return Padding(
           padding: defaultCenterPadding,
           child: Row(
@@ -319,7 +323,7 @@ class _NextPaymentCard extends StatelessWidget {
                                   .copyWith(fontFamily: "Alibaba"),
                             ),
                             Text(
-                                "/${PaymentCycleHelper.enum2PerUnitStr[orderCalculator.nextPaymentTemplate?.paymentFrequency]}",
+                                "/${PaymentFrequencyHelper.enum2PerUnitStr[orderCalculator.nextPaymentTemplate?.paymentFrequency]}",
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall!

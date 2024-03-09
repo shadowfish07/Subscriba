@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:subscriba/src/component/money_text.dart';
 import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/subscriptions/subscriptions_page_model.dart';
-import 'package:subscriba/src/util/payment_cycle.dart';
+import 'package:subscriba/src/util/payment_frequency_helper.dart';
 import 'package:subscriba/src/util/subscription_calculator.dart';
 
 class SubscriptionAppBar extends StatelessWidget
@@ -50,7 +50,7 @@ class SubscriptionAppBar extends StatelessWidget
                             money: perMainPaymentCyclePrize,
                             style: Theme.of(context).textTheme.titleLarge),
                         Text(
-                          '/${PaymentCycleHelper.enum2FormalStr[subscriptionPageModel.paymentFrequency]!.toLowerCase()}',
+                          '/${PaymentFrequencyHelper.enum2FormalStr[subscriptionPageModel.paymentFrequency]!.toLowerCase()}',
                           style: Theme.of(context)
                               .textTheme
                               .bodyLarge!
