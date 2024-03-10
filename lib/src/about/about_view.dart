@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:subscriba/src/database/model.dart';
 import 'package:subscriba/src/util/file_helper.dart';
 
@@ -18,6 +20,11 @@ class AboutView extends StatelessWidget {
       children: [_AppInfo(), _Settings()],
     ));
   }
+}
+
+Future<String> getAppVersion() async {
+  PackageInfo packageInfo = await PackageInfo.fromPlatform();
+  return packageInfo.version;
 }
 
 class _AppInfo extends StatelessWidget {
@@ -43,10 +50,17 @@ class _AppInfo extends StatelessWidget {
             style: Theme.of(context).textTheme.headlineMedium,
           ),
           const SizedBox(height: 10.0),
-          Text(
-            "v1.0.0",
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+          FutureBuilder(
+              future: getAppVersion(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const SizedBox.shrink();
+                }
+                return Text(
+                  "v${snapshot.data}",
+                  style: Theme.of(context).textTheme.bodyMedium,
+                );
+              }),
           const SizedBox(height: 30.0),
           // Add more ListTile for more settings
         ],
