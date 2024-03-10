@@ -1,4 +1,4 @@
-package com.example.flutter_application_1
+package top.shadowfish0.subscriba
 
 import io.flutter.embedding.android.FlutterActivity
 
