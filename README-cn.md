@@ -1,5 +1,7 @@
 # Subscriba
 
+[English](README.md) | [简体中文](README-cn.md)
+
 ## 介绍
 
 Subscriba 是一款帮助你管理订阅的软件。让你清楚知道你每天在各种订阅上花费了多少钱。
