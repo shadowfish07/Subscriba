@@ -19,7 +19,11 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
       - name: Build APK
-        run: flutter build apk --split-per-abi
+        env:
+          KEY_JKS: ${{ secrets.KEY_JKS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          ALIAS_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
+        run: echo $KEY_JKS > ${{ github.workspace }}/app/android/key.jks && flutter build apk --split-per-abi --build-name ${{ github.ref_name }}
       - name: Push APK to Releases
         uses: ncipollo/release-action@v1
         with:

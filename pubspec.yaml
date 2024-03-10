@@ -25,6 +25,7 @@ dependencies:
   sqflite_common: ^2.5.0+1
   share_plus: ^7.2.2
   file_picker: ^6.1.1
+  package_info_plus: ^5.0.1
 
 dev_dependencies:
   flutter_test:
