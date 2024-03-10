@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - "*" # Trigger when pushing a tag like v1.0
+      - "*"
 
 jobs:
   build:
@@ -15,7 +15,7 @@ jobs:
           java-version: "12.x"
       - uses: subosito/flutter-action@v1
         with:
-          flutter-version: "stable" # replace this with your required Flutter Version
+          channel: "stable"
       - name: Install dependencies
         run: flutter pub get
       - name: Build APK
