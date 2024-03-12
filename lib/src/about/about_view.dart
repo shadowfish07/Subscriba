@@ -7,12 +7,17 @@ import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:logger/logger.dart';
 import 'package:open_file/open_file.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:subscriba/src/database/model.dart';
 import 'package:subscriba/src/util/file_helper.dart';
+
+var logger = Logger(
+  filter: ProductionFilter(),
+);
 
 // Function to compare two versions
 int compareVersion(String version1, String version2) {
@@ -258,12 +263,16 @@ class _CheckForUpdateState extends State<_CheckForUpdate> {
           .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 500) {
+        logger.e("Failed to obtain version information(500)",
+            error: response.body, stackTrace: StackTrace.current);
         showSnackBar(
             'Failed to obtain version information, please try again later.');
         return;
       }
 
       if (response.statusCode == 403) {
+        logger.e("Failed to obtain version information(403)",
+            error: response.body, stackTrace: StackTrace.current);
         showSnackBar(
             'Failed to obtain version information, please try again later.');
         return;
@@ -281,9 +290,13 @@ class _CheckForUpdateState extends State<_CheckForUpdate> {
         });
       }
     } on TimeoutException catch (e) {
+      logger.e("Failed to obtain version information(timeout)",
+          error: e, stackTrace: StackTrace.current);
       showSnackBar(
           'Failed to obtain version information due to a network timeout. Please try again later.');
     } catch (e) {
+      logger.e("Failed to obtain version information",
+          error: e, stackTrace: StackTrace.current);
       showSnackBar(
           'Failed to obtain version information, please try again later.');
     } finally {
