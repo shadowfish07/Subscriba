@@ -252,23 +252,24 @@ class _CheckForUpdateState extends State<_CheckForUpdate> {
       _isLoading = true;
     });
 
-    var response = await http
-        .get(Uri.https('subscrik-update-uxuaswgvnk.cn-hongkong.fcapp.run'));
+    try {
+      var response = await http
+          .get(Uri.https('subscrik-update-uxuaswgvnk.cn-hongkong.fcapp.run'))
+          .timeout(const Duration(seconds: 10));
 
-    if (response.statusCode == 500) {
-      showSnackBar(
-          'Failed to obtain version information, please try again later.');
-      return;
-    }
+      if (response.statusCode == 500) {
+        showSnackBar(
+            'Failed to obtain version information, please try again later.');
+        return;
+      }
 
-    if (response.statusCode == 403) {
-      showSnackBar(
-          'Failed to obtain version information, please try again later.');
-      return;
-    }
+      if (response.statusCode == 403) {
+        showSnackBar(
+            'Failed to obtain version information, please try again later.');
+        return;
+      }
 
-    if (response.statusCode == 200) {
-      try {
+      if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final currentVersion = await getAppVersion();
         safeSetState(() {
@@ -278,15 +279,18 @@ class _CheckForUpdateState extends State<_CheckForUpdate> {
               ? false
               : needUpdate(currentVersion, latestVersion!);
         });
-      } catch (e) {
-        showSnackBar(
-            'Failed to obtain version information, please try again later.');
       }
+    } on TimeoutException catch (e) {
+      showSnackBar(
+          'Failed to obtain version information due to a network timeout. Please try again later.');
+    } catch (e) {
+      showSnackBar(
+          'Failed to obtain version information, please try again later.');
+    } finally {
+      safeSetState(() {
+        _isLoading = false;
+      });
     }
-
-    safeSetState(() {
-      _isLoading = false;
-    });
   }
 
   @override
