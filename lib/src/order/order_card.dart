@@ -26,7 +26,7 @@ class OrderCard extends StatelessWidget {
 
         final description = order.description ??
             paymentFrequency2Description[order.paymentFrequency] ??
-            "";
+            "Lifetime subscription";
 
         Future<bool?> showConfirmDialog() async {
           return await showDialog<bool>(

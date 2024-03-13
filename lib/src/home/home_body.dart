@@ -9,7 +9,7 @@ class HomeBody extends StatelessWidget {
     return const SingleChildScrollView(
       child: Column(
         children: [
-          HomeSubscriptionSection(),
+          MostExpensiveSubscriptionSection(),
           // HomeSubscriptionSection(),
           // HomeSubscriptionSection()
         ],

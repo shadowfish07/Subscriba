@@ -33,20 +33,30 @@ class SubscriptionPerPrize extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Row(children: [
-          MoneyText(
-            money: perMainPaymentCyclePrize,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          !orderCalculator.isIncludeLifetimeOrder
-              ? Text(
-                  "/${paymentFrequency2Display[mainPaymentFrequency]}",
-                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                )
-              : const SizedBox.shrink()
-        ]),
+        orderCalculator.isExpired
+            ? Text(
+                "Expired",
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium!
+                    .copyWith(color: Theme.of(context).colorScheme.error),
+              )
+            : Row(children: [
+                MoneyText(
+                  money: perMainPaymentCyclePrize,
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(),
+                ),
+                !orderCalculator.isIncludeLifetimeOrder
+                    ? Text(
+                        "/${paymentFrequency2Display[mainPaymentFrequency]}",
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                      )
+                    : const SizedBox.shrink()
+              ]),
         orderCalculator.isIncludeLifetimeOrder
             ? Text("lifetime",
                 style: Theme.of(context).textTheme.bodySmall!.copyWith(
@@ -59,6 +69,7 @@ class SubscriptionPerPrize extends StatelessWidget {
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                     suffix: "/day",
+                    showLineThrough: orderCalculator.isExpired,
                   )
                 : Container()
       ],
