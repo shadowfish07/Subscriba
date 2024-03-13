@@ -39,7 +39,10 @@ abstract class _SubscriptionModel with Store {
     if (instance.orders.isEmpty) return false;
     var orderCalculator = OrderCalculator(orders: instance.orders);
     final expiresIn = orderCalculator.expiresIn;
-    if (!instance.isRenew || expiresIn == null || expiresIn.inDays > 0) {
+    if (!instance.isRenew ||
+        expiresIn == null ||
+        expiresIn.inDays > 0 ||
+        orderCalculator.nextPaymentTemplate == null) {
       return false;
     }
 

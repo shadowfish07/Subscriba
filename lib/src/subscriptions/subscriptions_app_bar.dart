@@ -30,7 +30,7 @@ class SubscriptionAppBar extends StatelessWidget
               children: [
                 Observer(
                     builder: (_) => Text(
-                          'A total of ${subscriptionsModel.subscriptions.length}',
+                          '${subscriptionsModel.subscriptions.length} Subscriptions',
                           style: Theme.of(context).textTheme.titleLarge,
                         )),
                 Observer(builder: (_) {

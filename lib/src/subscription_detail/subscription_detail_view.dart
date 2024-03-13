@@ -548,12 +548,14 @@ class _SubscriptionTimeInfoCard extends StatelessWidget {
                             backgroundColor:
                                 Theme.of(context).colorScheme.surfaceVariant,
                             label: Text(
-                                isExpired(expiresIn) ? "Expired" : "Active",
+                                orderCalculator.isExpired
+                                    ? "Expired"
+                                    : "Active",
                                 style: Theme.of(context)
                                     .textTheme
                                     .labelMedium!
                                     .copyWith(
-                                        color: isExpired(expiresIn)
+                                        color: orderCalculator.isExpired
                                             ? Theme.of(context)
                                                 .colorScheme
                                                 .tertiary
@@ -601,9 +603,6 @@ class _SubscriptionTimeInfoCard extends StatelessWidget {
       },
     );
   }
-
-  bool isExpired(Duration? expiresIn) =>
-      expiresIn != null && expiresIn.inDays < 0;
 }
 
 class _SubscriptionDetailHeader extends StatelessWidget {

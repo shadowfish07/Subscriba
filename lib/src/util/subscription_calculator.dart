@@ -15,10 +15,12 @@ class SubscriptionCalculator {
 
   /// 协议均值算法，累加每个subscription的均值
   /// lifetime订单会被忽略
+  /// 已经过期的订单会被忽略
   double perPrizeByProtocol(PaymentFrequency paymentFrequency) {
     if (availableSubscriptions.isEmpty) return 0;
 
     return availableSubscriptions
+        .where((element) => !OrderCalculator(orders: element.orders).isExpired)
         .map((e) {
           return OrderCalculator(orders: e.orders)
               .perCostByProtocol(paymentFrequency);

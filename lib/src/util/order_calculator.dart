@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:subscriba/src/database/order.dart';
@@ -236,9 +238,18 @@ class OrderCalculator {
         .difference(nowDate);
   }
 
+  bool get isExpired {
+    return expiresIn != null && expiresIn!.inDays < 0;
+  }
+
   /// 获取用于自动续订的订单模板（以最后一次订单为准）
   Order? get nextPaymentTemplate {
     if (isIncludeLifetimeOrder || availableOrders.isEmpty) {
+      return null;
+    }
+
+    if (availableOrders[availableOrders.length - 1].paymentFrequency ==
+        PaymentFrequency.oneTime) {
       return null;
     }
 

@@ -5,25 +5,43 @@ import 'package:subscriba/src/component/section.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/subscription/subscription_card.dart';
+import 'package:subscriba/src/util/order_calculator.dart';
 
-class HomeSubscriptionSection extends StatelessWidget {
-  const HomeSubscriptionSection({super.key});
+/// 按均值价格从高到底排序，取前3个
+/// lifetime、已过期订单不会出现
+class MostExpensiveSubscriptionSection extends StatelessWidget {
+  const MostExpensiveSubscriptionSection({super.key});
 
   @override
   Widget build(BuildContext context) {
     final subscriptionModel = Provider.of<SubscriptionsModel>(context);
 
     return Observer(builder: (context) {
+      final renderingList = subscriptionModel.subscriptions
+          .where((element) {
+            final orderCalculator =
+                OrderCalculator(orders: element.instance.orders);
+            return !orderCalculator.isIncludeLifetimeOrder &&
+                !orderCalculator.isExpired;
+          })
+          .toList()
+          .sublist(0, 3);
       return Section(
         title: "Most Expensive",
         child: ListView.builder(
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
-          itemCount: subscriptionModel.subscriptions.length,
+          itemCount: renderingList.length,
           itemBuilder: (context, index) {
-            final subscription = subscriptionModel.subscriptions[index];
+            final sortedSubscriptions = List.from(renderingList)
+              ..sort(((a, b) {
+                return OrderCalculator(orders: b.instance.orders)
+                    .perCostByProtocol(PaymentFrequency.daily)
+                    .compareTo(OrderCalculator(orders: a.instance.orders)
+                        .perCostByProtocol(PaymentFrequency.daily));
+              }));
             return SubscriptionCard(
-              subscription: subscription,
+              subscription: sortedSubscriptions[index],
               paymentFrequency: PaymentFrequency.yearly,
             );
           },
