@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
@@ -17,23 +19,23 @@ class MostExpensiveSubscriptionSection extends StatelessWidget {
     final subscriptionModel = Provider.of<SubscriptionsModel>(context);
 
     return Observer(builder: (context) {
-      final renderingList = subscriptionModel.subscriptions
-          .where((element) {
-            final orderCalculator =
-                OrderCalculator(orders: element.instance.orders);
-            return !orderCalculator.isIncludeLifetimeOrder &&
-                !orderCalculator.isExpired;
-          })
-          .toList()
-          .sublist(0, 3);
+      final filteredList = subscriptionModel.subscriptions.where((element) {
+        final orderCalculator =
+            OrderCalculator(orders: element.instance.orders);
+        return !orderCalculator.isIncludeLifetimeOrder &&
+            !orderCalculator.isExpired;
+      }).toList();
+      final renderingSublist =
+          filteredList.sublist(0, min(3, filteredList.length));
+
       return Section(
         title: "Most Expensive",
         child: ListView.builder(
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
-          itemCount: renderingList.length,
+          itemCount: renderingSublist.length,
           itemBuilder: (context, index) {
-            final sortedSubscriptions = List.from(renderingList)
+            final sortedSubscriptions = List.from(renderingSublist)
               ..sort(((a, b) {
                 return OrderCalculator(orders: b.instance.orders)
                     .perCostByProtocol(PaymentFrequency.daily)
