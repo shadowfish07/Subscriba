@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:subscriba/src/component/money_text.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/order/order_edit.dart';
 import 'package:subscriba/src/util/date_format_helper.dart';
@@ -139,12 +140,9 @@ class OrderCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                          "\$${order.paymentPerPeriod.toStringAsFixed(2)}",
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium!
-                              .copyWith(fontFamily: "Alibaba"),
+                        MoneyText(
+                          money: order.paymentPerPeriod,
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
                         Text(
                           order.paymentType == PaymentType.lifetime

@@ -1,12 +1,18 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:subscriba/src/add_subscription/form_model.dart';
+import 'package:subscriba/src/component/money_input.dart';
 import 'package:subscriba/src/component/section.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/subscription_detail/per_period_cost_cards_row.dart';
+import 'package:subscriba/src/util/currency.dart';
+import 'package:subscriba/src/util/currency_amount.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
 import 'package:subscriba/src/util/payment_frequency_helper.dart';
 
@@ -29,8 +35,14 @@ class RecurringTab extends StatelessWidget {
         TextEditingController(text: formModel.startTimeDate);
     final endDateController =
         TextEditingController(text: formModel.endTimeDate);
-    final paymentPerPeriodController =
-        TextEditingController(text: formModel.paymentPerPeriodText);
+    final paymentPerPeriodController = TextEditingController(
+        text: formModel.paymentPerPeriod?.amount.toString());
+
+    paymentPerPeriodController.addListener(() {
+      formModel.paymentPerPeriod = CurrencyAmount.fromString(
+          paymentPerPeriodController.text,
+          formModel.paymentPerPeriod?.currency ?? Currency.CNY);
+    });
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,26 +123,14 @@ class RecurringTab extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Observer(builder: (context) {
-                  return TextField(
-                    style: const TextStyle(fontFamily: "Alibaba"),
-                    controller: paymentPerPeriodController,
+                  return MoneyInput(
+                    currency:
+                        formModel.paymentPerPeriod?.currency ?? Currency.CNY,
+                    moneyController: paymentPerPeriodController,
                     onChanged: (value) {
-                      formModel.paymentPerPeriodText = value;
+                      if (value == null) return;
+                      formModel.paymentPerPeriod = value;
                     },
-                    keyboardType: TextInputType.number,
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.allow(
-                          RegExp(r'^[1-9][0-9]*\.{0,1}\d*$')), // 只允许输入0到9的数字
-                    ],
-                    decoration: InputDecoration(
-                        prefixStyle: const TextStyle(fontFamily: "Alibaba"),
-                        border: const OutlineInputBorder(),
-                        labelText: 'Payment Per Period',
-                        prefix: const Text("\$"),
-                        helperText: formModel.paymentFrequency == null
-                            ? ''
-                            : "${PaymentFrequencyHelper.enum2FormalStr[formModel.paymentFrequency]} payment",
-                        errorText: formModel.error.paymentPerPeriod),
                   );
                 }),
                 const SizedBox(
@@ -146,20 +146,21 @@ class RecurringTab extends StatelessWidget {
                       paymentType: PaymentType.recurring,
                       startDate: formModel.startTimeTimestamp ?? 0,
                       endDate: formModel.endTimeTimestamp,
-                      paymentPerPeriod: formModel.paymentPerPeriod,
+                      paymentPerPeriod:
+                          formModel.paymentPerPeriod ?? CurrencyAmount.zero(),
                       paymentFrequency: formModel.paymentFrequency);
 
                   final orderCalculator = OrderCalculator(orders: [tempOrder]);
-                  final dailyCost = formModel.paymentPerPeriodText == null
-                      ? 0.0
+                  final dailyCost = formModel.paymentFrequency == null
+                      ? CurrencyAmount.zero()
                       : orderCalculator
                           .perCostByProtocol(PaymentFrequency.daily);
-                  final monthlyCost = formModel.paymentPerPeriodText == null
-                      ? 0.0
+                  final monthlyCost = formModel.paymentFrequency == null
+                      ? CurrencyAmount.zero()
                       : orderCalculator
                           .perCostByProtocol(PaymentFrequency.monthly);
-                  final annuallyCost = formModel.paymentPerPeriodText == null
-                      ? 0.0
+                  final annuallyCost = formModel.paymentFrequency == null
+                      ? CurrencyAmount.zero()
                       : orderCalculator
                           .perCostByProtocol(PaymentFrequency.yearly);
                   return PerPeriodCostCardsRow(

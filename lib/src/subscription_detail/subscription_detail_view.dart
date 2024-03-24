@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
+import 'package:subscriba/src/component/money_text.dart';
 import 'package:subscriba/src/component/section.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/database/subscription.dart';
@@ -13,6 +14,7 @@ import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/styles/styles.dart';
 import 'package:subscriba/src/subscription_detail/display_card.dart';
 import 'package:subscriba/src/subscription_detail/per_period_cost_cards_row.dart';
+import 'package:subscriba/src/util/currency_amount.dart';
 import 'package:subscriba/src/util/date_format_helper.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
 import 'package:subscriba/src/util/payment_frequency_helper.dart';
@@ -144,7 +146,7 @@ class _SubscriptionDetailBody extends StatelessWidget {
               final orderCalculator =
                   OrderCalculator(orders: subscription.instance.orders);
 
-              double calculateCost(PaymentFrequency cycleType) {
+              CurrencyAmount calculateCost(PaymentFrequency cycleType) {
                 return orderCalculator.isIncludeLifetimeOrder
                     ? orderCalculator.perCostByActual(cycleType)
                     : orderCalculator.perCostByProtocol(cycleType);
@@ -315,12 +317,10 @@ class _NextPaymentCard extends StatelessWidget {
                   Row(
                     children: isRenew
                         ? [
-                            Text(
-                              "\$${orderCalculator.nextPaymentTemplate?.paymentPerPeriod.toStringAsFixed(2)}",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .copyWith(fontFamily: "Alibaba"),
+                            MoneyText(
+                              money: orderCalculator
+                                  .nextPaymentTemplate!.paymentPerPeriod,
+                              style: Theme.of(context).textTheme.titleMedium,
                             ),
                             Text(
                                 "/${PaymentFrequencyHelper.enum2PerUnitStr[orderCalculator.nextPaymentTemplate?.paymentFrequency]}",
@@ -406,13 +406,10 @@ class _TotallyCostCard extends StatelessWidget {
           body: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "\$${OrderCalculator(orders: subscription.instance.orders).totalCost}",
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium!
-                    .copyWith(fontFamily: "Alibaba"),
-              ),
+              MoneyText(
+                  money: OrderCalculator(orders: subscription.instance.orders)
+                      .totalCost,
+                  style: Theme.of(context).textTheme.titleMedium),
               // Text("Top 1", style: Theme.of(context).textTheme.labelMedium)
             ],
           ),

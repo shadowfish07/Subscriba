@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:subscriba/src/component/money_text.dart';
 import 'package:subscriba/src/subscription_detail/display_card.dart';
+import 'package:subscriba/src/util/currency_amount.dart';
 
 class PerPeriodCostCardsRow extends StatelessWidget {
   const PerPeriodCostCardsRow(
@@ -8,9 +10,9 @@ class PerPeriodCostCardsRow extends StatelessWidget {
       required this.monthlyCost,
       required this.annuallyCost});
 
-  final double dailyCost;
-  final double monthlyCost;
-  final double annuallyCost;
+  final CurrencyAmount dailyCost;
+  final CurrencyAmount monthlyCost;
+  final CurrencyAmount annuallyCost;
 
   @override
   Widget build(BuildContext context) {
@@ -19,44 +21,33 @@ class PerPeriodCostCardsRow extends StatelessWidget {
       children: [
         Expanded(
             child: DisplayCard(
-          title: Text(
-            "Daily ",
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          body: Text(
-            dailyCost == -1 ? '-' : "\$${dailyCost.toStringAsFixed(2)}",
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium!
-                .copyWith(fontFamily: "Alibaba"),
-          ),
-        )),
+                title: Text(
+                  "Daily",
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                body: MoneyText(
+                  money: dailyCost,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ))),
+        Expanded(
+            child: DisplayCard(
+                title: Text(
+                  "Monthly",
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                body: MoneyText(
+                  money: monthlyCost,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ))),
         Expanded(
             child: DisplayCard(
           title: Text(
-            "Monthly ",
+            "Annually",
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          body: Text(
-            monthlyCost == -1 ? '-' : "\$${monthlyCost.toStringAsFixed(2)}",
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium!
-                .copyWith(fontFamily: "Alibaba"),
-          ),
-        )),
-        Expanded(
-            child: DisplayCard(
-          title: Text(
-            "Annually ",
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          body: Text(
-            annuallyCost == -1 ? '-' : "\$${annuallyCost.toStringAsFixed(2)}",
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium!
-                .copyWith(fontFamily: "Alibaba"),
+          body: MoneyText(
+            money: annuallyCost,
+            style: Theme.of(context).textTheme.titleMedium,
           ),
         )),
       ],

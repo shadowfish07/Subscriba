@@ -1,10 +1,11 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:subscriba/src/database/order.dart';
+import 'package:subscriba/src/util/currency_amount.dart';
 import 'package:subscriba/src/util/duration.dart' as my;
 
-double getDailyCostPerPeriod(
-    PaymentFrequency paymentCycle, double paymentPerPeriod) {
+CurrencyAmount getDailyCostPerPeriod(
+    PaymentFrequency paymentCycle, CurrencyAmount paymentPerPeriod) {
   if (paymentCycle == PaymentFrequency.daily) {
     return paymentPerPeriod;
   }
@@ -32,23 +33,23 @@ class OrderCalculator {
     return result;
   }
 
-  double get totalCost {
+  CurrencyAmount get totalCost {
     return availableOrders.map((e) {
       return e.paymentPerPeriod;
-    }).fold(0.0, (value, element) => value + element);
+    }).fold(CurrencyAmount.zero(), (value, element) => value + element);
   }
 
   /// 目前暂时不会有多个lifetime订单，后续看规划
-  double get lifetimeCost {
+  CurrencyAmount get lifetimeCost {
     return availableOrders
         .where((element) => element.paymentType == PaymentType.lifetime)
         .map((e) => e.paymentPerPeriod)
-        .fold(0.0, (value, element) => value + element);
+        .fold(CurrencyAmount.zero(), (value, element) => value + element);
   }
 
-  double oneTimeOrdersCost(PaymentFrequency paymentFrequency) {
-    if (availableOrders.isEmpty) return 0;
-    if (!isIncludeOneTimeOrder) return 0;
+  CurrencyAmount oneTimeOrdersCost(PaymentFrequency paymentFrequency) {
+    if (availableOrders.isEmpty) return CurrencyAmount.zero();
+    if (!isIncludeOneTimeOrder) return CurrencyAmount.zero();
 
     final oneTimeOrders = availableOrders.where(
         (element) => element.paymentFrequency == PaymentFrequency.oneTime);
@@ -61,7 +62,7 @@ class OrderCalculator {
           debugPrint("duration: $duration $dailyCost");
           return dailyCost *
               my.DurationHelper.paymentCycle2Days[paymentFrequency]!;
-        }).fold(0.0, (value, element) => value + element) /
+        }).fold(CurrencyAmount.zero(), (value, element) => value + element) /
         oneTimeOrders.length;
   }
 
@@ -76,41 +77,37 @@ class OrderCalculator {
   /// 这和普通预期中的10 * 12 不匹配，但更灵活普适。
   ///
   /// 如果订单中包含Lifetime订单，则返回-1
-  double perCostByProtocol(PaymentFrequency paymentFrequency) {
-    if (availableOrders.isEmpty) return 0;
-    if (isIncludeLifetimeOrder) return -1;
+  CurrencyAmount perCostByProtocol(PaymentFrequency paymentFrequency) {
+    if (availableOrders.isEmpty) return CurrencyAmount.zero();
+    if (isIncludeLifetimeOrder) return CurrencyAmount.NaN();
     final ordersWithoutOneTime = availableOrders.where(
         (element) => element.paymentFrequency != PaymentFrequency.oneTime);
     final costWithoutOneTimeOrders = ordersWithoutOneTime.map((e) {
           return getDailyCostPerPeriod(
                   e.paymentFrequency!, e.paymentPerPeriod) *
               my.DurationHelper.paymentCycle2Days[paymentFrequency]!;
-        }).fold(0.0, (value, element) => value + element) /
+        }).fold(CurrencyAmount.zero(), (value, element) => value + element) /
         ordersWithoutOneTime.length;
 
-    return _ensureDouble(costWithoutOneTimeOrders) +
-        _ensureDouble(oneTimeOrdersCost(paymentFrequency));
-  }
-
-  double _ensureDouble(double value) {
-    if (value.isNaN) return 0.0;
-    if (value.isInfinite) return 0.0;
-    return value;
+    return costWithoutOneTimeOrders.ensureAmount() +
+        oneTimeOrdersCost(paymentFrequency).ensureAmount();
   }
 
   /// 实际均值花费算法，计算实际使用时长折算到每天的花费
   /// 如果使用时间不足31天/365天，则月均/年均花费为-1（没有意义）
-  double perCostByActual(PaymentFrequency paymentFrequency) {
-    if (availableOrders.isEmpty || subscribingDaysByActual == 0) return 0;
+  CurrencyAmount perCostByActual(PaymentFrequency paymentFrequency) {
+    if (availableOrders.isEmpty || subscribingDaysByActual == 0) {
+      return CurrencyAmount.zero();
+    }
     if (paymentFrequency != PaymentFrequency.daily &&
         subscribingDaysByActual <
             my.DurationHelper.paymentCycle2Days[paymentFrequency]!) {
-      return -1;
+      return CurrencyAmount.NaN();
     }
 
     return availableOrders
             .map((e) => e.paymentPerPeriod)
-            .fold(0.0, (value, element) => value + element) /
+            .fold(CurrencyAmount.zero(), (value, element) => value + element) /
         subscribingDaysByActual *
         my.DurationHelper.paymentCycle2Days[paymentFrequency]!;
   }

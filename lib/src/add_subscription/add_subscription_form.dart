@@ -53,9 +53,8 @@ class _AddSubscriptionFormState extends State<AddSubscriptionForm>
               startDate: formModel.startTimeTimestamp!,
               endDate: formModel.endTimeTimestamp,
               subscriptionId: subscriptionId,
-              paymentCurrencyPerPeriod: "\$",
               paymentFrequency: formModel.paymentFrequency,
-              paymentPerPeriod: formModel.paymentPerPeriod),
+              paymentPerPeriod: formModel.paymentPerPeriod!),
         );
 
         subscriptionsModel.loadSubscriptions();
@@ -128,7 +127,9 @@ class _AddSubscriptionFormState extends State<AddSubscriptionForm>
                     child: FilledButton(
                         onPressed: () {
                           saveSubscription().then((isSuccess) {
-                            if (!isSuccess) return;
+                            if (!isSuccess) {
+                              return;
+                            }
                             Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(

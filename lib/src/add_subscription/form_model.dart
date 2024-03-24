@@ -1,6 +1,8 @@
 import 'package:intl/intl.dart';
 import 'package:mobx/mobx.dart';
 import 'package:subscriba/src/database/order.dart';
+import 'package:subscriba/src/util/currency.dart';
+import 'package:subscriba/src/util/currency_amount.dart';
 import 'package:subscriba/src/util/duration.dart';
 import 'package:subscriba/src/util/payment_frequency_helper.dart';
 
@@ -24,7 +26,7 @@ abstract class _FormModel with Store {
         ? DateFormat.yMd()
             .format(DateTime.fromMicrosecondsSinceEpoch(order.endDate!))
         : null;
-    paymentPerPeriodText = order.paymentPerPeriod.toString();
+    paymentPerPeriod = order.paymentPerPeriod;
   }
 
   @observable
@@ -69,23 +71,14 @@ abstract class _FormModel with Store {
     return getDateDuration(startTimeTimestamp!, endTimeTimestamp!);
   }
 
-  @computed
-  double get paymentPerPeriod {
-    if (paymentPerPeriodText == null || paymentPerPeriodText!.isEmpty == true) {
-      return 0.0;
-    }
-
-    return double.parse(paymentPerPeriodText!);
-  }
+  @observable
+  CurrencyAmount? paymentPerPeriod;
 
   @computed
   PaymentFrequency? get paymentFrequency {
     if (duration == null) return null;
     return PaymentFrequencyHelper.dayAmountToPaymentFrequency(duration!);
   }
-
-  @observable
-  String? paymentPerPeriodText;
 
   late List<ReactionDisposer> _disposers;
 
@@ -94,7 +87,7 @@ abstract class _FormModel with Store {
       reaction((_) => subscriptionName, validateSubscriptionName),
       reaction((_) => startTimeDate, validateStartTimeDate),
       reaction((_) => endTimeDate, validateEndTimeDate),
-      reaction((_) => paymentPerPeriodText, validatePaymentPerPeriod),
+      reaction((_) => paymentPerPeriod, validatePaymentPerPeriod),
     ];
   }
 
@@ -104,10 +97,10 @@ abstract class _FormModel with Store {
     if (paymentType == PaymentType.recurring) {
       validateStartTimeDate(startTimeDate);
       validateEndTimeDate(endTimeDate);
-      validatePaymentPerPeriod(paymentPerPeriodText);
+      validatePaymentPerPeriod(paymentPerPeriod);
     } else if (paymentType == PaymentType.lifetime) {
       validateStartTimeDate(startTimeDate);
-      validatePaymentPerPeriod(paymentPerPeriodText);
+      validatePaymentPerPeriod(paymentPerPeriod);
     }
   }
 
@@ -115,7 +108,7 @@ abstract class _FormModel with Store {
   void setPaymentType(PaymentType paymentType) {
     this.paymentType = paymentType;
     if (order == null || paymentType != order!.paymentType) {
-      paymentPerPeriodText = null;
+      paymentPerPeriod = CurrencyAmount.NaN(Currency.CNY);
       startTimeDate = DateFormat.yMd().format(DateTime.now());
       endTimeDate = null;
     } else {
@@ -154,11 +147,9 @@ abstract class _FormModel with Store {
   }
 
   @action
-  void validatePaymentPerPeriod(String? paymentPerPeriod) {
+  void validatePaymentPerPeriod(CurrencyAmount? paymentPerPeriod) {
     error.paymentPerPeriod =
-        paymentPerPeriod != null && paymentPerPeriod.isNotEmpty
-            ? null
-            : "This field is required";
+        paymentPerPeriod != null ? null : "This field is required";
   }
 
   void dispose() {

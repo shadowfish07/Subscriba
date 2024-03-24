@@ -67,8 +67,6 @@ abstract class _SubscriptionModel with Store {
           startDate: startDate,
           endDate: endDate,
           subscriptionId: instance.id,
-          paymentCurrencyPerPeriod:
-              nextPaymentTemplate.paymentCurrencyPerPeriod,
           paymentFrequency: nextPaymentTemplate.paymentFrequency,
           paymentPerPeriod: nextPaymentTemplate.paymentPerPeriod,
         ),
