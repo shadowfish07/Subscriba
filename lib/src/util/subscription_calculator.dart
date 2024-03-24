@@ -1,5 +1,6 @@
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/database/subscription.dart';
+import 'package:subscriba/src/util/currency_amount.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
 
 class SubscriptionCalculator {
@@ -16,8 +17,8 @@ class SubscriptionCalculator {
   /// 协议均值算法，累加每个subscription的均值
   /// lifetime订单会被忽略
   /// 已经过期的订单会被忽略
-  double perPrizeByProtocol(PaymentFrequency paymentFrequency) {
-    if (availableSubscriptions.isEmpty) return 0;
+  CurrencyAmount perPrizeByProtocol(PaymentFrequency paymentFrequency) {
+    if (availableSubscriptions.isEmpty) return CurrencyAmount(amount: 0);
 
     return availableSubscriptions
         .where((element) => !OrderCalculator(orders: element.orders).isExpired)
@@ -25,7 +26,8 @@ class SubscriptionCalculator {
           return OrderCalculator(orders: e.orders)
               .perCostByProtocol(paymentFrequency);
         })
-        .where((element) => element != -1)
-        .fold(0.0, (previousValue, element) => previousValue + element);
+        .where((element) => element.amount != -1)
+        .fold(CurrencyAmount(amount: 0),
+            (previousValue, element) => previousValue + element);
   }
 }

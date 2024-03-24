@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:subscriba/src/add_subscription/form_model.dart';
+import 'package:subscriba/src/component/money_input.dart';
+import 'package:subscriba/src/util/currency.dart';
 
 class LifetimeTab extends StatelessWidget {
   const LifetimeTab({super.key});
@@ -12,8 +15,8 @@ class LifetimeTab extends StatelessWidget {
     final formModel = Provider.of<FormModel>(context);
     final startDateController =
         TextEditingController(text: formModel.startTimeDate);
-    final paymentPerPeriodController =
-        TextEditingController(text: formModel.paymentPerPeriodText);
+    final paymentPerPeriodController = TextEditingController(
+        text: formModel.paymentPerPeriod?.amount.toString());
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,24 +53,16 @@ class LifetimeTab extends StatelessWidget {
         const SizedBox(
           height: 16,
         ),
-        TextField(
-          style: const TextStyle(fontFamily: "Alibaba"),
-          controller: paymentPerPeriodController,
-          onChanged: (value) {
-            formModel.paymentPerPeriodText = value;
-          },
-          keyboardType: TextInputType.number,
-          inputFormatters: <TextInputFormatter>[
-            FilteringTextInputFormatter.allow(
-                RegExp(r'^[1-9][0-9]*\.{0,1}\d*$')), // 只允许输入0到9的数字
-          ],
-          decoration: InputDecoration(
-              prefixStyle: const TextStyle(fontFamily: "Alibaba"),
-              border: const OutlineInputBorder(),
-              labelText: 'Cost',
-              prefix: const Text("\$"),
-              errorText: formModel.error.paymentPerPeriod),
-        ),
+        Observer(builder: (context) {
+          return MoneyInput(
+            currency: formModel.paymentPerPeriod?.currency ?? Currency.CNY,
+            moneyController: paymentPerPeriodController,
+            onChanged: (value) {
+              if (value == null) return;
+              formModel.paymentPerPeriod = value;
+            },
+          );
+        }),
         const SizedBox(
           height: 32,
         ),

@@ -29,13 +29,6 @@ mixin _$FormModel on _FormModel, Store {
   int? get duration => (_$durationComputed ??=
           Computed<int?>(() => super.duration, name: '_FormModel.duration'))
       .value;
-  Computed<double>? _$paymentPerPeriodComputed;
-
-  @override
-  double get paymentPerPeriod => (_$paymentPerPeriodComputed ??=
-          Computed<double>(() => super.paymentPerPeriod,
-              name: '_FormModel.paymentPerPeriod'))
-      .value;
   Computed<PaymentFrequency?>? _$paymentFrequencyComputed;
 
   @override
@@ -125,20 +118,19 @@ mixin _$FormModel on _FormModel, Store {
     });
   }
 
-  late final _$paymentPerPeriodTextAtom =
-      Atom(name: '_FormModel.paymentPerPeriodText', context: context);
+  late final _$paymentPerPeriodAtom =
+      Atom(name: '_FormModel.paymentPerPeriod', context: context);
 
   @override
-  String? get paymentPerPeriodText {
-    _$paymentPerPeriodTextAtom.reportRead();
-    return super.paymentPerPeriodText;
+  CurrencyAmount? get paymentPerPeriod {
+    _$paymentPerPeriodAtom.reportRead();
+    return super.paymentPerPeriod;
   }
 
   @override
-  set paymentPerPeriodText(String? value) {
-    _$paymentPerPeriodTextAtom.reportWrite(value, super.paymentPerPeriodText,
-        () {
-      super.paymentPerPeriodText = value;
+  set paymentPerPeriod(CurrencyAmount? value) {
+    _$paymentPerPeriodAtom.reportWrite(value, super.paymentPerPeriod, () {
+      super.paymentPerPeriod = value;
     });
   }
 
@@ -201,7 +193,7 @@ mixin _$FormModel on _FormModel, Store {
   }
 
   @override
-  void validatePaymentPerPeriod(String? paymentPerPeriod) {
+  void validatePaymentPerPeriod(CurrencyAmount? paymentPerPeriod) {
     final _$actionInfo = _$_FormModelActionController.startAction(
         name: '_FormModel.validatePaymentPerPeriod');
     try {
@@ -219,11 +211,10 @@ subscriptionName: ${subscriptionName},
 subscriptionDescription: ${subscriptionDescription},
 startTimeDate: ${startTimeDate},
 endTimeDate: ${endTimeDate},
-paymentPerPeriodText: ${paymentPerPeriodText},
+paymentPerPeriod: ${paymentPerPeriod},
 startTimeTimestamp: ${startTimeTimestamp},
 endTimeTimestamp: ${endTimeTimestamp},
 duration: ${duration},
-paymentPerPeriod: ${paymentPerPeriod},
 paymentFrequency: ${paymentFrequency}
     ''';
   }
