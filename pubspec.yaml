@@ -31,6 +31,9 @@ dependencies:
   permission_handler: ^11.3.0
   logger: ^2.1.0
   shared_preferences: ^2.2.2
+  crypto: ^3.0.1
+  timeago: ^3.6.1
+  flutter_svg: ^2.0.10
 
 dev_dependencies:
   flutter_test:
@@ -58,3 +61,4 @@ flutter:
   assets:
     # Add assets from the images directory to the application.
     - assets/images/
+    - assets/icons/

@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +17,9 @@ import 'package:provider/provider.dart';
 import 'package:subscriba/src/currency_select/currency_select_view.dart';
 import 'package:subscriba/src/database/model.dart';
 import 'package:subscriba/src/settings/settings_model.dart';
+import 'package:subscriba/src/util/exchange_rate.dart';
 import 'package:subscriba/src/util/file_helper.dart';
+import 'package:timeago/timeago.dart' as timeAgo;
 
 var logger = Logger(
   filter: ProductionFilter(),
@@ -141,30 +145,8 @@ class _Settings extends StatelessWidget {
     return Column(
       children: [
         const _CheckForUpdate(),
-        ListTile(
-          leading: const Icon(Icons.currency_exchange),
-          title: const Text('Default currency'),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Observer(builder: (context) {
-                return Text(settingsModel.defaultCurrency.ISOCode);
-              }),
-              const Icon(Icons.chevron_right),
-            ],
-          ),
-          onTap: () async {
-            final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => CurrencySelectView(
-                          selectedCurrency: settingsModel.defaultCurrency,
-                        )));
-            if (result != null) {
-              settingsModel.updateDefaultCurrency(result);
-            }
-          },
-        ),
+        _DefaultCurrency(settingsModel: settingsModel),
+        const _UpdateExchangeRates(),
         ListTile(
           leading: const Icon(Icons.file_upload),
           title: const Text('Export data'),
@@ -204,6 +186,108 @@ class _Settings extends StatelessWidget {
           },
         ),
       ],
+    );
+  }
+}
+
+class _DefaultCurrency extends StatelessWidget {
+  const _DefaultCurrency({
+    super.key,
+    required this.settingsModel,
+  });
+
+  final SettingsModel settingsModel;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Icons.payments),
+      title: const Text('Default currency'),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Observer(builder: (context) {
+            return Text(settingsModel.defaultCurrency.ISOCode);
+          }),
+          const Icon(Icons.chevron_right),
+        ],
+      ),
+      onTap: () async {
+        final result = await Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => CurrencySelectView(
+                      selectedCurrency: settingsModel.defaultCurrency,
+                    )));
+        if (result != null) {
+          settingsModel.updateDefaultCurrency(result);
+        }
+      },
+    );
+  }
+}
+
+class _UpdateExchangeRates extends StatefulWidget {
+  const _UpdateExchangeRates({
+    super.key,
+  });
+
+  @override
+  State<_UpdateExchangeRates> createState() => _UpdateExchangeRatesState();
+}
+
+class _UpdateExchangeRatesState extends State<_UpdateExchangeRates> {
+  // final isLoading = ValueNotifier<bool>(false);
+  bool isLoading = false;
+
+  void safeSetState(void Function() fn) {
+    if (mounted) {
+      setState(fn);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Icons.currency_exchange),
+      title: const Text("Update Exchange Rates"),
+      trailing: isLoading
+          ? const _LoadingIndicator()
+          : Text(timeAgo.format(ExchangeRate.lastUpdated)),
+      onTap: () async {
+        try {
+          safeSetState(() {
+            isLoading = true;
+          });
+          final isUpdated = await ExchangeRate.fetchExchangeRate();
+          if (isUpdated) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Successfully Updated'),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Already Up-to-date'),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Update Failed'),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        } finally {
+          safeSetState(() {
+            isLoading = false;
+          });
+        }
+      },
     );
   }
 }
@@ -334,7 +418,6 @@ class _CheckForUpdateState extends State<_CheckForUpdate> {
   @override
   void initState() {
     super.initState();
-    getLatestVersion();
   }
 
   showSnackBar(String message) {
@@ -384,12 +467,7 @@ class _CheckForUpdateState extends State<_CheckForUpdate> {
       leading: const Icon(Icons.update),
       title: const Text('Check for updates'),
       trailing: _isLoading
-          ? const SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-              ))
+          ? const _LoadingIndicator()
           : downloadProgress != null
               ? downloadProgress == -1
                   ? const Row(
@@ -427,5 +505,21 @@ class _CheckForUpdateState extends State<_CheckForUpdate> {
                       : const Text("Up to date"),
       onTap: onTap,
     );
+  }
+}
+
+class _LoadingIndicator extends StatelessWidget {
+  const _LoadingIndicator({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox(
+        width: 16,
+        height: 16,
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+        ));
   }
 }
