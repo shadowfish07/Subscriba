@@ -9,6 +9,7 @@ import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/database/subscription.dart';
 import 'package:subscriba/src/order/order_add.dart';
 import 'package:subscriba/src/order/order_card.dart';
+import 'package:subscriba/src/settings/settings_model.dart';
 import 'package:subscriba/src/store/subscription_model.dart';
 import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/styles/styles.dart';
@@ -26,6 +27,7 @@ class SubscriptionDetailView extends StatelessWidget {
 
   Future<SubscriptionModel> _getSubscription(int subscriptionId) async {
     final data = await SubscriptionProvider().getSubscription(subscriptionId);
+    debugPrint("data: $data ${data!.orders[0].paymentPerPeriod.currency}");
     // TODO: 找不到的兜底UI
     return SubscriptionModel(data!);
   }
@@ -123,6 +125,7 @@ class _SubscriptionDetailBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingsModel = Provider.of<SettingsModel>(context);
     return SingleChildScrollView(
       child: SizedBox(
         child: Column(
@@ -143,8 +146,9 @@ class _SubscriptionDetailBody extends StatelessWidget {
             ),
             // const SizedBox(height: 54),
             Observer(builder: (context) {
-              final orderCalculator =
-                  OrderCalculator(orders: subscription.instance.orders);
+              final orderCalculator = OrderCalculator(
+                orders: subscription.instance.orders,
+              );
 
               CurrencyAmount calculateCost(PaymentFrequency cycleType) {
                 return orderCalculator.isIncludeLifetimeOrder

@@ -1,4 +1,7 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:subscriba/src/util/currency.dart';
+import 'package:subscriba/src/util/exchange_rate.dart';
 
 class CurrencyAmount {
   CurrencyAmount(
@@ -32,17 +35,28 @@ class CurrencyAmount {
     }
   }
 
-  CurrencyAmount operator +(CurrencyAmount other) {
-    if (other.currency != currency) {
-      // TODO 后续如果要实现不同币种相加的话需要实现
-      throw Exception('Cannot add amounts with different currencies');
-    }
+  /// 不传currency默认为defaultCurrency
+  CurrencyAmount toCurrency([Currency? currency]) {
+    final usingCurrency = currency ?? defaultCurrency;
+    return CurrencyAmount(
+        currency: usingCurrency,
+        amount: ExchangeRate.getRate(this.currency, usingCurrency) * amount);
+  }
 
+  CurrencyAmount operator +(CurrencyAmount other) {
     if (isNaN) {
       throw Exception('Cannot add NaN amounts');
     }
 
-    return CurrencyAmount(currency: currency, amount: amount + other.amount);
+    debugPrint("sssssss ${ExchangeRate.exchangeRates}");
+
+    debugPrint(
+        "ssssssss $currency$amount + ${other.currency}${other.amount}  ${ExchangeRate.getRate(other.currency, currency)}");
+
+    return CurrencyAmount(
+        currency: currency,
+        amount: amount +
+            ExchangeRate.getRate(other.currency, currency) * other.amount);
   }
 
   CurrencyAmount operator /(num other) {
@@ -73,13 +87,14 @@ class CurrencyAmount {
   }
 
   int compareTo(CurrencyAmount other) {
-    if (other.currency != currency) {
-      throw Exception(
-          'Cannot compare CurrencyAmounts of different currencies.');
+    if (amount <
+        ExchangeRate.getRate(other.currency, currency) * other.amount) {
+      return -1;
     }
-
-    if (amount < other.amount) return -1;
-    if (amount > other.amount) return 1;
+    if (amount >
+        ExchangeRate.getRate(other.currency, currency) * other.amount) {
+      return 1;
+    }
     return 0;
   }
 }
