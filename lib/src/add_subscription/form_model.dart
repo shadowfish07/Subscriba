@@ -1,7 +1,6 @@
 import 'package:intl/intl.dart';
 import 'package:mobx/mobx.dart';
 import 'package:subscriba/src/database/order.dart';
-import 'package:subscriba/src/util/currency.dart';
 import 'package:subscriba/src/util/currency_amount.dart';
 import 'package:subscriba/src/util/duration.dart';
 import 'package:subscriba/src/util/payment_frequency_helper.dart';

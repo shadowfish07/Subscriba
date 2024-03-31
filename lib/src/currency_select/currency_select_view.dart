@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:subscriba/src/util/currency.dart';
 
@@ -23,7 +22,7 @@ class CurrencySelectView extends StatelessWidget {
 class _CurrencyList extends StatelessWidget {
   final Currency selectedCurrency;
 
-  const _CurrencyList({super.key, required this.selectedCurrency});
+  const _CurrencyList({required this.selectedCurrency});
 
   @override
   Widget build(BuildContext context) {

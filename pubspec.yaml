@@ -32,6 +32,8 @@ dependencies:
   logger: ^2.1.0
   shared_preferences: ^2.2.2
 
+  path: any
+  flutter_gen: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

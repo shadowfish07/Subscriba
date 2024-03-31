@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:subscriba/src/add_subscription/form_model.dart';
 import 'package:subscriba/src/component/money_input.dart';
 import 'package:subscriba/src/settings/settings_model.dart';
-import 'package:subscriba/src/util/currency.dart';
 
 class LifetimeTab extends StatelessWidget {
   const LifetimeTab({super.key});

@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:logger/logger.dart';
 import 'package:open_file/open_file.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -211,9 +209,7 @@ class _Settings extends StatelessWidget {
 }
 
 class _CheckForUpdate extends StatefulWidget {
-  const _CheckForUpdate({
-    super.key,
-  });
+  const _CheckForUpdate();
 
   @override
   _CheckForUpdateState createState() => _CheckForUpdateState();
