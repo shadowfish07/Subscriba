@@ -61,7 +61,7 @@ class _CurrencyDropdownButton extends StatelessWidget {
   final Function(Currency?) onChanged;
 
   const _CurrencyDropdownButton(
-      {super.key, required this.currency, required this.onChanged});
+      {required this.currency, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
