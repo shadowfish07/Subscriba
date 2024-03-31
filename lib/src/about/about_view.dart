@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,10 @@ import 'package:open_file/open_file.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
+import 'package:subscriba/src/currency_select/currency_select_view.dart';
 import 'package:subscriba/src/database/model.dart';
+import 'package:subscriba/src/settings/settings_model.dart';
 import 'package:subscriba/src/util/file_helper.dart';
 
 var logger = Logger(
@@ -111,6 +115,7 @@ class _Settings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingsModel = Provider.of<SettingsModel>(context);
     Future<void> showLoadingDialog() {
       return showDialog(
           context: context,
@@ -138,6 +143,30 @@ class _Settings extends StatelessWidget {
     return Column(
       children: [
         const _CheckForUpdate(),
+        ListTile(
+          leading: const Icon(Icons.currency_exchange),
+          title: const Text('Default currency'),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Observer(builder: (context) {
+                return Text(settingsModel.defaultCurrency.ISOCode);
+              }),
+              const Icon(Icons.chevron_right),
+            ],
+          ),
+          onTap: () async {
+            final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => CurrencySelectView(
+                          selectedCurrency: settingsModel.defaultCurrency,
+                        )));
+            if (result != null) {
+              settingsModel.updateDefaultCurrency(result);
+            }
+          },
+        ),
         ListTile(
           leading: const Icon(Icons.file_upload),
           title: const Text('Export data'),
