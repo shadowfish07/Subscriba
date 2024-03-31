@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:intl/intl.dart';
@@ -148,7 +147,9 @@ class RecurringTab extends StatelessWidget {
                           formModel.paymentPerPeriod ?? CurrencyAmount.zero(),
                       paymentFrequency: formModel.paymentFrequency);
 
-                  final orderCalculator = OrderCalculator(orders: [tempOrder]);
+                  final orderCalculator = OrderCalculator(
+                      orders: [tempOrder],
+                      targetCurrency: settingsModel.defaultCurrency);
                   final dailyCost = formModel.paymentFrequency == null
                       ? CurrencyAmount.zero()
                       : orderCalculator
@@ -161,10 +162,15 @@ class RecurringTab extends StatelessWidget {
                       ? CurrencyAmount.zero()
                       : orderCalculator
                           .perCostByProtocol(PaymentFrequency.yearly);
+
+                  debugPrint(
+                      "dailyCost: ${formModel.paymentPerPeriod} ${settingsModel.defaultCurrency} ${dailyCost}");
                   return PerPeriodCostCardsRow(
-                      dailyCost: dailyCost,
-                      monthlyCost: monthlyCost,
-                      annuallyCost: annuallyCost);
+                    dailyCost: dailyCost,
+                    monthlyCost: monthlyCost,
+                    annuallyCost: annuallyCost,
+                    originalCurrency: formModel.paymentPerPeriod!.currency,
+                  );
                 }),
                 const SizedBox(
                   height: 8,

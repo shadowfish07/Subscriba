@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:subscriba/src/util/currency_amount.dart';
 
 class MoneyText extends StatelessWidget {
-  const MoneyText(
-      {super.key,
-      required this.money,
-      this.style,
-      this.suffix = "",
-      this.showLineThrough = false});
+  const MoneyText({
+    super.key,
+    required this.money,
+    this.style,
+    this.suffix = "",
+    this.showLineThrough = false,
+  });
 
   final CurrencyAmount money;
   final TextStyle? style;

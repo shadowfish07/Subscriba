@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
-import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:subscriba/src/util/currency.dart';
 import 'package:http/http.dart' as http;
@@ -22,6 +21,10 @@ class ExchangeRate {
       defaultExchangeRate;
 
   static DateTime lastUpdated = DateTime(2024, 3, 31);
+
+  static double getRate(Currency from, Currency to) {
+    return exchangeRates[from]?[to] ?? 1;
+  }
 
   static void _loadFromJSON(String json) {
     final exchangeRatesFromJSON = jsonDecode(json);
@@ -105,8 +108,8 @@ class ExchangeRate {
         for (var target in latestExchangeRates.keys) {
           final targetCurrency = Currency.fromISOCode(target);
           exchangeRates[baseCurrency]![targetCurrency] =
-              latestExchangeRates[base]['value'] /
-                  latestExchangeRates[target]["value"];
+              latestExchangeRates[target]['value'] /
+                  latestExchangeRates[base]["value"];
         }
       }
 
