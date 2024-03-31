@@ -30,6 +30,7 @@ dependencies:
   open_file: ^3.3.2
   permission_handler: ^11.3.0
   logger: ^2.1.0
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:

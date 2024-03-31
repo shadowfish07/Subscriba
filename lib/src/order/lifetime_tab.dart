@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:subscriba/src/add_subscription/form_model.dart';
 import 'package:subscriba/src/component/money_input.dart';
+import 'package:subscriba/src/settings/settings_model.dart';
 import 'package:subscriba/src/util/currency.dart';
 
 class LifetimeTab extends StatelessWidget {
@@ -13,6 +14,7 @@ class LifetimeTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final formModel = Provider.of<FormModel>(context);
+    final settingsModel = Provider.of<SettingsModel>(context);
     final startDateController =
         TextEditingController(text: formModel.startTimeDate);
     final paymentPerPeriodController = TextEditingController(
@@ -55,7 +57,8 @@ class LifetimeTab extends StatelessWidget {
         ),
         Observer(builder: (context) {
           return MoneyInput(
-            currency: formModel.paymentPerPeriod?.currency ?? Currency.CNY,
+            currency: formModel.paymentPerPeriod?.currency ??
+                settingsModel.defaultCurrency,
             moneyController: paymentPerPeriodController,
             onChanged: (value) {
               if (value == null) return;

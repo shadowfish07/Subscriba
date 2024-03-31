@@ -108,7 +108,7 @@ abstract class _FormModel with Store {
   void setPaymentType(PaymentType paymentType) {
     this.paymentType = paymentType;
     if (order == null || paymentType != order!.paymentType) {
-      paymentPerPeriod = CurrencyAmount.NaN(Currency.CNY);
+      paymentPerPeriod = CurrencyAmount.NaN();
       startTimeDate = DateFormat.yMd().format(DateTime.now());
       endTimeDate = null;
     } else {

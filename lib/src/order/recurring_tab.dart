@@ -10,11 +10,10 @@ import 'package:subscriba/src/add_subscription/form_model.dart';
 import 'package:subscriba/src/component/money_input.dart';
 import 'package:subscriba/src/component/section.dart';
 import 'package:subscriba/src/database/order.dart';
+import 'package:subscriba/src/settings/settings_model.dart';
 import 'package:subscriba/src/subscription_detail/per_period_cost_cards_row.dart';
-import 'package:subscriba/src/util/currency.dart';
 import 'package:subscriba/src/util/currency_amount.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
-import 'package:subscriba/src/util/payment_frequency_helper.dart';
 
 // TODO 这个信息再想想交互怎么做，可能考虑放在弹窗里展示
 const onetimeCalculationHint = '''
@@ -30,6 +29,7 @@ class RecurringTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingsModel = Provider.of<SettingsModel>(context);
     final formModel = Provider.of<FormModel>(context);
     final startDateController =
         TextEditingController(text: formModel.startTimeDate);
@@ -41,7 +41,8 @@ class RecurringTab extends StatelessWidget {
     paymentPerPeriodController.addListener(() {
       formModel.paymentPerPeriod = CurrencyAmount.fromString(
           paymentPerPeriodController.text,
-          formModel.paymentPerPeriod?.currency ?? Currency.CNY);
+          formModel.paymentPerPeriod?.currency ??
+              settingsModel.defaultCurrency);
     });
 
     return Column(
@@ -124,8 +125,8 @@ class RecurringTab extends StatelessWidget {
               children: [
                 Observer(builder: (context) {
                   return MoneyInput(
-                    currency:
-                        formModel.paymentPerPeriod?.currency ?? Currency.CNY,
+                    currency: formModel.paymentPerPeriod?.currency ??
+                        settingsModel.defaultCurrency,
                     moneyController: paymentPerPeriodController,
                     onChanged: (value) {
                       if (value == null) return;
