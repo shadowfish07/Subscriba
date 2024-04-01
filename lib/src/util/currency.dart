@@ -14,16 +14,31 @@ class UnsupportedCurrencyException implements Exception {
 const currencySymbolMap = {
   Currency.CNY: "¥",
   Currency.USD: "\$",
+  Currency.EUR: "€",
+  Currency.INR: "₹",
+  Currency.JPY: "¥",
+  Currency.TRY: "₺",
+  Currency.ARS: "\$",
 };
 
 const currencyNameMap = {
-  Currency.CNY: "Chinese Yuan Renminbi",
+  Currency.CNY: "Chinese Yuan",
   Currency.USD: "US Dollar",
+  Currency.EUR: "Euro",
+  Currency.INR: "Indian Rupee",
+  Currency.JPY: "Japanese Yen",
+  Currency.TRY: "Turkish Lira",
+  Currency.ARS: "Argentine Peso",
 };
 
 enum Currency {
   CNY(ISOCode: "CNY"),
-  USD(ISOCode: "USD");
+  USD(ISOCode: "USD"),
+  EUR(ISOCode: "EUR"),
+  INR(ISOCode: "INR"),
+  JPY(ISOCode: "JPY"),
+  TRY(ISOCode: "TRY"),
+  ARS(ISOCode: "ARS");
 
   const Currency({
     required this.ISOCode,
