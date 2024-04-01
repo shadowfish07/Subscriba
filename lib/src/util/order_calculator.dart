@@ -56,7 +56,7 @@ class OrderCalculator {
     if (!isIncludeOneTimeOrder) return CurrencyAmount.zero(targetCurrency);
 
     debugPrint(
-        "dailyCost ${paymentFrequency} oneTimeOrdersCost ${CurrencyAmount.zero(targetCurrency)}");
+        "dailyCost $paymentFrequency oneTimeOrdersCost ${CurrencyAmount.zero(targetCurrency)}");
 
     final oneTimeOrders = availableOrders.where(
         (element) => element.paymentFrequency == PaymentFrequency.oneTime);
@@ -87,7 +87,7 @@ class OrderCalculator {
   CurrencyAmount perCostByProtocol(PaymentFrequency paymentFrequency) {
     if (availableOrders.isEmpty) return CurrencyAmount.zero(targetCurrency);
     if (isIncludeLifetimeOrder) return CurrencyAmount.NaN(targetCurrency);
-    debugPrint("dailyCost ${paymentFrequency} targetCurrency $targetCurrency");
+    debugPrint("dailyCost $paymentFrequency targetCurrency $targetCurrency");
     final ordersWithoutOneTime = availableOrders.where(
         (element) => element.paymentFrequency != PaymentFrequency.oneTime);
     final costWithoutOneTimeOrders = ordersWithoutOneTime.map((e) {
