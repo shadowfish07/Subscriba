@@ -2,9 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -192,7 +190,6 @@ class _Settings extends StatelessWidget {
 
 class _DefaultCurrency extends StatelessWidget {
   const _DefaultCurrency({
-    super.key,
     required this.settingsModel,
   });
 
@@ -228,9 +225,7 @@ class _DefaultCurrency extends StatelessWidget {
 }
 
 class _UpdateExchangeRates extends StatefulWidget {
-  const _UpdateExchangeRates({
-    super.key,
-  });
+  const _UpdateExchangeRates();
 
   @override
   State<_UpdateExchangeRates> createState() => _UpdateExchangeRatesState();
@@ -509,9 +504,7 @@ class _CheckForUpdateState extends State<_CheckForUpdate> {
 }
 
 class _LoadingIndicator extends StatelessWidget {
-  const _LoadingIndicator({
-    super.key,
-  });
+  const _LoadingIndicator();
 
   @override
   Widget build(BuildContext context) {

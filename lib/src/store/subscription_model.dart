@@ -1,8 +1,6 @@
 import 'package:mobx/mobx.dart';
-import 'package:provider/provider.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/database/subscription.dart';
-import 'package:subscriba/src/settings/settings_model.dart';
 import 'package:subscriba/src/util/currency.dart';
 import 'package:subscriba/src/util/duration.dart';
 import 'package:subscriba/src/util/order_calculator.dart';

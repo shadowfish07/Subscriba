@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:subscriba/src/component/money_text.dart';
 import 'package:subscriba/src/component/money_text_with_original_currency.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/order/order_edit.dart';

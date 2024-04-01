@@ -118,7 +118,7 @@ class RecurringTab extends StatelessWidget {
                         settingsModel.defaultCurrency,
                     moneyController: paymentPerPeriodController,
                     onChanged: (value) {
-                      debugPrint("value ${value}");
+                      debugPrint("value $value");
                       if (value == null) return;
                       formModel.paymentPerPeriod = value;
                     },
