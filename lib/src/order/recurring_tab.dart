@@ -34,13 +34,6 @@ class RecurringTab extends StatelessWidget {
     final paymentPerPeriodController = TextEditingController(
         text: formModel.paymentPerPeriod?.amount.toString());
 
-    paymentPerPeriodController.addListener(() {
-      formModel.paymentPerPeriod = CurrencyAmount.fromString(
-          paymentPerPeriodController.text,
-          formModel.paymentPerPeriod?.currency ??
-              settingsModel.defaultCurrency);
-    });
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -125,6 +118,7 @@ class RecurringTab extends StatelessWidget {
                         settingsModel.defaultCurrency,
                     moneyController: paymentPerPeriodController,
                     onChanged: (value) {
+                      debugPrint("value ${value}");
                       if (value == null) return;
                       formModel.paymentPerPeriod = value;
                     },
@@ -143,9 +137,12 @@ class RecurringTab extends StatelessWidget {
                       paymentType: PaymentType.recurring,
                       startDate: formModel.startTimeTimestamp ?? 0,
                       endDate: formModel.endTimeTimestamp,
-                      paymentPerPeriod:
-                          formModel.paymentPerPeriod ?? CurrencyAmount.zero(),
+                      paymentPerPeriod: formModel.paymentPerPeriod ??
+                          CurrencyAmount.zero(settingsModel.defaultCurrency),
                       paymentFrequency: formModel.paymentFrequency);
+
+                  debugPrint(
+                      "formModel.paymentPerPeriod ${formModel.paymentPerPeriod}");
 
                   final orderCalculator = OrderCalculator(
                       orders: [tempOrder],
@@ -163,13 +160,11 @@ class RecurringTab extends StatelessWidget {
                       : orderCalculator
                           .perCostByProtocol(PaymentFrequency.yearly);
 
-                  debugPrint(
-                      "dailyCost: ${formModel.paymentPerPeriod} ${settingsModel.defaultCurrency} ${dailyCost}");
                   return PerPeriodCostCardsRow(
                     dailyCost: dailyCost,
                     monthlyCost: monthlyCost,
                     annuallyCost: annuallyCost,
-                    originalCurrency: formModel.paymentPerPeriod!.currency,
+                    originalCurrency: formModel.paymentPerPeriod?.currency,
                   );
                 }),
                 const SizedBox(

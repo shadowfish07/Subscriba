@@ -1,5 +1,6 @@
 import 'package:mobx/mobx.dart';
 import 'package:subscriba/src/database/subscription.dart';
+import 'package:subscriba/src/settings/settings_model.dart';
 import 'package:subscriba/src/store/subscription_model.dart';
 
 part 'subscriptions_model.g.dart';
@@ -8,9 +9,11 @@ part 'subscriptions_model.g.dart';
 class SubscriptionsModel = _SubscriptionsModel with _$SubscriptionsModel;
 
 abstract class _SubscriptionsModel with Store {
-  _SubscriptionsModel() {
+  _SubscriptionsModel(this._settingsModel) {
     loadSubscriptions();
   }
+
+  final SettingsModel _settingsModel;
 
   @observable
   ObservableList<SubscriptionModel> subscriptions =
@@ -27,7 +30,7 @@ abstract class _SubscriptionsModel with Store {
   loadSubscriptions() async {
     subscriptions = ObservableList.of(
         ((await SubscriptionProvider().getSubscriptions())
-            .map((e) => SubscriptionModel(e))));
+            .map((e) => SubscriptionModel(e, _settingsModel.defaultCurrency))));
     for (var element in subscriptions) {
       subscriptionsMap[element.instance.id] = element;
     }

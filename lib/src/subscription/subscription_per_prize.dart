@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:subscriba/src/component/money_text.dart';
 import 'package:subscriba/src/database/order.dart';
+import 'package:subscriba/src/settings/settings_model.dart';
 import 'package:subscriba/src/store/subscription_model.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
 
@@ -21,8 +23,11 @@ class SubscriptionPerPrize extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final orderCalculator =
-        OrderCalculator(orders: subscription.instance.orders);
+    final settingsModel = Provider.of<SettingsModel>(context);
+
+    final orderCalculator = OrderCalculator(
+        orders: subscription.instance.orders,
+        targetCurrency: settingsModel.defaultCurrency);
     final perMainPaymentCyclePrize = orderCalculator.isIncludeLifetimeOrder
         ? orderCalculator.lifetimeCost
         : orderCalculator.perCostByProtocol(mainPaymentFrequency);

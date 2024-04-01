@@ -31,7 +31,7 @@ class CurrencyAmount {
       return CurrencyAmount(
           currency: currency ?? defaultCurrency, amount: double.parse(amount));
     } catch (e) {
-      return CurrencyAmount.NaN();
+      return CurrencyAmount.NaN(currency);
     }
   }
 
