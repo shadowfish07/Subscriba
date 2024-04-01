@@ -6,6 +6,7 @@ class MoneyText extends StatelessWidget {
     super.key,
     required this.money,
     this.style,
+    this.prefix = "",
     this.suffix = "",
     this.showLineThrough = false,
   });
@@ -13,13 +14,14 @@ class MoneyText extends StatelessWidget {
   final CurrencyAmount money;
   final TextStyle? style;
   final String suffix;
+  final String prefix;
   final bool showLineThrough;
 
   @override
   Widget build(BuildContext context) {
     final usingStyle = style ?? Theme.of(context).textTheme.titleMedium!;
     return Text(
-      "${money.currency.symbol}${money.isNaN ? '-' : money.amount.toStringAsFixed(2)}$suffix",
+      "$prefix${money.currency.symbol}${money.isNaN ? '-' : money.amount.toStringAsFixed(2)}$suffix",
       style: usingStyle.copyWith(
           fontFamily: "Alibaba",
           decoration: showLineThrough ? TextDecoration.lineThrough : null),

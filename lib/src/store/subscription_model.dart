@@ -1,6 +1,9 @@
 import 'package:mobx/mobx.dart';
+import 'package:provider/provider.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/database/subscription.dart';
+import 'package:subscriba/src/settings/settings_model.dart';
+import 'package:subscriba/src/util/currency.dart';
 import 'package:subscriba/src/util/duration.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
 
@@ -13,7 +16,9 @@ abstract class _SubscriptionModel with Store {
   @observable
   Subscription instance;
 
-  _SubscriptionModel(this.instance);
+  Currency defaultCurrency;
+
+  _SubscriptionModel(this.instance, this.defaultCurrency);
 
   @action
   Future<void> reload() async {
@@ -37,7 +42,8 @@ abstract class _SubscriptionModel with Store {
   @action
   Future<bool> tryRenew() async {
     if (instance.orders.isEmpty) return false;
-    var orderCalculator = OrderCalculator(orders: instance.orders);
+    var orderCalculator = OrderCalculator(
+        orders: instance.orders, targetCurrency: defaultCurrency);
     final expiresIn = orderCalculator.expiresIn;
     if (!instance.isRenew ||
         expiresIn == null ||
@@ -72,7 +78,8 @@ abstract class _SubscriptionModel with Store {
         ),
       );
       await reload();
-      orderCalculator = OrderCalculator(orders: instance.orders);
+      orderCalculator = OrderCalculator(
+          orders: instance.orders, targetCurrency: defaultCurrency);
     }
     return true;
   }

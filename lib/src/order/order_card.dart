@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:provider/provider.dart';
 import 'package:subscriba/src/component/money_text.dart';
+import 'package:subscriba/src/component/money_text_with_original_currency.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/order/order_edit.dart';
+import 'package:subscriba/src/settings/settings_model.dart';
 import 'package:subscriba/src/util/date_format_helper.dart';
 import 'package:subscriba/src/util/duration.dart';
 
@@ -16,6 +19,7 @@ class OrderCard extends StatelessWidget {
   final Function? onEdit;
   @override
   Widget build(BuildContext context) {
+    final settingsModel = Provider.of<SettingsModel>(context);
     return Observer(
       builder: (_) {
         const paymentFrequency2Description = {
@@ -140,9 +144,11 @@ class OrderCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        MoneyText(
-                          money: order.paymentPerPeriod,
+                        MoneyTextWithOriginalCurrency.row(
+                          money: order.paymentPerPeriod
+                              .toCurrency(settingsModel.defaultCurrency),
                           style: Theme.of(context).textTheme.titleMedium,
+                          originalCurrency: order.paymentPerPeriod.currency,
                         ),
                         Text(
                           order.paymentType == PaymentType.lifetime

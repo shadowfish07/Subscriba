@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:subscriba/src/component/money_text.dart';
+import 'package:subscriba/src/component/money_text_with_original_currency.dart';
 import 'package:subscriba/src/component/section.dart';
 import 'package:subscriba/src/database/order.dart';
 import 'package:subscriba/src/database/subscription.dart';
@@ -23,13 +24,10 @@ import 'package:subscriba/src/util/payment_frequency_helper.dart';
 class SubscriptionDetailView extends StatelessWidget {
   static const routeName = '/subscription/detail';
 
-  late final Future<SubscriptionModel> subscription;
+  late final Future<Subscription?> subscription;
 
-  Future<SubscriptionModel> _getSubscription(int subscriptionId) async {
-    final data = await SubscriptionProvider().getSubscription(subscriptionId);
-    debugPrint("data: $data ${data!.orders[0].paymentPerPeriod.currency}");
-    // TODO: 找不到的兜底UI
-    return SubscriptionModel(data!);
+  Future<Subscription?> _getSubscription(int subscriptionId) async {
+    return SubscriptionProvider().getSubscription(subscriptionId);
   }
 
   SubscriptionDetailView({super.key, required int subscriptionId}) {
@@ -38,11 +36,15 @@ class SubscriptionDetailView extends StatelessWidget {
 
   @override
   Widget build(context) {
-    return FutureBuilder<SubscriptionModel>(
+    return FutureBuilder<Subscription?>(
         future: subscription,
         builder: (context, snapshot) {
+          // TODO: 找不到的兜底UI
+          final settingsModel = Provider.of<SettingsModel>(context);
+
           if (snapshot.hasData) {
-            final subscription = snapshot.data!;
+            final subscription = SubscriptionModel(
+                snapshot.data!, settingsModel.defaultCurrency);
             subscription.tryRenew().then((hasRenewed) {
               if (hasRenewed) {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -136,8 +138,9 @@ class _SubscriptionDetailBody extends StatelessWidget {
               children: [
                 _SubscriptionDetailHeader(subscription: subscription),
                 Observer(builder: (context) {
-                  final orderCalculator =
-                      OrderCalculator(orders: subscription.instance.orders);
+                  final orderCalculator = OrderCalculator(
+                      orders: subscription.instance.orders,
+                      targetCurrency: settingsModel.defaultCurrency);
                   return orderCalculator.availableOrders.isEmpty
                       ? _CreateFirstOrderCard(subscription: subscription)
                       : _SubscriptionTimeInfoCard(subscription: subscription);
@@ -147,8 +150,8 @@ class _SubscriptionDetailBody extends StatelessWidget {
             // const SizedBox(height: 54),
             Observer(builder: (context) {
               final orderCalculator = OrderCalculator(
-                orders: subscription.instance.orders,
-              );
+                  orders: subscription.instance.orders,
+                  targetCurrency: settingsModel.defaultCurrency);
 
               CurrencyAmount calculateCost(PaymentFrequency cycleType) {
                 return orderCalculator.isIncludeLifetimeOrder
@@ -189,8 +192,9 @@ class _SubscriptionDetailBody extends StatelessWidget {
               ),
             ),
             Observer(builder: (context) {
-              final orderCalculator =
-                  OrderCalculator(orders: subscription.instance.orders);
+              final orderCalculator = OrderCalculator(
+                  orders: subscription.instance.orders,
+                  targetCurrency: settingsModel.defaultCurrency);
               return orderCalculator.availableOrders.isEmpty
                   ? Container()
                   : _RecurringCardsRow(subscription: subscription);
@@ -213,10 +217,13 @@ class _OrdersSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingsModel = Provider.of<SettingsModel>(context);
+
     return Observer(
       builder: (_) {
-        final orderCalculator =
-            OrderCalculator(orders: subscription.instance.orders);
+        final orderCalculator = OrderCalculator(
+            orders: subscription.instance.orders,
+            targetCurrency: settingsModel.defaultCurrency);
 
         return Section(
             title: "Orders",
@@ -264,13 +271,17 @@ class _RecurringCardsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingsModel = Provider.of<SettingsModel>(context);
     return Observer(
       builder: (_) {
-        final isLifetime = OrderCalculator(orders: subscription.instance.orders)
+        final isLifetime = OrderCalculator(
+                orders: subscription.instance.orders,
+                targetCurrency: settingsModel.defaultCurrency)
             .isIncludeLifetimeOrder;
-        final isLastOrderOneTime =
-            OrderCalculator(orders: subscription.instance.orders)
-                .isLastOrderOneTime;
+        final isLastOrderOneTime = OrderCalculator(
+                orders: subscription.instance.orders,
+                targetCurrency: settingsModel.defaultCurrency)
+            .isLastOrderOneTime;
 
         if (isLifetime || isLastOrderOneTime) {
           return const SizedBox.shrink();
@@ -298,14 +309,19 @@ class _NextPaymentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingsModel = Provider.of<SettingsModel>(context);
+
     return Observer(
       builder: (_) {
-        final orderCalculator =
-            OrderCalculator(orders: subscription.instance.orders);
+        final orderCalculator = OrderCalculator(
+            orders: subscription.instance.orders,
+            targetCurrency: settingsModel.defaultCurrency);
         final isRenew = subscription.instance.isRenew;
         // TODO 永久订阅时的展示
         // ignore: unused_local_variable
-        final isLifetime = OrderCalculator(orders: subscription.instance.orders)
+        final isLifetime = OrderCalculator(
+                orders: subscription.instance.orders,
+                targetCurrency: settingsModel.defaultCurrency)
             .isIncludeLifetimeOrder;
 
         return Expanded(
@@ -319,23 +335,32 @@ class _NextPaymentCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: isRenew
                         ? [
-                            MoneyText(
+                            MoneyTextWithOriginalCurrency(
                               money: orderCalculator
-                                  .nextPaymentTemplate!.paymentPerPeriod,
+                                  .nextPaymentTemplate!.paymentPerPeriod
+                                  .toCurrency(settingsModel.defaultCurrency),
                               style: Theme.of(context).textTheme.titleMedium,
+                              originalCurrency: orderCalculator
+                                  .nextPaymentTemplate!
+                                  .paymentPerPeriod
+                                  .currency,
                             ),
-                            Text(
-                                "/${PaymentFrequencyHelper.enum2PerUnitStr[orderCalculator.nextPaymentTemplate?.paymentFrequency]}",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall!
-                                    .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                    ))
+                            Transform.translate(
+                              offset: const Offset(0, -2),
+                              child: Text(
+                                  "/${PaymentFrequencyHelper.enum2PerUnitStr[orderCalculator.nextPaymentTemplate?.paymentFrequency]}",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall!
+                                      .copyWith(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
+                                      )),
+                            )
                           ]
                         : [
                             Text("-",
@@ -359,8 +384,11 @@ class _RenewCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Observer(
       builder: (_) {
+        final settingsModel = Provider.of<SettingsModel>(context);
         final isRenew = subscription.instance.isRenew;
-        final isLifetime = OrderCalculator(orders: subscription.instance.orders)
+        final isLifetime = OrderCalculator(
+                orders: subscription.instance.orders,
+                targetCurrency: settingsModel.defaultCurrency)
             .isIncludeLifetimeOrder;
 
         final onTap = isLifetime
@@ -400,6 +428,8 @@ class _TotallyCostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingsModel = Provider.of<SettingsModel>(context);
+
     return Expanded(
         flex: 2,
         child: DisplayCard(
@@ -411,9 +441,12 @@ class _TotallyCostCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               MoneyText(
-                  money: OrderCalculator(orders: subscription.instance.orders)
-                      .totalCost,
-                  style: Theme.of(context).textTheme.titleMedium),
+                money: OrderCalculator(
+                        orders: subscription.instance.orders,
+                        targetCurrency: settingsModel.defaultCurrency)
+                    .totalCost,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               // Text("Top 1", style: Theme.of(context).textTheme.labelMedium)
             ],
           ),
@@ -478,8 +511,10 @@ class _SubscriptionTimeInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Observer(
       builder: (_) {
-        final orderCalculator =
-            OrderCalculator(orders: subscription.instance.orders);
+        final settingsModel = Provider.of<SettingsModel>(context);
+        final orderCalculator = OrderCalculator(
+            orders: subscription.instance.orders,
+            targetCurrency: settingsModel.defaultCurrency);
         final lastContinuousSubscriptionDate =
             orderCalculator.lastContinuousSubscriptionDate;
         final latestSubscriptionDate = orderCalculator.latestSubscriptionDate;

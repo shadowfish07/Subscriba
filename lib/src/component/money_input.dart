@@ -26,13 +26,20 @@ class MoneyInput extends StatelessWidget {
           _CurrencyDropdownButton(
             currency: currency,
             onChanged: (currency) {
+              final newValue =
+                  CurrencyAmount.fromString(moneyController.text, currency);
               onChanged(
-                  CurrencyAmount.fromString(moneyController.text, currency));
+                  newValue.isNaN ? CurrencyAmount.zero(currency) : newValue);
             },
           ),
           Expanded(
             child: TextField(
               controller: moneyController,
+              onChanged: (value) {
+                final newValue = CurrencyAmount.fromString(value, currency);
+                onChanged(
+                    newValue.isNaN ? CurrencyAmount.zero(currency) : newValue);
+              },
               style: const TextStyle(fontFamily: "Alibaba"),
               keyboardType: TextInputType.number,
               inputFormatters: <TextInputFormatter>[

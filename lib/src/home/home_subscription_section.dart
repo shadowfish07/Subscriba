@@ -5,6 +5,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:subscriba/src/component/section.dart';
 import 'package:subscriba/src/database/order.dart';
+import 'package:subscriba/src/settings/settings_model.dart';
 import 'package:subscriba/src/store/subscriptions_model.dart';
 import 'package:subscriba/src/subscription/subscription_card.dart';
 import 'package:subscriba/src/util/order_calculator.dart';
@@ -17,11 +18,13 @@ class MostExpensiveSubscriptionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final subscriptionModel = Provider.of<SubscriptionsModel>(context);
+    final settingsModel = Provider.of<SettingsModel>(context);
 
     return Observer(builder: (context) {
       final filteredList = subscriptionModel.subscriptions.where((element) {
-        final orderCalculator =
-            OrderCalculator(orders: element.instance.orders);
+        final orderCalculator = OrderCalculator(
+            orders: element.instance.orders,
+            targetCurrency: settingsModel.defaultCurrency);
         return !orderCalculator.isIncludeLifetimeOrder &&
             !orderCalculator.isExpired;
       }).toList();
@@ -37,9 +40,13 @@ class MostExpensiveSubscriptionSection extends StatelessWidget {
           itemBuilder: (context, index) {
             final sortedSubscriptions = List.from(renderingSublist)
               ..sort(((a, b) {
-                return OrderCalculator(orders: b.instance.orders)
+                return OrderCalculator(
+                        orders: b.instance.orders,
+                        targetCurrency: settingsModel.defaultCurrency)
                     .perCostByProtocol(PaymentFrequency.daily)
-                    .compareTo(OrderCalculator(orders: a.instance.orders)
+                    .compareTo(OrderCalculator(
+                            orders: a.instance.orders,
+                            targetCurrency: settingsModel.defaultCurrency)
                         .perCostByProtocol(PaymentFrequency.daily));
               }));
             return SubscriptionCard(

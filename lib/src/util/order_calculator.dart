@@ -23,10 +23,10 @@ CurrencyAmount getDailyCostPerPeriod(
 }
 
 class OrderCalculator {
-  const OrderCalculator({required this.orders, this.targetCurrency});
+  const OrderCalculator({required this.orders, required this.targetCurrency});
 
   final List<Order> orders;
-  final Currency? targetCurrency;
+  final Currency targetCurrency;
 
   List<Order> get availableOrders {
     final result =

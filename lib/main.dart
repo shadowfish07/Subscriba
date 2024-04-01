@@ -10,8 +10,10 @@ void main() async {
 
   ExchangeRate.loadExchangeRate();
 
+  final settingsModel = SettingsModel();
+
   runApp(MyApp(
-    subscriptionsModel: SubscriptionsModel(),
-    settingsModel: SettingsModel(),
+    subscriptionsModel: SubscriptionsModel(settingsModel),
+    settingsModel: settingsModel,
   ));
 }

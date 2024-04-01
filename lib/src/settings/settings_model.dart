@@ -32,6 +32,7 @@ abstract class _SettingsModel with Store {
   @action
   Future<void> updateDefaultCurrency(Currency currency) async {
     _defaultCurrency = currency;
+    CurrencyAmount.defaultCurrency = _defaultCurrency;
     final sharedPreferences = await this.sharedPreferences;
     await sharedPreferences.setString(
         "defaultCurrency", _defaultCurrency.ISOCode);
